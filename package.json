@@ -1,7 +1,12 @@
 {
-  "name": "pr0game-teamview",
+  "name": "0game-teamview",
   "version": "0.1.0",
   "description": "backend service for sharing player & planet infos within teams",
+  "keywords": [
+    "ogame",
+    "online game",
+    "2moons"
+  ],
   "main": "index.js",
   "scripts": {
     "lint": "npx standard",
