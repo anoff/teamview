@@ -1,0 +1,24 @@
+{
+  "name": "pr0game-teamview",
+  "version": "0.1.0",
+  "description": "backend service for sharing player & planet infos within teams",
+  "main": "index.js",
+  "scripts": {
+    "lint": "npx standard",
+    "dev": "npx nodemon index.js",
+    "test": "npm run lint"
+  },
+  "author": "Andreas Offenhaeuser <https://anoff.io>",
+  "license": "MIT",
+  "dependencies": {
+    "dotenv": "^16.0.0",
+    "express": "^4.18.1",
+    "knex": "^2.0.0",
+    "pg": "^8.7.3",
+    "sqlite3": "^5.0.8"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.16",
+    "standard": "^17.0.0"
+  }
+}
