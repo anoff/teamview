@@ -6,11 +6,12 @@
 |---------|------------|------------|-------|---------|
 | create API token (=new user) | none | H:password, username/comment | POST /`v1/tokens` | token |
 | delete API token | password | H:password | DELETE `/v1/tokens/<token>`| success |
-| create a team | password | H:password, teamName | POST /v1/teams | team ID, teamCode (required to join) |
+| create a team | token | token, teamName | POST /v1/teams | team ID, teamCode (required to join) |
 | retrieve a teams passcode | none (you must be part of the team) | none | GET `/v1/teams/<teamID>/passcode` | passcode
-| join a team | password | H:password, H:teamCode | POST `/v1/tokens/<token>/teams/<teamID>` | success |
-| leave a team | password | H:password | DELETE `/v1/tokens/<token>/teams/<teamID>` | success |
-| add galaxy data | none | array of planet info | POST `/v1/tokens/<token>/planets`
+| join a team | password | H:password, H:teamCode, token | POST `/v1/teams/<teamID>/members` | success |
+| leave a team | password | H:password, token | DELETE `/v1/teams/<teamID>/members` | success |
+| add planet data | none | array of planet info, token | POST `/v1/planets`
+| add player data | none | array of player info, token | POST `/v1/players`
 
 Limitations:
 1. deleting an API token or leaving a team does not remove the data that has been already sent
@@ -49,17 +50,19 @@ classDiagram
     galaxy: int
     system: int
     position: int
+    resources: json
+    buildings: json
+    fleet: json
+    defense: json
     playerId: int (players.id)
   }
   class players {
     id: int
     name: string
     alliance: string
+    research: json
     rank: int
-    points: int
-    pointsDefense: int
-    pointsBuildings: int
-    pointsFleet: int
+    points: json
   }
 ```
 
