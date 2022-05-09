@@ -62,3 +62,12 @@ classDiagram
     pointsFleet: int
   }
 ```
+
+## Ideas
+
+### Prevent API spam by implementing rate limit
+
+Especially for POST/DELETE operations
+
+- either via proxy https://faun.pub/prevent-ddos-attacks-with-traefik-2-44fb32eeac4f
+- or in app https://www.npmjs.com/package/express-slow-down
