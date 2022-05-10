@@ -1,5 +1,10 @@
 # 0game Teamview
 
+## Other Scripts
+
+- `setupDb.js`: run once to initialize local postgresdb, credentials provided via `.env`
+- `importStats.js`: loads the /stats.json file from the server and dumps it into the players table (does not update, creates new entry each time)
+
 ## Required use cases
 
 | usecase | auth level | payload (H:eader) | route | returns |
