@@ -17,7 +17,11 @@ const tamperMonkeyHeader = {
   include: '/https:\\/\\/(www.|)pr0game\\.com\\/game\\.php.*/',
   grant: [
     'GM_setValue',
-    'GM_getValue'
+    'GM_getValue',
+    'GM_xmlhttpRequest'
+  ],
+  connect: [
+    'localhost'
   ]
 }
 // stop here
