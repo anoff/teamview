@@ -16,6 +16,7 @@
   "author": "Andreas Offenhaeuser <https://anoff.io>",
   "license": "MIT",
   "dependencies": {
+    "ajv": "^8.11.0",
     "dotenv": "^16.0.0",
     "express": "^4.18.1",
     "express-validator": "^6.14.0",

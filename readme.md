@@ -8,7 +8,7 @@
 | delete API token | password | H:password | DELETE `/v1/tokens/<token>`| success |
 | create a team | token | token, teamName | POST /v1/teams | team ID, teamCode (required to join) |
 | retrieve a teams passcode | none (you must be part of the team) | none | GET `/v1/teams/<teamID>/passcode` | passcode
-| join a team | password | H:password, H:teamCode, token | POST `/v1/teams/<teamID>/members` | success |
+| join a team | password | H:password, H:teamCode, token | POST `/v1/teams/join` | success |
 | leave a team | password | H:password, token | DELETE `/v1/teams/<teamID>/members` | success |
 | add planet data | none | array of planet info, token | POST `/v1/planets`
 | add player data | none | array of player info, token | POST `/v1/players`
@@ -27,6 +27,7 @@ classDiagram
   teamMembers --> tokens
   planets --> players
   planets --> teams
+  research --> players
   class tokens {
     id: int
     name: string
@@ -40,12 +41,11 @@ classDiagram
   }
   class teamMembers {
     id: int
-    token: int (tokens.id)
-    team: int (teams.id)
+    tokenId: int (tokens.id)
+    teamId: int (teams.id)
   }
   class planets {
     id: int
-    teamId: int (teams.id)
     universe: int
     galaxy: int
     system: int
@@ -54,15 +54,31 @@ classDiagram
     buildings: json
     fleet: json
     defense: json
+    gamePlanetId: int
     playerId: int (players.id)
+    access: int (teams.id)
   }
   class players {
     id: int
     name: string
     alliance: string
-    research: json
     rank: int
-    points: json
+    pointsResearch: int
+    pointsDefense: int
+    pointsFleet: int
+    unitsDestroyed: int
+    unitsLost: int
+    battlesLost: int
+    battlesWon: int
+    battlesDraw: int
+    research: json
+    access: int (teams.id)
+  }
+  class research {
+    id: int
+    stuff...
+    playerId: int (players.id)
+    access: int (teams.id)
   }
 ```
 

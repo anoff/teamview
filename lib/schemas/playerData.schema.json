@@ -1,0 +1,100 @@
+{
+  "$id": "0game-teamview/playerData.json",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "id": {
+      "type": "integer"
+    },
+    "alliance": {
+      "type": "string"
+    },
+    "rank": {
+      "type": "integer"
+    },
+    "points": {
+      "type": "object",
+      "properties": {
+        "total": {
+          "type": "integer"
+        },
+        "fleet": {
+          "type": "integer"
+        },
+        "defense": {
+          "type": "integer"
+        },
+        "research": {
+          "type": "integer"
+        }
+      }
+    },
+    "research": {
+      "type": "object",
+      "properties": {
+        "spyTech": {
+          "type": "integer"
+        },
+        "computerTech": {
+          "type": "integer"
+        },
+        "weaponsTech": {
+          "type": "integer"
+        },
+        "shieldTech": {
+          "type": "integer"
+        },
+        "armourTech": {
+          "type": "integer"
+        },
+        "energyTech": {
+          "type": "integer"
+        },
+        "hyperspaceTech": {
+          "type": "integer"
+        },
+        "combustionEngine": {
+          "type": "integer"
+        },
+        "impulseEngine": {
+          "type": "integer"
+        },
+        "hyperspaceEngine": {
+          "type": "integer"
+        },
+        "laserTech": {
+          "type": "integer"
+        },
+        "ionTech": {
+          "type": "integer"
+        },
+        "plasmaTech": {
+          "type": "integer"
+        },
+        "expeditionResearch": {
+          "type": "integer"
+        },
+        "intergalacticResearchNetwork": {
+          "type": "integer"
+        },
+        "gravitonResearch": {
+          "type": "integer"
+        },
+        "mineralResearch": {
+          "type": "integer"
+        },
+        "semiCrystalsResearch": {
+          "type": "integer"
+        },
+        "fuelResearch": {
+          "type": "integer"
+        }
+      }
+    }
+  },
+  "required": [
+    "name"
+  ]
+}

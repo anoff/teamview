@@ -24,9 +24,8 @@ async function initDb () {
         .createTable('tokens', table => {
           table.increments('id')
           table.string('name')
-          table.string('value')
+          table.string('value').unique().index()
           table.string('password')
-          table.unique('value')
           table.timestamps(false, true, true)
         })
     }
@@ -39,10 +38,8 @@ async function initDb () {
       await knex.schema
         .createTable('teams', table => {
           table.increments('id')
-          table.string('name')
-          table.string('code')
-          table.unique('name')
-          table.unique('code')
+          table.string('name').unique()
+          table.string('code').unique().index()
           table.timestamps(false, true, true)
         })
     }
@@ -54,7 +51,7 @@ async function initDb () {
       await knex.schema
         .createTable('players', table => {
           table.increments('id')
-          table.string('name')
+          table.string('name').index()
           table.string('alliance')
           table.integer('rank').unsigned()
           table.json('points')
@@ -71,16 +68,28 @@ async function initDb () {
       await knex.schema
         .createTable('planets', table => {
           table.increments('id')
-          table.integer('galaxy').unsigned()
-          table.integer('system').unsigned()
-          table.integer('position').unsigned()
+          table.integer('galaxy').unsigned().index()
+          table.integer('system').unsigned().index()
+          table.integer('position').unsigned().index()
           table.json('resources')
           table.json('buildings')
           table.json('fleet')
           table.json('defense')
-          table.string('code')
           table.integer('teamId').unsigned().references('teams.id')
           table.integer('playerId').unsigned().references('players.id')
+          table.timestamps(false, true, true)
+        })
+    }
+    await knex.schema.dropTableIfExists('teamMembers')
+    tableExists = await knex.schema.hasTable('teamMembers')
+    if (!tableExists) {
+      console.log('recreate teamMembers')
+      // Create a table
+      await knex.schema
+        .createTable('teamMembers', table => {
+          table.increments('id')
+          table.integer('tokenId').unsigned().references('tokens.id')
+          table.integer('teamId').unsigned().references('teams.id')
           table.timestamps(false, true, true)
         })
     }
