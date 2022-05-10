@@ -1,0 +1,14 @@
+{
+  "name": "0game-teamview-userscript",
+  "private": true,
+  "devDependencies": {
+    "http-server": "^14.1.0",
+    "webpack": "^5.72.0",
+    "webpack-cli": "^4.9.2",
+    "webpack-userscript": "^2.5.8"
+  },
+  "scripts": {
+    "dev": "npx webpack build --watch --node-env development & npx http-server ../dist --port 8080",
+    "build": "npx webpack build"
+  }
+}
