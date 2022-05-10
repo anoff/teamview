@@ -81,13 +81,15 @@ function modifyPlayerText (playerData) {
   const ROWS_COUNT = 15
   const COLUMN_PLAYER = 5
   const rowsWithPlanets = Array.from(document.querySelector('content table.table569').querySelectorAll('tr')).slice(ROWS_HEADER, ROWS_HEADER + ROWS_COUNT)
-  for (const [i, row] of rowsWithPlanets.entries()) {
+  for (const row of rowsWithPlanets) {
     const cells = row.querySelectorAll('td')
     const playerName = cleanName(cells[COLUMN_PLAYER].innerText)
     if (playerName) {
-      console.log(playerData)
       const data = playerData.find(e => e.name === playerName)
-      cells[COLUMN_PLAYER].innerText += ` (${data.rank})`
+      const s = document.createElement('span')
+      s.innerHTML = ` (${data.rank})`
+      s.style = 'font-size: 80%; color: yellow;'
+      cells[COLUMN_PLAYER].querySelector('a').appendChild(s)
     }
   }
 }
