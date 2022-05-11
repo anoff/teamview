@@ -59,6 +59,7 @@ async function initDb () {
           table.integer('pointsResearch').unsigned()
           table.integer('pointsDefense').unsigned()
           table.integer('pointsFleet').unsigned()
+          table.integer('pointsBuilding').unsigned()
           table.integer('points').unsigned()
           table.integer('unitsDestroyed').unsigned()
           table.integer('unitsLost').unsigned()

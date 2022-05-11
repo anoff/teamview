@@ -20,6 +20,7 @@ async function main () {
       pointsResearch: parseInt(s.researchScore),
       pointsDefense: parseInt(s.defensiveScore),
       pointsFleet: parseInt(s.fleetScore),
+      pointsBuilding: parseInt(s.buildingScore),
       points: parseInt(s.score),
       unitsDestroyed: parseInt(s.unitsDestroyed),
       unitsLost: parseInt(s.unitsLost),
