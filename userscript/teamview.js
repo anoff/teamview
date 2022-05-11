@@ -26,19 +26,32 @@ function getVisibleSystem () {
   const ROWS_HEADER = 2
   const ROWS_COUNT = 15
   const COLUMN_PLAYER = 5
+  const COLUMN_PLANETNAME = 2
   const COLUMN_MOON = 3
   const COLUMN_DEBRIS = 4
-  const COLUMN_PLANETNAME = 2
   const rowsWithPlanets = Array.from(document.querySelector('content table.table569').querySelectorAll('tr')).slice(ROWS_HEADER, ROWS_HEADER + ROWS_COUNT)
   const entries = []
   for (const [i, row] of rowsWithPlanets.entries()) {
     const cells = Array.from(row.querySelectorAll('td'))
     const planetName = cleanName(cells[COLUMN_PLANETNAME].innerText)
     const playerName = cleanName(cells[COLUMN_PLAYER].innerText)
+    const hasMoon = cells[COLUMN_MOON].children.length > 0
+    let debrisCrystal = 0
+    let debrisMetal = 0
+    const debrisPopup = cells[COLUMN_DEBRIS].innerHTML
+    if (debrisPopup) {
+      const match = /Metal: <[a-zA-Z<>\\/]+([\d]+).*Crystal: <[a-zA-Z<>\\/]+([\d]+).*/g.exec(debrisPopup)
+      if (match) {
+        const [, debrisMetalStr, debrisCrystalStr] = match
+        debrisCrystal = parseInt(debrisCrystalStr)
+        debrisMetal = parseInt(debrisMetalStr)
+      }
+    }
     if (planetName && playerName) {
-      entries.push({ planetName, playerName, position: i })
+      entries.push({ planetName, playerName, position: i, hasMoon, debrisMetal, debrisCrystal })
     }
   }
+  console.log(entries)
   return entries
 }
 
@@ -58,7 +71,6 @@ function requestPlayerData (names) {
           // make sure result is always an array
           data = [data]
         }
-        console.log(data)
         resolve(data)
       } else {
         console.warn('Error occured while trying to fetch data from teamview server', res.status, res.statusText)
@@ -82,7 +94,6 @@ function addColumn (addCount = 1, titles = []) {
         for (let i = 0; i < addCount; i++) {
           const e = document.createElement('th')
           e.setAttribute('style', tr.children[COLUMN_STYLE_REF].getAttribute('style'))
-          console.log(tr.children[COLUMN_STYLE_REF].style)
           let title = `Extra ${i + 1}`
           if (titles.length === addCount) {
             title = titles[i]
@@ -110,47 +121,67 @@ function addColumn (addCount = 1, titles = []) {
   }
 }
 
-function modifyTable (playerData) {
-  function cleanName (name) {
-    return name.split('(')[0].trim()
-  }
+function modifyTable (data, modfiyFn) {
   // all indexes 0-based
   // const ROW_SYSTEM = 0
   const ROWS_HEADER = 2
   const ROWS_COUNT = 15
-  const COLUMN_PLAYER = 5
-  const COLUMN_STATS = 8
   const rowsWithPlanets = Array.from(document.querySelector('content table.table569').querySelectorAll('tr')).slice(ROWS_HEADER, ROWS_HEADER + ROWS_COUNT)
   for (const row of rowsWithPlanets) {
     const cells = row.querySelectorAll('td')
-    const playerName = cleanName(cells[COLUMN_PLAYER].innerText)
-    if (playerName) {
-      const ingameRankStr = cells[COLUMN_PLAYER].querySelector('a')
-        .getAttribute('data-tooltip-content')
-        .split('pos. ')[1].split('<')[0]
-      const ingameRank = parseInt(ingameRankStr)
-      const data = playerData.find(e => e.name === playerName)
-      const s = document.createElement('span')
-      s.innerHTML = ` ${ingameRank}`
-      s.style = 'font-size: 80%; color: yellow;'
-      cells[COLUMN_PLAYER].querySelector('a').appendChild(s)
-
-      const s2 = document.createElement('span')
-      s.innerText = `Fleet: ${data.pointsFleet}\nDefense: ${data.pointsDefense}`
-      cells[COLUMN_STATS].appendChild(s)
-    }
+    modfiyFn(data, cells)
   }
 }
 
+function modifyAddRankFromPopup (data, cells, rowIx) {
+  function cleanName (name) {
+    return name.split('(')[0].trim()
+  }
+  const COLUMN_PLAYER = 5
+  const playerName = cleanName(cells[COLUMN_PLAYER].innerText)
+  if (playerName) {
+    const ingameRankStr = cells[COLUMN_PLAYER].querySelector('a')
+      .getAttribute('data-tooltip-content')
+      .split('pos. ')[1].split('<')[0]
+    const ingameRank = parseInt(ingameRankStr)
+    const s = document.createElement('span')
+    s.innerHTML = ` (${ingameRank})`
+    s.style = 'font-size: 80%; color: yellow;'
+    cells[COLUMN_PLAYER].querySelector('a').appendChild(s)
+  }
+}
+
+function modifyAddPlayerStats (data, cells, rowIx) {
+  function cleanName (name) {
+    return name.split('(')[0].trim()
+  }
+  const COLUMN_STATS = 8
+  const COLUMN_PLAYER = 5
+  const playerName = cleanName(cells[COLUMN_PLAYER].innerText)
+  const isInactive = cells[COLUMN_PLAYER].innerText.includes('i)')
+  if (playerName) {
+    // only modify if this row contains a player
+    const d = data.find(e => e.name === playerName)
+    const s = document.createElement('span')
+    if (isInactive) {
+      s.innerText = `Buildings: ${d.pointsBuilding}\nDefense: ${d.pointsDefense}`
+    } else {
+      s.innerText = `Fleet: ${d.pointsFleet}\nDefense: ${d.pointsDefense}`
+    }
+    s.style = 'font-size: 85%;'
+    cells[COLUMN_STATS].appendChild(s)
+  }
+}
 addMenuButton()
 
 if (window.location.search.includes('page=galaxy')) {
   addColumn(2, ['Player Stats', 'Spio Info'])
+  modifyTable({}, modifyAddRankFromPopup)
   const data = getVisibleSystem()
   const players = data.map(e => e.playerName)
   const uniquePlayers = Array.from(new Set(players))
   requestPlayerData(uniquePlayers)
     .then(playerData => {
-      return modifyTable(playerData)
+      return modifyTable(playerData, modifyAddPlayerStats)
     })
 }

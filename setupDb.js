@@ -44,7 +44,7 @@ async function initDb () {
         })
     }
     await knex.schema.dropTableIfExists('planets')
-    await knex.schema.dropTableIfExists('players')
+    // await knex.schema.dropTableIfExists('players')
     tableExists = await knex.schema.hasTable('players')
     if (!tableExists) {
       console.log('recreate players')
@@ -77,6 +77,7 @@ async function initDb () {
       await knex.schema
         .createTable('planets', table => {
           table.increments('id')
+          table.string('name')
           table.integer('galaxy').unsigned().index()
           table.integer('system').unsigned().index()
           table.integer('position').unsigned().index()
@@ -84,6 +85,9 @@ async function initDb () {
           table.json('buildings')
           table.json('fleet')
           table.json('defense')
+          table.bool('hasMoon')
+          table.integer('debrisMetal').unsigned()
+          table.integer('debrisCrystal').unsigned()
           table.integer('teamId').unsigned().references('teams.id')
           table.integer('playerId').unsigned().references('players.id')
           table.timestamps(false, true, true)
