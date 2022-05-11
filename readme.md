@@ -71,6 +71,7 @@ classDiagram
     pointsResearch: int
     pointsDefense: int
     pointsFleet: int
+    pointsBuilding: int
     unitsDestroyed: int
     unitsLost: int
     battlesLost: int
