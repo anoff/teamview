@@ -35,7 +35,10 @@
   },
   "nodemonConfig": {
     "ignore": [
-      "userscript/"
+      "userscript/",
+      "dist/",
+      "package.json",
+      ".devcontainer/*"
     ],
     "exec": "node index.js | pino-pretty"
   }

@@ -1,3 +1,7 @@
+/**
+ * Parse planet information out of current visible system in the galaxy view table
+ * @returns Array[{ planetName, playerName, position, hasMoon, debrisMetal, debrisCrystal }]
+ */
 function getVisibleSystem () {
   function cleanName (name) {
     return name.split('(')[0].trim()
@@ -10,6 +14,8 @@ function getVisibleSystem () {
   const COLUMN_PLANETNAME = 2
   const COLUMN_MOON = 3
   const COLUMN_DEBRIS = 4
+  const systemCoords = Array.from(document.querySelector('content table.table569').querySelectorAll('tr'))[0].innerText
+  const [galaxy, system] = systemCoords.split(' ')[1].split(':').map(e => parseInt(e))
   const rowsWithPlanets = Array.from(document.querySelector('content table.table569').querySelectorAll('tr')).slice(ROWS_HEADER, ROWS_HEADER + ROWS_COUNT)
   const entries = []
   for (const [i, row] of rowsWithPlanets.entries()) {
@@ -29,10 +35,9 @@ function getVisibleSystem () {
       }
     }
     if (planetName && playerName) {
-      entries.push({ planetName, playerName, position: i, hasMoon, debrisMetal, debrisCrystal })
+      entries.push({ name: planetName, playerName, galaxy, system, position: i, hasMoon, debrisMetal, debrisCrystal })
     }
   }
-  console.log(entries)
   return entries
 }
 
@@ -106,6 +111,10 @@ function modifyAddPlayerStats (data, cells, rowIx) {
     // only modify if this row contains a player
     const d = data.find(e => e.name === playerName)
     const s = document.createElement('span')
+    if (!d) {
+      console.warn('Could not find player information for player: ', playerName)
+      return
+    }
     s.classList = 'fadein-text'
     if (isInactive) {
       s.innerText = `🏭${d.pointsBuilding}\n🛡${d.pointsDefense}`

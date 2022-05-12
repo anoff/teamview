@@ -23,6 +23,8 @@ Limitations:
 1. there is no way to delete submitted data
 1. an API tokens password cannot be recovered
 1. deleting a team is only possible for the last remaining member
+1. each token can only be assigned to one team, each browser plugin can only have one token (=one player can belong to one team only)
+1. maximum number of members in a team is limited to 30
 
 ## DB structure
 
@@ -96,3 +98,9 @@ Especially for POST/DELETE operations
 
 - either via proxy https://faun.pub/prevent-ddos-attacks-with-traefik-2-44fb32eeac4f
 - or in app https://www.npmjs.com/package/express-slow-down
+
+## Development
+
+- use vscode for devcontainer magic
+- use https://github.com/sqlectron/sqlectron-gui/releases for working with the database
+  

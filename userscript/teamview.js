@@ -59,6 +59,29 @@ function requestPlayerData (names) {
 function uploadPlanets () {
   const data = gv.getVisibleSystem()
   console.log('uploading', data)
+
+  return new Promise((resolve, reject) => GM_xmlhttpRequest({
+    method: 'POST',
+    url: 'http://localhost:3000/v1/planets',
+    data: JSON.stringify({ planets: data }),
+    headers: {
+      token: 'TOKEN_pocket-wind-swung-barn',
+      'content-type': 'application/json; charset=utf-8'
+    },
+    onload: function (res) {
+      if (res.status === 200) {
+        resolve()
+      } else {
+        const err = {
+          status: res.status,
+          statusText: res.statusText,
+          error: res.responseText
+        }
+        console.warn('Error while sending planet information to server', err)
+        reject(new Error('Failed to send planet data to teamview server'))
+      }
+    }
+  }))
 }
 addMenuButton()
 
@@ -75,7 +98,6 @@ if (window.location.search.includes('page=galaxy')) {
   const uniquePlayers = Array.from(new Set(players))
   requestPlayerData(uniquePlayers)
     .then(playerData => {
-      console.log(playerData)
       return gv.modifyTable(playerData, gv.modifyAddPlayerStats)
     })
 }

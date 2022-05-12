@@ -8,13 +8,14 @@
   // Add the IDs of extensions you want installed when the container is created.
   "extensions": [
     "standard.vscode-standard",
-    "ms-ossdata.vscode-postgresql"
+    "mtxr.sqltools",
+    "mtxr.sqltools-driver-pg"
   ],
   // Use 'forwardPorts' to make a list of ports inside the container available locally.
   "forwardPorts": [
     3000,
-    27017,
-    8080
+    8080,
+    5432
   ],
   "postCreateCommand": "npm install",
   // Comment out to connect as root instead. More info: https://aka.ms/vscode-remote/containers/non-root.
