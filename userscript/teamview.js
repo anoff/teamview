@@ -3,7 +3,7 @@
 
 const gv = require('./galaxyview')
 
-function GM_addStyle (css) {
+function GM_addStyle (css) { // eslint-disable-line camelcase
   const style = document.getElementById('GM_addStyleBy8626') || (function () {
     const style = document.createElement('style')
     style.type = 'text/css'

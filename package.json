@@ -10,7 +10,7 @@
   "main": "index.js",
   "scripts": {
     "lint": "standard",
-    "dev": "nodemon",
+    "dev": "NODE_ENV=development nodemon",
     "test": "npm run lint"
   },
   "author": "Andreas Offenhaeuser <https://anoff.io>",
