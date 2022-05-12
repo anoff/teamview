@@ -1,5 +1,16 @@
 'use strict'
 /* globals GM_xmlhttpRequest */
+function GM_addStyle (css) {
+  const style = document.getElementById('GM_addStyleBy8626') || (function () {
+    const style = document.createElement('style')
+    style.type = 'text/css'
+    style.id = 'GM_addStyleBy8626'
+    document.head.appendChild(style)
+    return style
+  })()
+  const sheet = style.sheet
+  sheet.insertRule(css, (sheet.rules || sheet.cssRules || []).length)
+}
 
 function addMenuButton () {
   // add button to menu
@@ -163,10 +174,11 @@ function modifyAddPlayerStats (data, cells, rowIx) {
     // only modify if this row contains a player
     const d = data.find(e => e.name === playerName)
     const s = document.createElement('span')
+    s.classList = 'fadein-text'
     if (isInactive) {
-      s.innerText = `Buildings: ${d.pointsBuilding}\nDefense: ${d.pointsDefense}`
+      s.innerText = `🏭${d.pointsBuilding}\n🛡${d.pointsDefense}`
     } else {
-      s.innerText = `Fleet: ${d.pointsFleet}\nDefense: ${d.pointsDefense}`
+      s.innerText = `🚀${d.pointsFleet} / 🛡${d.pointsDefense}\n💥${(d.unitsDestroyed / 1e6).toFixed(1)}M / ↘️${(d.unitsLost / 1e6).toFixed(1)}M`
     }
     s.style = 'font-size: 85%;'
     cells[COLUMN_STATS].appendChild(s)
@@ -175,6 +187,10 @@ function modifyAddPlayerStats (data, cells, rowIx) {
 addMenuButton()
 
 if (window.location.search.includes('page=galaxy')) {
+  GM_addStyle('.fadein-text { -webkit-animation: fadein 2s; animation: fadein 2s;}')
+  GM_addStyle('@keyframes fadein { from { opacity: 0; } to { opacity: 1; }}')
+  GM_addStyle('@-webkit-keyframes fadein { from { opacity: 0; } to { opacity: 1; }}')
+
   addColumn(2, ['Player Stats', 'Spio Info'])
   modifyTable({}, modifyAddRankFromPopup)
   const data = getVisibleSystem()
@@ -182,6 +198,7 @@ if (window.location.search.includes('page=galaxy')) {
   const uniquePlayers = Array.from(new Set(players))
   requestPlayerData(uniquePlayers)
     .then(playerData => {
+      console.log(playerData)
       return modifyTable(playerData, modifyAddPlayerStats)
     })
 }
