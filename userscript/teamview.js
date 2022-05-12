@@ -42,11 +42,7 @@ function requestPlayerData (names) {
     },
     onload: function (res) {
       if (res.status === 200) {
-        let data = JSON.parse(res.responseText)
-        if (names.length === 1) {
-          // make sure result is always an array
-          data = [data]
-        }
+        const data = JSON.parse(res.responseText)
         resolve(data)
       } else {
         console.warn('Error occured while trying to fetch data from teamview server', res.status, res.statusText)
