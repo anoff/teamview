@@ -1,7 +1,8 @@
 'use strict'
-/* globals GM_xmlhttpRequest */
+/* globals  */
 
 const gv = require('./galaxyview')
+const req = require('./requests')
 
 function GM_addStyle (css) { // eslint-disable-line camelcase
   const style = document.getElementById('GM_addStyleBy8626') || (function () {
@@ -31,54 +32,6 @@ function showSettings () {
   Array.from(document.querySelector('content').children).forEach(c => c.remove())
 }
 
-function requestPlayerData (names) {
-  const namesArray = names.join(',')
-  console.log('sending request', namesArray)
-  return new Promise((resolve, reject) => GM_xmlhttpRequest({
-    method: 'GET',
-    url: `http://localhost:3000/v1/players/${namesArray}`,
-    headers: {
-      token: 'TOKEN_pocket-wind-swung-barn'
-    },
-    onload: function (res) {
-      if (res.status === 200) {
-        const data = JSON.parse(res.responseText)
-        resolve(data)
-      } else {
-        console.warn('Error occured while trying to fetch data from teamview server', res.status, res.statusText)
-        reject(new Error('Failed to fetch data from teamview server'))
-      }
-    }
-  }))
-}
-
-function uploadPlanets () {
-  const data = gv.getVisibleSystem()
-  console.log('uploading', data)
-
-  return new Promise((resolve, reject) => GM_xmlhttpRequest({
-    method: 'POST',
-    url: 'http://localhost:3000/v1/planets',
-    data: JSON.stringify({ planets: data }),
-    headers: {
-      token: 'TOKEN_pocket-wind-swung-barn',
-      'content-type': 'application/json; charset=utf-8'
-    },
-    onload: function (res) {
-      if (res.status === 200) {
-        resolve()
-      } else {
-        const err = {
-          status: res.status,
-          statusText: res.statusText,
-          error: res.responseText
-        }
-        console.warn('Error while sending planet information to server', err)
-        reject(new Error('Failed to send planet data to teamview server'))
-      }
-    }
-  }))
-}
 addMenuButton()
 
 if (window.location.search.includes('page=galaxy')) {
@@ -86,13 +39,21 @@ if (window.location.search.includes('page=galaxy')) {
   GM_addStyle('@keyframes fadein { from { opacity: 0; } to { opacity: 1; }}')
   GM_addStyle('@-webkit-keyframes fadein { from { opacity: 0; } to { opacity: 1; }}')
 
+  GM_addStyle('.dot { height: 7px; width: 7px; border-radius: 50%; display: inline-block;}')
+  GM_addStyle('.status-ok { background-color: #00ee00; }')
+  GM_addStyle('.status-error { background-color: #ee0000; }')
+  GM_addStyle('.status-outdated { background-color: #eeee00; }')
+  GM_addStyle('.status-unknown { background-color: #fff; }')
+  GM_addStyle('.status-working { animation: status-animation 0.7s infinite; animation-direction: alternate; }')
+  GM_addStyle('@keyframes status-animation { from {background-color: #fff;} to {background-color: #3ae;}}')
+
   gv.addColumn(2, ['Player Stats', 'Spio Info'])
-  gv.addUploadButton(uploadPlanets)
+  gv.addUploadSection()
   gv.modifyTable({}, gv.modifyAddRankFromPopup)
   const data = gv.getVisibleSystem()
   const players = data.map(e => e.playerName)
   const uniquePlayers = Array.from(new Set(players))
-  requestPlayerData(uniquePlayers)
+  req.getPlayerData(uniquePlayers)
     .then(playerData => {
       return gv.modifyTable(playerData, gv.modifyAddPlayerStats)
     })

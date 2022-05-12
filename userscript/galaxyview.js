@@ -1,3 +1,5 @@
+const req = require('./requests')
+
 /**
  * Parse planet information out of current visible system in the galaxy view table
  * @returns Array[{ planetName, playerName, position, hasMoon, debrisMetal, debrisCrystal }]
@@ -126,25 +128,54 @@ function modifyAddPlayerStats (data, cells, rowIx) {
   }
 }
 
-function addUploadButton (onClickFn) {
-  const galaxySubmitButton = Array.from(document.querySelectorAll('#galaxy_form table input')).filter(e => e.type === 'submit')[0]
-  const b = document.createElement('button')
-  b.type = 'button'
-  b.innerText = 'Upload'
-  b.id = 'teamview-upload'
-  b.onclick = onClickFn
+function doUploadPlanets () {
+  const data = getVisibleSystem()
+  setStatus('status-working', `Uploading ${data.length} planets`)
+  const p = req.uploadPlanets(data)
+  p.then(res => {
+    const { totalCount, successCount } = JSON.parse(res.response)
+    setStatus('status-ok', `Updated ${successCount}/${totalCount} planets`)
+  }).catch(e => {
+    setStatus('status-error', 'Failed, see console')
+    console.error(e)
+  })
+}
+function addUploadSection () {
+  const sectionHTML = `
+    <td class="transparent">
+      <table>
+        <tbody><tr>
+            <th colspan="4">Teamview</th>
+          </tr>
+          <tr>
+            <td><button type="button" id="teamview-upload">Upload</button></td>
+            <td><span style="font-weight: bold;">Status</span></div></td>
+            <td><span id="teamview-status-icon" class="dot status-unknown"></td>
+            <td><span id="teamview-status-text" style="font-size: 85%;"></span></td>
+        </tr>
+      </tbody></table>
+    </td>
+  `
+  document.querySelectorAll('#galaxy_form table tr')[0].insertAdjacentHTML('beforeend', sectionHTML)
+  document.getElementById('teamview-upload').onclick = doUploadPlanets
 
-  galaxySubmitButton.insertAdjacentElement('afterend', b)
-
+  const button = document.getElementById('teamview-upload')
   document.onkeydown = function (e) {
     e = e || window.event
     switch (e.which || e.keyCode) {
       case 13 : // enter
       case 32: // space
-        b.click()
+        button.click()
         break
     }
   }
+}
+
+function setStatus (cssClass, text) {
+  const iconElm = document.getElementById('teamview-status-icon')
+  const textElm = document.getElementById('teamview-status-text')
+  iconElm.classList = `dot ${cssClass}`
+  textElm.innerText = text
 }
 
 function modifyTable (data, modfiyFn) {
@@ -159,10 +190,11 @@ function modifyTable (data, modfiyFn) {
   }
 }
 module.exports = {
-  addUploadButton,
+  addUploadSection,
   addColumn,
   getVisibleSystem,
   modifyAddRankFromPopup,
   modifyAddPlayerStats,
-  modifyTable
+  modifyTable,
+  setStatus
 }
