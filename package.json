@@ -10,7 +10,7 @@
   "main": "index.js",
   "scripts": {
     "lint": "standard",
-    "dev": "nodemon --exec 'node index.js | pino-pretty'",
+    "dev": "nodemon",
     "test": "npm run lint"
   },
   "author": "Andreas Offenhaeuser <https://anoff.io>",
@@ -32,5 +32,11 @@
     "nodemon": "^2.0.16",
     "pino-pretty": "^7.6.1",
     "standard": "^17.0.0"
+  },
+  "nodemonConfig": {
+    "ignore": [
+      "userscript/"
+    ],
+    "exec": "node index.js | pino-pretty"
   }
 }
