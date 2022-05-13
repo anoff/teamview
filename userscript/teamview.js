@@ -3,6 +3,7 @@
 
 const gv = require('./galaxyview')
 const req = require('./requests')
+const pb = require('./planetBookmark')
 
 function GM_addStyle (css) { // eslint-disable-line camelcase
   const style = document.getElementById('GM_addStyleBy8626') || (function () {
@@ -50,11 +51,15 @@ if (window.location.search.includes('page=galaxy')) {
   gv.addColumn(2, ['Player Stats', 'Spio Info'])
   gv.addUploadSection()
   gv.modifyTable({}, gv.modifyAddRankFromPopup)
+  pb.addShowFavoritesButton()
+  pb.addBookmarkButton()
   const data = gv.getVisibleSystem()
   const players = data.map(e => e.playerName)
   const uniquePlayers = Array.from(new Set(players))
-  req.getPlayerData(uniquePlayers)
-    .then(playerData => {
-      return gv.modifyTable(playerData, gv.modifyAddPlayerStats)
-    })
+  if (uniquePlayers.length) {
+    req.getPlayerData(uniquePlayers)
+      .then(playerData => {
+        return gv.modifyTable(playerData, gv.modifyAddPlayerStats)
+      })
+  }
 }
