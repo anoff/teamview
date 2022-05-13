@@ -6,7 +6,7 @@ console.log('devmode', isDevelopment)
 // configure your script stuff here
 const pathOut = path.resolve(__dirname, '..', 'dist')
 const entryPoint = './teamview.js' // this script should require all other files that are needed, each file should export something
-const scriptName = '0game-teamview'
+const scriptName = 'teamview'
 const tamperMonkeyHeader = {
   name: scriptName,
   version: '0.0.1',

@@ -124,7 +124,9 @@ function modifyAddPlayerStats (data, cells, rowIx) {
       s.innerText = `🚀${d.pointsFleet} / 🛡${d.pointsDefense}\n💥${(d.unitsDestroyed / 1e6).toFixed(1)}M / ↘️${(d.unitsLost / 1e6).toFixed(1)}M`
     }
     s.style = 'font-size: 85%;'
-    cells[COLUMN_STATS].appendChild(s)
+    if (cells[COLUMN_STATS]) {
+      cells[COLUMN_STATS].appendChild(s)
+    }
   }
 }
 
@@ -134,7 +136,7 @@ function doUploadPlanets () {
   const p = req.uploadPlanets(data)
   p.then(res => {
     const { totalCount, successCount } = JSON.parse(res.response)
-    setStatus('status-ok', `Updated ${successCount}/${totalCount} planets`)
+    setStatus('status-ok', `Updated ${successCount}/${totalCount}`)
   }).catch(e => {
     setStatus('status-error', 'Failed, see console')
     console.error(e)
@@ -142,7 +144,7 @@ function doUploadPlanets () {
 }
 function addUploadSection () {
   const sectionHTML = `
-    <td class="transparent">
+    <td class="transparent" id="teamview-section">
       <table>
         <tbody><tr>
             <th colspan="4">Teamview</th>

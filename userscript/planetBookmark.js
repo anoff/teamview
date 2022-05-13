@@ -20,26 +20,57 @@ function insertBookmarkedRows () {
   const colspan = Array.from(colRow.children).map(e => parseInt(e.getAttribute('colspan')) || 1).reduce((p, c) => p + c, 0)
   const cols = colRow.children
   cols[0].innerText = 'Location'
-  cols[1].setAttribute('colspan', 3)
+  cols[1].innerText = 'Planet'
+  cols[1].setAttribute('colspan', 2)
   cols[2].innerText = 'Name'
-  cols[2].setAttribute('colspan', 3)
+  cols[2].setAttribute('colspan', 2)
   cols[3].innerText = 'Actions'
-  cols[3].setAttribute('colspan', colspan - 1 - 3 - 3) // causes issues if button is pressed multiple times
-  Array.from(cols).slice(4).forEach(e => e.remove())
+  cols[4].innerText = 'Last Scan'
+  cols[4].setAttribute('colspan', colspan - 1 - 2 - 2 - 1)
 
-  const bookmarks = GM_getValue('bookmarks')
+  Array.from(cols).slice(5).forEach(e => e.remove())
+
+  const bookmarkOrderFn = b => b.position + b.system * 50 + b.galaxy * 400 * 50
+  const bookmarks = GM_getValue('bookmarks').sort((a, b) => bookmarkOrderFn(a) > bookmarkOrderFn(b) ? -1 : 1)
+  console.log(bookmarks)
   for (const b of bookmarks) {
-    const html = `<tr>
+    let timeSinceLastScan = '-'
+    if (b.lastScan) {
+      const seconds = Math.round((new Date() - new Date(b.lastScan)) / 1000)
+      let hours = 0
+      let minutes = 0
+      hours = Math.floor(seconds / 3600)
+      minutes = Math.floor((seconds - hours * 3600) / 60)
+      timeSinceLastScan = `${minutes} min`
+      if (hours) {
+        timeSinceLastScan = `${hours} hrs ${timeSinceLastScan}`
+      }
+    }
+    const html = `<tr id="row-${b.planetId}">
     <td>${b.galaxy}:${b.system}:${b.position}</td>
-    <td colspan="3">${b.planetName}</td>
-    <td colspan="3">${b.playerName}</td>
-    <td colspan="${colspan - 1 - 3 - 3}">
-      <a href="javascript:doit(6,${b.planetId},{'210':'2'})"><img src="./styles/theme/nova/img/e.gif" title="Spying" alt=""></a>
+    <td colspan="2">${b.planetName}</td>
+    <td colspan="2">${b.playerName}</td>
+    <td>
+      <a id="scan-${b.planetId}" href="javascript:doit(6,${b.planetId},{'210':'2'});">🔍</a>
+      <a id="delete-${b.planetId}" href="#">❌</a>
     </td>
+    <td colspan="${colspan - 1 - 2 - 2 - 1}">${timeSinceLastScan}</td>
     </tr>`
     colRow.insertAdjacentHTML('afterend', html)
+
+    function removeBookmark (planetId) {
+      const bookmarks = GM_getValue('bookmarks')
+      const ix = bookmarks.findIndex(e => e.planetId === planetId)
+      if (ix > -1) {
+        bookmarks.splice(ix, 1)
+        GM_setValue('bookmarks', bookmarks)
+        const row = document.getElementById(`row-${planetId}`)
+        row.remove()
+      }
+    }
+    document.getElementById(`scan-${b.planetId}`).addEventListener('click', updateTimestamp.bind(this, b.planetId))
+    document.getElementById(`delete-${b.planetId}`).addEventListener('click', removeBookmark.bind(this, b.planetId))
   }
-  console.log({ colspan })
 }
 function addShowFavoritesButton () {
   function onClick () {
@@ -73,7 +104,7 @@ function addBookmarkButton () {
     if (spioButton) {
       const planetId = parseInt(spioButton.getAttribute('href').split(',')[1])
       const planetName = cells[COLUMN_PLANETNAME].innerText.split(' (')[0]
-      const playerName = cells[COLUMN_PLAYER].innerText.split(' (')[0]
+      const playerName = cells[COLUMN_PLAYER].innerText
       const position = parseInt(cells[COLUMN_POS].innerText)
       const a = document.createElement('a')
       a.textContent = '🔖'
@@ -93,14 +124,25 @@ function addBookmark (galaxy, system, position, planetId, planetName, playerName
   }
   const ix = bookmarks.findIndex(e => e.galaxy === galaxy && e.system === system && e.position === position)
   if (ix > -1) {
-    console.log('updating', ix)
     bookmarks[ix] = { galaxy, system, position, planetId, planetName, playerName }
   } else {
-    console.log('adding new')
     bookmarks.push({ galaxy, system, position, planetId, planetName, playerName })
   }
   GM_setValue('bookmarks', bookmarks)
 }
+
+function updateTimestamp (planetId) {
+  let bookmarks = GM_getValue('bookmarks')
+  if (!bookmarks) {
+    bookmarks = []
+  }
+  const ix = bookmarks.findIndex(e => e.planetId === planetId)
+  if (ix > -1) {
+    bookmarks[ix].lastScan = new Date().toISOString()
+  }
+  GM_setValue('bookmarks', bookmarks)
+}
+
 module.exports = {
   addBookmarkButton,
   addShowFavoritesButton,
