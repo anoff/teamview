@@ -4,18 +4,7 @@
 const gv = require('./galaxyview')
 const req = require('./requests')
 const pb = require('./planetBookmark')
-
-function GM_addStyle (css) { // eslint-disable-line camelcase
-  const style = document.getElementById('GM_addStyleBy8626') || (function () {
-    const style = document.createElement('style')
-    style.type = 'text/css'
-    style.id = 'GM_addStyleBy8626'
-    document.head.appendChild(style)
-    return style
-  })()
-  const sheet = style.sheet
-  sheet.insertRule(css, (sheet.rules || sheet.cssRules || []).length)
-}
+const { GM_addStyle } = require('./utils') // eslint-disable-line camelcase
 
 function addMenuButton () {
   // add button to menu
@@ -54,6 +43,7 @@ if (window.location.search.includes('page=galaxy')) {
   pb.addShowFavoritesButton()
   pb.addBookmarkButton()
   const data = gv.getVisibleSystem()
+  gv.checkPlanetStatus(data)
   const players = data.map(e => e.playerName)
   const uniquePlayers = Array.from(new Set(players))
   if (uniquePlayers.length) {
