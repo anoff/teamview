@@ -2,9 +2,9 @@
 /* globals  */
 
 const gv = require('./galaxyview')
-const req = require('./requests')
 const pb = require('./planetBookmark')
-const { GM_addStyle } = require('./utils') // eslint-disable-line camelcase
+const { SpioParser } = require('./spioParser')
+const sp = new SpioParser()
 
 function addMenuButton () {
   // add button to menu
@@ -28,4 +28,10 @@ if (window.location.search.includes('page=galaxy')) {
   gv.init()
   pb.addShowFavoritesButton()
   pb.addBookmarkButton()
+}
+
+if (sp.isSpioPage()) {
+  const messages = sp.getMessages()
+  const data = messages.map(e => sp.parse_text(e))
+  console.log(data)
 }

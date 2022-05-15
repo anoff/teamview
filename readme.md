@@ -90,6 +90,11 @@ classDiagram
   }
 ```
 
+## Todo
+
+- [ ] check that valid player id is taken for planets (players get inserted over and over..should not reference old entry)
+- [ ] remove team feature
+- [ ] add team feature
 ## Ideas
 
 ### Prevent API spam by implementing rate limit
@@ -103,4 +108,3 @@ Especially for POST/DELETE operations
 
 - use vscode for devcontainer magic
 - use https://github.com/sqlectron/sqlectron-gui/releases for working with the database
-  

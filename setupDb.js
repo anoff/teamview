@@ -15,6 +15,15 @@ async function initDb () {
   })
 
   try {
+    await knex.raw(`
+    CREATE OR REPLACE FUNCTION update_updated_at_column()
+    RETURNS TRIGGER AS $$
+    BEGIN
+     NEW."updatedAt"=now(); 
+     RETURN NEW;
+    END;
+    $$ language 'plpgsql';
+  `)
     let tableExists = false
     // await knex.schema.dropTableIfExists('tokens')
     tableExists = await knex.schema.hasTable('tokens')
@@ -43,7 +52,7 @@ async function initDb () {
           table.timestamps(false, true, true)
         })
     }
-    await knex.schema.dropTableIfExists('planets')
+    // await knex.schema.dropTableIfExists('planets')
     // await knex.schema.dropTableIfExists('players')
     tableExists = await knex.schema.hasTable('players')
     if (!tableExists) {
@@ -81,10 +90,6 @@ async function initDb () {
           table.integer('galaxy').unsigned().index()
           table.integer('system').unsigned().index()
           table.integer('position').unsigned().index()
-          table.json('resources')
-          table.json('buildings')
-          table.json('fleet')
-          table.json('defense')
           table.bool('hasMoon')
           table.integer('debrisMetal').unsigned()
           table.integer('debrisCrystal').unsigned()
@@ -105,6 +110,31 @@ async function initDb () {
           table.integer('teamId').unsigned().references('teams.id')
           table.timestamps(false, true, true)
         })
+    }
+
+    // await knex.schema.dropTableIfExists('spyreports')
+    tableExists = await knex.schema.hasTable('spyreports')
+    if (!tableExists) {
+      console.log('recreate spyreports')
+      // Create a table
+      await knex.schema
+        .createTable('spyreports', table => {
+          table.increments('id')
+          table.integer('reportId').unsigned()
+          table.date('date')
+          table.json('resources')
+          table.json('buildings')
+          table.json('ships')
+          table.json('research')
+          table.json('defense')
+          table.integer('planetId').unsigned().references('planets.id')
+          table.timestamps(false, true, true)
+        })
+        .raw(`
+          CREATE TRIGGER update_user_updated_at BEFORE UPDATE
+          ON ?? FOR EACH ROW EXECUTE PROCEDURE 
+          update_updated_at_column();
+        `, ['spyreports'])
     }
   } catch (e) {
     console.error(e)
