@@ -47,7 +47,7 @@ function insertBookmarkedRows () {
       }
     }
     const html = `<tr id="row-${b.planetId}">
-    <td>${b.galaxy}:${b.system}:${b.position}</td>
+    <td><a href="game.php?page=galaxy&galaxy=${b.galaxy}&system=${b.system}">${b.galaxy}:${b.system}:${b.position}</a></td>
     <td colspan="2">${b.planetName}</td>
     <td colspan="2">${b.playerName}</td>
     <td>
