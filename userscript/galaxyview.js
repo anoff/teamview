@@ -149,9 +149,9 @@ function modifyAddRankFromPopup (data, cells, rowIx) {
   const COLUMN_PLAYER = 5
   const playerName = cleanName(cells[COLUMN_PLAYER].innerText)
   if (playerName) {
-    const ingameRankStr = cells[COLUMN_PLAYER].querySelector('a')
+    const innerhtml = cells[COLUMN_PLAYER].querySelector('a')
       .getAttribute('data-tooltip-content')
-      .split('pos. ')[1].split('<')[0]
+    const ingameRankStr = /(Platz|pos.) ([0-9]+)/.exec(innerhtml)[2]
     const ingameRank = parseInt(ingameRankStr)
     const s = document.createElement('span')
     s.innerHTML = ` (${ingameRank})`
