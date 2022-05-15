@@ -1,3 +1,4 @@
+/* globals location */
 const req = require('./requests')
 const { GM_addStyle } = require('./utils') // eslint-disable-line camelcase
 
@@ -229,7 +230,7 @@ function addUploadSection () {
     </td>
   `
   document.querySelectorAll('#galaxy_form table tr')[0].insertAdjacentHTML('beforeend', sectionHTML)
-  document.getElementById('teamview-upload').onclick = doUploadPlanets
+  document.getElementById('teamview-upload').addEventListener('click', doUploadPlanets)
 
   const button = document.getElementById('teamview-upload')
   document.onkeydown = function (e) {
@@ -238,6 +239,14 @@ function addUploadSection () {
       case 13 : // enter
       case 32: // space
         button.click()
+        break
+      case 72: // l
+        button.click()
+        location.assign("javascript:galaxy_submit('systemLeft')")
+        break
+      case 76: // h
+        button.click()
+        location.assign("javascript:galaxy_submit('systemRight')")
         break
     }
   }
@@ -296,6 +305,7 @@ module.exports = {
   addColumn,
   checkPlanetStatus,
   getVisibleSystem,
+  init,
   modifyAddRankFromPopup,
   modifyAddPlayerStats,
   modifyTable,
