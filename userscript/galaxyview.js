@@ -37,7 +37,7 @@ function getVisibleSystem () {
       }
     }
     if (planetName && playerName) {
-      entries.push({ name: planetName, playerName, galaxy, system, position: i, hasMoon, debrisMetal, debrisCrystal })
+      entries.push({ name: planetName, playerName, galaxy, system, position: i + 1, hasMoon, debrisMetal, debrisCrystal })
     }
   }
   return entries
