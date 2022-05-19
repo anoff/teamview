@@ -1,4 +1,3 @@
-const WebpackUserscript = require('webpack-userscript')
 const path = require('path')
 const isDevelopment = process.env.NODE_ENV === 'development'
 
