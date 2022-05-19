@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  app:
+    container_name: teamview-app
+    build: .
+    volumes:
+      - .:/app:cached
+    command: npm run dev
+    depends_on: [db]
+    ports:
+      - "8080:3000"
+
+  db:
+    container_name: teamview-db
+    image: postgres:latest
+    restart: unless-stopped
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_DB: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5433:5432"
+
+volumes:
+  postgres-data:
