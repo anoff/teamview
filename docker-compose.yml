@@ -4,9 +4,7 @@ services:
   app:
     container_name: teamview-app
     build: .
-    volumes:
-      - .:/app:cached
-    command: npm run dev
+    command: npm run start
     depends_on: [db]
     ports:
       - "8080:3000"
