@@ -19,7 +19,7 @@
   const apiKey = GM_getValue('api_key')
   const debugMode = GM_getValue('debug_mode') === 1
   const developerMode = GM_getValue('developer_mode') === 1
-  const apiUrl = developerMode ? 'http://localhost:3000/' : 'https://tbd.com/'
+  const apiUrl = developerMode ? 'http://localhost:3000/' : 'https://teamview.mietemieze.de/'
 
   // document.querySelector('head').insertAdjacentHTML('beforeend', `<link rel="stylesheet" href="${apiUrl}skin.css">`)
   // document.querySelector('body').insertAdjacentHTML('beforeend', `<script type="text/javascript" src="${apiUrl}teamview.js"></script>`)
