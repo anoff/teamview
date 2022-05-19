@@ -250,6 +250,18 @@ function addUploadSection () {
         break
     }
   }
+
+  // make sure that clicking the default navigation buttons also uploads data
+  const dirs = ['systemRight', 'systemLeft', 'galaxyRight', 'galaxyLeft']
+  dirs.forEach(dir => {
+    const elm = Array.from(document.querySelectorAll('input')).find(e => e.type === 'button' && e.name === dir)
+    if (elm) {
+      elm.onclick = () => {
+        button.click()
+        location.assign(`javascript:galaxy_submit('${dir}')`)
+      }
+    }
+  })
 }
 
 function setStatus (cssClass, text) {
