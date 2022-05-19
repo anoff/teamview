@@ -11,7 +11,8 @@
   "scripts": {
     "lint": "standard",
     "dev": "NODE_ENV=development nodemon",
-    "test": "npm run lint"
+    "test": "npm run lint",
+    "start": "NODE_ENV=production node index.js"
   },
   "author": "Andreas Offenhaeuser <https://anoff.io>",
   "license": "MIT",
