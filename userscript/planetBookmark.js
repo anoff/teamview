@@ -148,3 +148,7 @@ module.exports = {
   addShowFavoritesButton,
   removeRows
 }
+
+// use these to combile planetBookmark standalone
+// addBookmarkButton()
+// addShowFavoritesButton()

@@ -4,7 +4,7 @@ const isDevelopment = process.env.NODE_ENV === 'development'
 
 console.log('devmode', isDevelopment)
 // configure your script stuff here
-const pathOut = path.resolve(__dirname, '..', 'dist')
+const pathOut = path.resolve(__dirname, '..', 'public')
 const entryPoint = './teamview.js' // this script should require all other files that are needed, each file should export something
 const scriptName = 'teamview'
 const tamperMonkeyHeader = {
@@ -36,19 +36,7 @@ module.exports = {
   entry: entryPoint,
   output: {
     path: pathOut,
-    filename: `${scriptName}.user.js`
+    filename: `${scriptName}.js`
   },
-  devtool: false,
-  plugins: [
-    new WebpackUserscript({
-      updateBaseUrl: 'https://git.pr0game.com/atain/lazy_pr0gamer/raw/branch/master/dist/',
-      headers: tamperMonkeyHeader,
-      ssri: true,
-      proxyScript: {
-        baseUrl: 'file:///Users/anoff/developer/pr0game-teamview/dist',
-        filename: '[basename].proxy.user.js',
-        enable: isDevelopment
-      }
-    })
-  ]
+  devtool: false
 }

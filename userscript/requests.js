@@ -1,9 +1,9 @@
-/* globals GM_xmlhttpRequest */
+/* globals xmlhttpRequest */
 
 function getPlayerData (names) {
   const namesArray = names.join(',')
   console.log('sending request', namesArray)
-  return new Promise((resolve, reject) => GM_xmlhttpRequest({
+  return new Promise((resolve, reject) => xmlhttpRequest({
     method: 'GET',
     url: `http://localhost:3000/v1/players/${namesArray}`,
     headers: {
@@ -25,7 +25,7 @@ function deletePlanet (planet) {
   const TIMEOUT_S = 2
 
   const location = `${planet.galaxy}:${planet.system}:${planet.position}`
-  return new Promise((resolve, reject) => GM_xmlhttpRequest({
+  return new Promise((resolve, reject) => xmlhttpRequest({
     method: 'DELETE',
     url: `http://localhost:3000/v1/planets/${location}`,
     headers: {
@@ -53,7 +53,7 @@ function deletePlanet (planet) {
 
 function uploadPlanets (data) {
   const TIMEOUT_S = 2
-  return new Promise((resolve, reject) => GM_xmlhttpRequest({
+  return new Promise((resolve, reject) => xmlhttpRequest({
     method: 'POST',
     url: 'http://localhost:3000/v1/planets',
     data: JSON.stringify({ planets: data }),
@@ -80,6 +80,34 @@ function uploadPlanets (data) {
   }))
 }
 
+function uploadSpio (data) {
+  const TIMEOUT_S = 2
+  return new Promise((resolve, reject) => xmlhttpRequest({
+    method: 'POST',
+    url: 'http://localhost:3000/v1/planets',
+    data: JSON.stringify({ planets: data }),
+    headers: {
+      token: 'TOKEN_pocket-wind-swung-barn',
+      'content-type': 'application/json; charset=utf-8'
+    },
+    timeout: TIMEOUT_S * 1000,
+    onload: function (res) {
+      if (res.status === 200) {
+        resolve(res)
+      } else {
+        const err = {
+          status: res.status,
+          statusText: res.statusText,
+          error: res.responseText
+        }
+        console.warn('Error while sending planet information to server', err)
+        reject(new Error('Failed to send planet data to teamview server'))
+      }
+    },
+    ontimeout: () => reject(new Error(`Timeout: Response did not arrive in ${TIMEOUT_S} seconds`)),
+    onerror: e => reject(e)
+  }))
+}
 /**
  * Check which planets in a given system are already known
  * @param {Array[string]} locations a list of locations in format <SYSTEM>:<GALAXY>:[POSITION]
@@ -88,7 +116,7 @@ function uploadPlanets (data) {
 function getPlanetUploadStatus (locations) {
   const TIMEOUT_S = 2
   const locationsConc = locations.join(',')
-  return new Promise((resolve, reject) => GM_xmlhttpRequest({
+  return new Promise((resolve, reject) => xmlhttpRequest({
     method: 'GET',
     url: `http://localhost:3000/v1/planets/${locationsConc}?type=exists`,
     headers: {
