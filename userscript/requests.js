@@ -5,9 +5,9 @@ function getPlayerData (names) {
   console.log('sending request', namesArray)
   return new Promise((resolve, reject) => TM_xmlhttpRequest({
     method: 'GET',
-    url: `${apiUrl}/v1/players/${namesArray}`,
+    url: `${window.apiUrl}/v1/players/${namesArray}`,
     headers: {
-      token: 'TOKEN_pocket-wind-swung-barn'
+      token: window.apiKey
     },
     onload: function (res) {
       if (res.status === 200) {
@@ -27,9 +27,9 @@ function deletePlanet (planet) {
   const location = `${planet.galaxy}:${planet.system}:${planet.position}`
   return new Promise((resolve, reject) => TM_xmlhttpRequest({
     method: 'DELETE',
-    url: `${apiUrl}/v1/planets/${location}`,
+    url: `${window.apiUrl}/v1/planets/${location}`,
     headers: {
-      token: 'TOKEN_pocket-wind-swung-barn',
+      token: window.apiKey,
       'content-type': 'application/json; charset=utf-8'
     },
     timeout: TIMEOUT_S * 1000,
@@ -55,10 +55,10 @@ function uploadPlanets (data) {
   const TIMEOUT_S = 2
   return new Promise((resolve, reject) => TM_xmlhttpRequest({
     method: 'POST',
-    url: `${apiUrl}/v1/planets`,
+    url: `${window.apiUrl}/v1/planets`,
     data: JSON.stringify({ planets: data }),
     headers: {
-      token: 'TOKEN_pocket-wind-swung-barn',
+      token: window.apiKey,
       'content-type': 'application/json; charset=utf-8'
     },
     timeout: TIMEOUT_S * 1000,
@@ -84,10 +84,10 @@ function uploadSpio (data) {
   const TIMEOUT_S = 2
   return new Promise((resolve, reject) => TM_xmlhttpRequest({
     method: 'POST',
-    url: `${apiUrl}/v1/planets`,
+    url: `${window.apiUrl}/v1/planets`,
     data: JSON.stringify({ planets: data }),
     headers: {
-      token: 'TOKEN_pocket-wind-swung-barn',
+      token: window.apiKey,
       'content-type': 'application/json; charset=utf-8'
     },
     timeout: TIMEOUT_S * 1000,
@@ -118,9 +118,9 @@ function getPlanetUploadStatus (locations) {
   const locationsConc = locations.join(',')
   return new Promise((resolve, reject) => TM_xmlhttpRequest({
     method: 'GET',
-    url: `${apiUrl}/v1/planets/${locationsConc}?type=exists`,
+    url: `${window.apiUrl}/v1/planets/${locationsConc}?type=exists`,
     headers: {
-      token: 'TOKEN_pocket-wind-swung-barn',
+      token: window.apiKey,
       'content-type': 'application/json; charset=utf-8'
     },
     timeout: TIMEOUT_S * 1000,
