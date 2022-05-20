@@ -4,7 +4,7 @@ const knexDriver = require('knex')
 async function initDb () {
   const knex = knexDriver({
     client: 'pg',
-    version: '7.2',
+    version: '14.2',
     connection: {
       host: process.env.POSTGRES_HOST,
       port: process.env.POSTGRES_PORT,
@@ -139,7 +139,7 @@ async function initDb () {
           table.integer('reportId').unsigned()
           table.string('reportType')
           table.date('date')
-          table.json('resources')
+          table.json('resources') // somehow knex creates text columns
           table.json('buildings')
           table.json('ships')
           table.json('research')
@@ -152,6 +152,13 @@ async function initDb () {
           ON ?? FOR EACH ROW EXECUTE PROCEDURE 
           update_updated_at_column();
         `, ['reports'])
+        // .raw(`
+        //   ALTER TABLE reports
+        //   ADD COLUMN resources json,
+        //   ADD COLUMN buildings json,
+        //   ADD COLUMN ships json,
+        //   ADD COLUMN defense json,
+        //   ADD COLUMN research json`)
     }
   } catch (e) {
     console.error(e)
