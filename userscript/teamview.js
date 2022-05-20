@@ -3,8 +3,7 @@
 
 const gv = require('./galaxyview')
 const pb = require('./planetBookmark')
-const { SpioParser } = require('./spioParser')
-const sp = new SpioParser()
+const sp = require('./spioParser')
 
 function addMenuButton () {
   // add button to menu
@@ -30,8 +29,4 @@ if (window.location.search.includes('page=galaxy')) {
   pb.addBookmarkButton()
 }
 
-if (sp.isSpioPage()) {
-  const messages = sp.getMessages()
-  const data = messages.map(e => sp.parse_text(e))
-  console.log(data)
-}
+sp.init()

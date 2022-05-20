@@ -1,5 +1,7 @@
 /* globals TM_xmlhttpRequest */
 
+const TIMEOUT_S = 2 // timeout for request
+
 function getPlayerData (names) {
   const namesArray = names.join(',')
   console.log('sending request', namesArray)
@@ -22,8 +24,6 @@ function getPlayerData (names) {
 }
 
 function deletePlanet (planet) {
-  const TIMEOUT_S = 2
-
   const location = `${planet.galaxy}:${planet.system}:${planet.position}`
   return new Promise((resolve, reject) => TM_xmlhttpRequest({
     method: 'DELETE',
@@ -52,7 +52,6 @@ function deletePlanet (planet) {
 }
 
 function uploadPlanets (data) {
-  const TIMEOUT_S = 2
   return new Promise((resolve, reject) => TM_xmlhttpRequest({
     method: 'POST',
     url: `${window.apiUrl}/v1/planets`,
@@ -80,12 +79,11 @@ function uploadPlanets (data) {
   }))
 }
 
-function uploadSpio (data) {
-  const TIMEOUT_S = 2
+function uploadReports (data) {
   return new Promise((resolve, reject) => TM_xmlhttpRequest({
     method: 'POST',
-    url: `${window.apiUrl}/v1/planets`,
-    data: JSON.stringify({ planets: data }),
+    url: `${window.apiUrl}/v1/reports`,
+    data: JSON.stringify({ reports: data }),
     headers: {
       token: window.apiKey,
       'content-type': 'application/json; charset=utf-8'
@@ -100,8 +98,8 @@ function uploadSpio (data) {
           statusText: res.statusText,
           error: res.responseText
         }
-        console.warn('Error while sending planet information to server', err)
-        reject(new Error('Failed to send planet data to teamview server'))
+        console.warn('Error while sending reports to server', err)
+        reject(new Error('Failed to send reports to teamview server'))
       }
     },
     ontimeout: () => reject(new Error(`Timeout: Response did not arrive in ${TIMEOUT_S} seconds`)),
@@ -144,7 +142,7 @@ function getPlanetUploadStatus (locations) {
 module.exports = {
   deletePlanet,
   uploadPlanets,
-  uploadSpio,
+  uploadReports,
   getPlanetUploadStatus,
   getPlayerData
 }

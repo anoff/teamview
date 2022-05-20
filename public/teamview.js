@@ -259,6 +259,18 @@ function addUploadSection () {
         break
     }
   }
+
+  // make sure that clicking the default navigation buttons also uploads data
+  const dirs = ['systemRight', 'systemLeft', 'galaxyRight', 'galaxyLeft']
+  dirs.forEach(dir => {
+    const elm = Array.from(document.querySelectorAll('input')).find(e => e.type === 'button' && e.name === dir)
+    if (elm) {
+      elm.onclick = () => {
+        button.click()
+        location.assign(`javascript:galaxy_submit('${dir}')`)
+      }
+    }
+  })
 }
 
 function setStatus (cssClass, text) {
@@ -494,16 +506,18 @@ module.exports = {
   \*********************/
 /***/ ((module) => {
 
-/* globals xmlhttpRequest */
+/* globals TM_xmlhttpRequest */
+
+const TIMEOUT_S = 2 // timeout for request
 
 function getPlayerData (names) {
   const namesArray = names.join(',')
   console.log('sending request', namesArray)
-  return new Promise((resolve, reject) => xmlhttpRequest({
+  return new Promise((resolve, reject) => TM_xmlhttpRequest({
     method: 'GET',
-    url: `http://localhost:3000/v1/players/${namesArray}`,
+    url: `${window.apiUrl}/v1/players/${namesArray}`,
     headers: {
-      token: 'TOKEN_pocket-wind-swung-barn'
+      token: window.apiKey
     },
     onload: function (res) {
       if (res.status === 200) {
@@ -518,14 +532,12 @@ function getPlayerData (names) {
 }
 
 function deletePlanet (planet) {
-  const TIMEOUT_S = 2
-
   const location = `${planet.galaxy}:${planet.system}:${planet.position}`
-  return new Promise((resolve, reject) => xmlhttpRequest({
+  return new Promise((resolve, reject) => TM_xmlhttpRequest({
     method: 'DELETE',
-    url: `http://localhost:3000/v1/planets/${location}`,
+    url: `${window.apiUrl}/v1/planets/${location}`,
     headers: {
-      token: 'TOKEN_pocket-wind-swung-barn',
+      token: window.apiKey,
       'content-type': 'application/json; charset=utf-8'
     },
     timeout: TIMEOUT_S * 1000,
@@ -548,13 +560,12 @@ function deletePlanet (planet) {
 }
 
 function uploadPlanets (data) {
-  const TIMEOUT_S = 2
-  return new Promise((resolve, reject) => xmlhttpRequest({
+  return new Promise((resolve, reject) => TM_xmlhttpRequest({
     method: 'POST',
-    url: 'http://localhost:3000/v1/planets',
+    url: `${window.apiUrl}/v1/planets`,
     data: JSON.stringify({ planets: data }),
     headers: {
-      token: 'TOKEN_pocket-wind-swung-barn',
+      token: window.apiKey,
       'content-type': 'application/json; charset=utf-8'
     },
     timeout: TIMEOUT_S * 1000,
@@ -576,14 +587,13 @@ function uploadPlanets (data) {
   }))
 }
 
-function uploadSpio (data) {
-  const TIMEOUT_S = 2
-  return new Promise((resolve, reject) => xmlhttpRequest({
+function uploadReports (data) {
+  return new Promise((resolve, reject) => TM_xmlhttpRequest({
     method: 'POST',
-    url: 'http://localhost:3000/v1/planets',
-    data: JSON.stringify({ planets: data }),
+    url: `${window.apiUrl}/v1/reports`,
+    data: JSON.stringify({ reports: data }),
     headers: {
-      token: 'TOKEN_pocket-wind-swung-barn',
+      token: window.apiKey,
       'content-type': 'application/json; charset=utf-8'
     },
     timeout: TIMEOUT_S * 1000,
@@ -596,8 +606,8 @@ function uploadSpio (data) {
           statusText: res.statusText,
           error: res.responseText
         }
-        console.warn('Error while sending planet information to server', err)
-        reject(new Error('Failed to send planet data to teamview server'))
+        console.warn('Error while sending reports to server', err)
+        reject(new Error('Failed to send reports to teamview server'))
       }
     },
     ontimeout: () => reject(new Error(`Timeout: Response did not arrive in ${TIMEOUT_S} seconds`)),
@@ -612,11 +622,11 @@ function uploadSpio (data) {
 function getPlanetUploadStatus (locations) {
   const TIMEOUT_S = 2
   const locationsConc = locations.join(',')
-  return new Promise((resolve, reject) => xmlhttpRequest({
+  return new Promise((resolve, reject) => TM_xmlhttpRequest({
     method: 'GET',
-    url: `http://localhost:3000/v1/planets/${locationsConc}?type=exists`,
+    url: `${window.apiUrl}/v1/planets/${locationsConc}?type=exists`,
     headers: {
-      token: 'TOKEN_pocket-wind-swung-barn',
+      token: window.apiKey,
       'content-type': 'application/json; charset=utf-8'
     },
     timeout: TIMEOUT_S * 1000,
@@ -640,6 +650,7 @@ function getPlanetUploadStatus (locations) {
 module.exports = {
   deletePlanet,
   uploadPlanets,
+  uploadReports,
   getPlanetUploadStatus,
   getPlayerData
 }
@@ -651,7 +662,10 @@ module.exports = {
 /*!***********************!*\
   !*** ./spioParser.js ***!
   \***********************/
-/***/ ((module) => {
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+const { setStatus, addStyles } = __webpack_require__(/*! ./teamviewSection */ "./teamviewSection.js")
+const req = __webpack_require__(/*! ./requests */ "./requests.js")
 
 class SpioParser {
   isSpioPage () {
@@ -739,7 +753,11 @@ class SpioParser {
       }
       return json
     }
-    const [dateRaw] = header.split(/\t/)
+    const [dateRaw, , subject] = header.split(/\t/)
+    let reportType = 'espionage'
+    if ([languageMap.messageType_en.enemySpy, languageMap.messageType_de.enemySpy].includes(subject)) {
+      reportType = 'enemySpy'
+    }
     const [report] = body.split(/\n\n/)
     const [title, ...content] = report.split(/\n/)
     const date = parseDate(dateRaw).toISOString()
@@ -747,6 +765,7 @@ class SpioParser {
     const jsons = parseData(content)
     return {
       id,
+      reportType,
       date,
       planet,
       jsons
@@ -916,15 +935,134 @@ const languageMap = {
     'produktionsmaximierung kristall': 'r_semiCrystalsResearch',
     'produktionsmaximierung deuterium': 'r_fuelResearch',
     gravitonforschung: 'r_gravitonResearch'
+  },
+  messageType_en: {
+    enemySpy: 'Spying activity',
+    espionage: 'Intelligence report'
+  },
+  messageType_de: {
+    enemySpy: 'Spionage-Aktivität',
+    espionage: 'Spionagebericht'
   }
 }
 
-function uploadSpies (reports) {
+function uploadReports () {
+  const sp = new SpioParser()
+  const messages = sp.getMessages()
+  const data = messages
+    .map(e => sp.parse_text(e))
+    .map(r => {
+      return {
+        reportId: r.id,
+        reportType: r.reportType,
+        galaxy: parseInt(r.planet.split(':')[0]),
+        system: parseInt(r.planet.split(':')[1]),
+        position: parseInt(r.planet.split(':')[2]),
+        date: r.date,
+        resources: r.jsons.resources,
+        buildings: r.jsons.buildings,
+        ships: r.jsons.ships,
+        research: r.jsons.research,
+        defense: r.jsons.defense
+      }
+    })
+  console.log(data)
+  const p = req.uploadReports(data)
+  p.then(res => {
+    const { totalCount, successCount } = JSON.parse(res.response)
+    setStatus('status-ok', `Submitted ${successCount}/${totalCount}`)
+  }).catch(e => {
+    setStatus('status-error', 'Failed, see console')
+    console.error(e)
+  })
+}
 
+function addUploadSection () {
+  const sectionHTML = `
+    <td class="transparent" id="teamview-section">
+      <table>
+        <tbody><tr>
+            <th colspan="4">Teamview</th>
+          </tr>
+          <tr>
+            <td><button type="button" id="teamview-upload">Upload</button></td>
+            <td><span style="font-weight: bold;">Status</span></div></td>
+            <td><span id="teamview-status-icon" class="dot status-unknown"></td>
+            <td><span id="teamview-status-text" style="font-size: 85%;"></span></td>
+        </tr>
+      </tbody></table>
+    </td>
+  `
+  document.querySelector('#messagestable').insertAdjacentHTML('afterend', sectionHTML)
+  document.getElementById('teamview-upload').addEventListener('click', uploadReports)
+
+  setStatus('status-outdated', 'ready to upload')
+
+  const button = document.getElementById('teamview-upload')
+  document.onkeydown = function (e) {
+    e = e || window.event
+    switch (e.which || e.keyCode) {
+      case 13 : // enter
+      case 32: // space
+        button.click()
+        break
+    }
+  }
+
+  // make sure that clicking the default navigation buttons also uploads data
+  const pagination = document.querySelector('#messagestable').querySelectorAll('.right a')
+  pagination.forEach(link => {
+    link.addEventListener('click', button.click.bind(this))
+  })
+}
+
+function init () {
+  const sp = new SpioParser()
+  if (sp.isSpioPage()) {
+    addStyles()
+    addUploadSection()
+  }
 }
 
 module.exports = {
-  SpioParser
+  SpioParser,
+  init
+}
+
+
+/***/ }),
+
+/***/ "./teamviewSection.js":
+/*!****************************!*\
+  !*** ./teamviewSection.js ***!
+  \****************************/
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+const { GM_addStyle } = __webpack_require__(/*! ./utils */ "./utils.js") // eslint-disable-line camelcase
+
+function addStyles () {
+  GM_addStyle('.fadein-text { -webkit-animation: fadein 2s; animation: fadein 2s;}')
+  GM_addStyle('@keyframes fadein { from { opacity: 0; } to { opacity: 1; }}')
+  GM_addStyle('@-webkit-keyframes fadein { from { opacity: 0; } to { opacity: 1; }}')
+
+  GM_addStyle('.dot { height: 7px; width: 7px; border-radius: 50%; display: inline-block;}')
+  GM_addStyle('.status-ok { background-color: #00ee00; }')
+  GM_addStyle('.status-error { background-color: #ee0000; }')
+  GM_addStyle('.status-outdated { background-color: #eeee00; }')
+  GM_addStyle('.status-unknown { background-color: #fff; }')
+  GM_addStyle('.status-working { animation: status-animation 0.7s infinite; animation-direction: alternate; }')
+  GM_addStyle('@keyframes status-animation { from {background-color: #fff;} to {background-color: #3ae;}}')
+}
+
+function setStatus (cssClass, text) {
+  const iconElm = document.getElementById('teamview-status-icon')
+  const textElm = document.getElementById('teamview-status-text')
+  iconElm.classList = `dot ${cssClass}`
+  textElm.innerText = text
+}
+module.exports = {
+  addStyles,
+  setStatus
 }
 
 
@@ -994,8 +1132,7 @@ var __webpack_exports__ = {};
 
 const gv = __webpack_require__(/*! ./galaxyview */ "./galaxyview.js")
 const pb = __webpack_require__(/*! ./planetBookmark */ "./planetBookmark.js")
-const { SpioParser } = __webpack_require__(/*! ./spioParser */ "./spioParser.js")
-const sp = new SpioParser()
+const sp = __webpack_require__(/*! ./spioParser */ "./spioParser.js")
 
 function addMenuButton () {
   // add button to menu
@@ -1021,11 +1158,7 @@ if (window.location.search.includes('page=galaxy')) {
   pb.addBookmarkButton()
 }
 
-if (sp.isSpioPage()) {
-  const messages = sp.getMessages()
-  const data = messages.map(e => sp.parse_text(e))
-  console.log(data)
-}
+sp.init()
 
 })();
 

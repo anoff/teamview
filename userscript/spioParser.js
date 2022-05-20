@@ -1,3 +1,6 @@
+const { setStatus, addStyles } = require('./teamviewSection')
+const req = require('./requests')
+
 class SpioParser {
   isSpioPage () {
     return window.location.search.includes('page=messages') && window.location.search.includes('category=0')
@@ -84,7 +87,11 @@ class SpioParser {
       }
       return json
     }
-    const [dateRaw] = header.split(/\t/)
+    const [dateRaw, , subject] = header.split(/\t/)
+    let reportType = 'espionage'
+    if ([languageMap.messageType_en.enemySpy, languageMap.messageType_de.enemySpy].includes(subject)) {
+      reportType = 'enemySpy'
+    }
     const [report] = body.split(/\n\n/)
     const [title, ...content] = report.split(/\n/)
     const date = parseDate(dateRaw).toISOString()
@@ -92,6 +99,7 @@ class SpioParser {
     const jsons = parseData(content)
     return {
       id,
+      reportType,
       date,
       planet,
       jsons
@@ -187,13 +195,170 @@ const languageMap = {
     'semi-crystals research': 'r_semiCrystalsResearch',
     'fuel research': 'r_fuelResearch',
     'graviton research': 'r_gravitonResearch'
+  },
+  spyitems_de: {
+    // lowercased
+    // resources
+    metall: 'res_metal',
+    kristall: 'res_crystal',
+    deuterium: 'res_deuterium',
+    energie: 'res_energy',
+    // ships
+    'kleiner transporter': 'sh_lightCargo',
+    'großer transporter': 'sh_heavyCargo',
+    'leichter jäger': 'sh_lightFighter',
+    'schwerer jäger': 'sh_heavyFighter',
+    kreuzer: 'sh_cruiser',
+    schlachtschiff: 'sh_battleship',
+    kolonieschiff: 'sh_colonyShip',
+    recycler: 'sh_recycler',
+    spionagesonde: 'sh_spyProbe',
+    bomber: 'sh_planetBomber',
+    solarsatellit: 'sh_solarSatellite',
+    zerstörer: 'sh_starFighter',
+    todesstern: 'sh_battleFortress',
+    schlachtkreuzer: 'sh_battleCruiser',
+    // defense
+    raketenwerfer: 'def_missileLauncher',
+    'leichtes lasergeschütz': 'def_lightLaserTurret',
+    'schweres lasergeschütz': 'def_heavyLaserTurret',
+    gaußkanone: 'def_gaussCannon',
+    ionengeschütz: 'def_ionCannon',
+    plasmawerfer: 'def_plasmaCannon',
+    'kleine schildkuppel': 'def_smallShieldDome',
+    'große schildkuppel': 'def_largeShieldDome',
+    abfangrakete: 'def_interceptor',
+    interplanetarrakete: 'def_interplanetaryMissiles',
+    // buildings
+    metallmine: 'b_metalMine',
+    kristallmine: 'b_crystalMine',
+    deuteriumsynthetisierer: 'b_deuteriumRefinery',
+    solarkraftwerk: 'b_solarPowerPlant',
+    technoDome: 'b_university',
+    fusionskraftwerk: 'b_deuteriumPowerPlant',
+    roboterfabrik: 'b_robotFactory',
+    nanitenfabrik: 'b_naniteFactory',
+    raumschiffwerft: 'b_shipyard',
+    metallspeicher: 'b_metalStorage',
+    kristallspeicher: 'b_crystalStorage',
+    deuteriumtank: 'b_deuteriumStorage',
+    forschungslabor: 'b_researchLab',
+    terraformer: 'b_terraformer',
+    allianzdepot: 'b_allianceDepot',
+    basisstützpunkt: 'b_moonBase',
+    sensorenphalanx: 'b_phalanxSensor',
+    sprungtor: 'b_jumpgate',
+    raketensilo: 'b_missileSilo',
+    // research
+    spionagetechnik: 'r_spyTechnology',
+    computertechnik: 'r_computerTechnology',
+    waffentechnik: 'r_weaponsTechnology',
+    schildtechnik: 'r_shieldTechnology',
+    raumschiffpanzerung: 'r_armourTechnology',
+    energietechnik: 'r_energyTechnology',
+    hyperraumtechnik: 'r_hyperspaceTechnology',
+    verbrennungstriebwerk: 'r_combustionEngine',
+    impulstriebwerk: 'r_impulseEngine',
+    hyperraumantrieb: 'r_hyperspaceEngine',
+    lasertechnik: 'r_laserTechnology',
+    ionentechnik: 'r_ionTechnology',
+    plasmatechnik: 'r_plasmaTechnology',
+    'intergalaktisches forschungsnetzwerk': 'r_intergalacticResearchNetwork',
+    astrophysik: 'r_expeditionResearch',
+    'produktionsmaximierung metall': 'r_mineralResearch',
+    'produktionsmaximierung kristall': 'r_semiCrystalsResearch',
+    'produktionsmaximierung deuterium': 'r_fuelResearch',
+    gravitonforschung: 'r_gravitonResearch'
+  },
+  messageType_en: {
+    enemySpy: 'Spying activity',
+    espionage: 'Intelligence report'
+  },
+  messageType_de: {
+    enemySpy: 'Spionage-Aktivität',
+    espionage: 'Spionagebericht'
   }
 }
 
-function uploadSpies (reports) {
+function uploadReports () {
+  const sp = new SpioParser()
+  const messages = sp.getMessages()
+  const data = messages
+    .map(e => sp.parse_text(e))
+    .map(r => {
+      return {
+        reportId: r.id,
+        reportType: r.reportType,
+        galaxy: parseInt(r.planet.split(':')[0]),
+        system: parseInt(r.planet.split(':')[1]),
+        position: parseInt(r.planet.split(':')[2]),
+        date: r.date,
+        resources: r.jsons.resources,
+        buildings: r.jsons.buildings,
+        ships: r.jsons.ships,
+        research: r.jsons.research,
+        defense: r.jsons.defense
+      }
+    })
+  console.log(data)
+  const p = req.uploadReports(data)
+  p.then(res => {
+    const { totalCount, successCount } = JSON.parse(res.response)
+    setStatus('status-ok', `Submitted ${successCount}/${totalCount}`)
+  }).catch(e => {
+    setStatus('status-error', 'Failed, see console')
+    console.error(e)
+  })
+}
 
+function addUploadSection () {
+  const sectionHTML = `
+    <td class="transparent" id="teamview-section">
+      <table>
+        <tbody><tr>
+            <th colspan="4">Teamview</th>
+          </tr>
+          <tr>
+            <td><button type="button" id="teamview-upload">Upload</button></td>
+            <td><span style="font-weight: bold;">Status</span></div></td>
+            <td><span id="teamview-status-icon" class="dot status-unknown"></td>
+            <td><span id="teamview-status-text" style="font-size: 85%;"></span></td>
+        </tr>
+      </tbody></table>
+    </td>
+  `
+  document.querySelector('#messagestable').insertAdjacentHTML('afterend', sectionHTML)
+  document.getElementById('teamview-upload').addEventListener('click', uploadReports)
+
+  setStatus('status-outdated', 'ready to upload')
+
+  const button = document.getElementById('teamview-upload')
+  document.onkeydown = function (e) {
+    e = e || window.event
+    switch (e.which || e.keyCode) {
+      case 13 : // enter
+      case 32: // space
+        button.click()
+        break
+    }
+  }
+
+  // make sure that clicking the default navigation buttons also uploads data
+  const pagination = document.querySelector('#messagestable').querySelectorAll('.right a')
+  pagination.forEach(link => {
+    link.addEventListener('click', button.click.bind(this))
+  })
+}
+
+function init () {
+  const sp = new SpioParser()
+  if (sp.isSpioPage()) {
+    addStyles()
+    addUploadSection()
+  }
 }
 
 module.exports = {
-  SpioParser
+  SpioParser,
+  init
 }
