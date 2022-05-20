@@ -36,7 +36,11 @@ async function initDb () {
           table.string('value').unique().index()
           table.string('password')
           table.timestamps(false, true, true)
-        })
+        }).raw(`
+          CREATE TRIGGER update_user_updated_at BEFORE UPDATE
+          ON ?? FOR EACH ROW EXECUTE PROCEDURE 
+          update_updated_at_column();
+        `, ['reports'])
     }
 
     // await knex.schema.dropTableIfExists('teams')
@@ -76,7 +80,11 @@ async function initDb () {
           table.integer('battlesWon').unsigned()
           table.integer('battlesDraw').unsigned()
           table.timestamps(false, true, true)
-        })
+        }).raw(`
+          CREATE TRIGGER update_user_updated_at BEFORE UPDATE
+          ON ?? FOR EACH ROW EXECUTE PROCEDURE 
+          update_updated_at_column();
+        `, ['reports'])
     }
 
     tableExists = await knex.schema.hasTable('planets')
@@ -94,9 +102,13 @@ async function initDb () {
           table.integer('debrisMetal').unsigned()
           table.integer('debrisCrystal').unsigned()
           table.integer('teamId').unsigned().references('teams.id')
-          table.integer('playerId').unsigned().references('players.id')
+          table.integer('playerIngameId').unsigned()
           table.timestamps(false, true, true)
-        })
+        }).raw(`
+          CREATE TRIGGER update_user_updated_at BEFORE UPDATE
+          ON ?? FOR EACH ROW EXECUTE PROCEDURE 
+          update_updated_at_column();
+        `, ['reports'])
     }
     // await knex.schema.dropTableIfExists('teamMembers')
     tableExists = await knex.schema.hasTable('teamMembers')
@@ -109,18 +121,23 @@ async function initDb () {
           table.integer('tokenId').unsigned().references('tokens.id')
           table.integer('teamId').unsigned().references('teams.id')
           table.timestamps(false, true, true)
-        })
+        }).raw(`
+          CREATE TRIGGER update_user_updated_at BEFORE UPDATE
+          ON ?? FOR EACH ROW EXECUTE PROCEDURE 
+          update_updated_at_column();
+        `, ['reports'])
     }
 
-    // await knex.schema.dropTableIfExists('spyreports')
-    tableExists = await knex.schema.hasTable('spyreports')
+    await knex.schema.dropTableIfExists('reports')
+    tableExists = await knex.schema.hasTable('reports')
     if (!tableExists) {
-      console.log('recreate spyreports')
+      console.log('recreate reports')
       // Create a table
       await knex.schema
-        .createTable('spyreports', table => {
+        .createTable('reports', table => {
           table.increments('id')
           table.integer('reportId').unsigned()
+          table.string('reportType')
           table.date('date')
           table.json('resources')
           table.json('buildings')
@@ -134,7 +151,7 @@ async function initDb () {
           CREATE TRIGGER update_user_updated_at BEFORE UPDATE
           ON ?? FOR EACH ROW EXECUTE PROCEDURE 
           update_updated_at_column();
-        `, ['spyreports'])
+        `, ['reports'])
     }
   } catch (e) {
     console.error(e)

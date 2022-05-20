@@ -30,11 +30,8 @@ Limitations:
 
 ```mermaid
 classDiagram
-  teamMembers --> teams
-  teamMembers --> tokens
   planets --> players
-  planets --> teams
-  research --> players
+  spyReports --> planets
   class tokens {
     id: int
     name: string
@@ -57,13 +54,19 @@ classDiagram
     galaxy: int
     system: int
     position: int
+    gamePlanetId: int
+    playerIngameId: int [soft ref]
+  }
+  class spyReports {
+    id: int
+    reportId: int
+    reportType: string
+    date: date
     resources: json
     buildings: json
     fleet: json
     defense: json
-    gamePlanetId: int
-    playerId: int (players.id)
-    access: int (teams.id)
+    planetId: int (planets.id)
   }
   class players {
     id: int
@@ -80,13 +83,6 @@ classDiagram
     battlesWon: int
     battlesDraw: int
     research: json
-    access: int (teams.id)
-  }
-  class research {
-    id: int
-    stuff...
-    playerId: int (players.id)
-    access: int (teams.id)
   }
 ```
 
