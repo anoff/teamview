@@ -138,7 +138,7 @@ async function initDb () {
           table.increments('id')
           table.integer('reportId').unsigned()
           table.string('reportType')
-          table.date('date')
+          table.datetime('date')
           table.json('resources') // somehow knex creates text columns
           table.json('buildings')
           table.json('ships')
