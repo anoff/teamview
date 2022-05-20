@@ -1,11 +1,11 @@
-/* globals xmlhttpRequest */
+/* globals TM_xmlhttpRequest */
 
 function getPlayerData (names) {
   const namesArray = names.join(',')
   console.log('sending request', namesArray)
-  return new Promise((resolve, reject) => xmlhttpRequest({
+  return new Promise((resolve, reject) => TM_xmlhttpRequest({
     method: 'GET',
-    url: `http://localhost:3000/v1/players/${namesArray}`,
+    url: `${apiUrl}/v1/players/${namesArray}`,
     headers: {
       token: 'TOKEN_pocket-wind-swung-barn'
     },
@@ -25,9 +25,9 @@ function deletePlanet (planet) {
   const TIMEOUT_S = 2
 
   const location = `${planet.galaxy}:${planet.system}:${planet.position}`
-  return new Promise((resolve, reject) => xmlhttpRequest({
+  return new Promise((resolve, reject) => TM_xmlhttpRequest({
     method: 'DELETE',
-    url: `http://localhost:3000/v1/planets/${location}`,
+    url: `${apiUrl}/v1/planets/${location}`,
     headers: {
       token: 'TOKEN_pocket-wind-swung-barn',
       'content-type': 'application/json; charset=utf-8'
@@ -53,9 +53,9 @@ function deletePlanet (planet) {
 
 function uploadPlanets (data) {
   const TIMEOUT_S = 2
-  return new Promise((resolve, reject) => xmlhttpRequest({
+  return new Promise((resolve, reject) => TM_xmlhttpRequest({
     method: 'POST',
-    url: 'http://localhost:3000/v1/planets',
+    url: `${apiUrl}/v1/planets`,
     data: JSON.stringify({ planets: data }),
     headers: {
       token: 'TOKEN_pocket-wind-swung-barn',
@@ -82,9 +82,9 @@ function uploadPlanets (data) {
 
 function uploadSpio (data) {
   const TIMEOUT_S = 2
-  return new Promise((resolve, reject) => xmlhttpRequest({
+  return new Promise((resolve, reject) => TM_xmlhttpRequest({
     method: 'POST',
-    url: 'http://localhost:3000/v1/planets',
+    url: `${apiUrl}/v1/planets`,
     data: JSON.stringify({ planets: data }),
     headers: {
       token: 'TOKEN_pocket-wind-swung-barn',
@@ -116,9 +116,9 @@ function uploadSpio (data) {
 function getPlanetUploadStatus (locations) {
   const TIMEOUT_S = 2
   const locationsConc = locations.join(',')
-  return new Promise((resolve, reject) => xmlhttpRequest({
+  return new Promise((resolve, reject) => TM_xmlhttpRequest({
     method: 'GET',
-    url: `http://localhost:3000/v1/planets/${locationsConc}?type=exists`,
+    url: `${apiUrl}/v1/planets/${locationsConc}?type=exists`,
     headers: {
       token: 'TOKEN_pocket-wind-swung-barn',
       'content-type': 'application/json; charset=utf-8'
@@ -144,6 +144,7 @@ function getPlanetUploadStatus (locations) {
 module.exports = {
   deletePlanet,
   uploadPlanets,
+  uploadSpio,
   getPlanetUploadStatus,
   getPlayerData
 }
