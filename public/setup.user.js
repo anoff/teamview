@@ -16,7 +16,6 @@
 /* globals unsafeWindow, GM_getValue, GM_setValue, GM_xmlhttpRequest */
 (function teamviewInit () {
   // const version = GM_getValue('version') || '1.0.0'
-  const apiKey = GM_getValue('api_key')
   const debugMode = GM_getValue('debug_mode') === 1
   const developerMode = GM_getValue('developer_mode') === 1
   let apiUrl = developerMode ? 'http://localhost:3000' : 'https://teamview.mietemieze.de'
@@ -33,7 +32,6 @@
   unsafeWindow.TM_setValue = GM_setValue
   unsafeWindow.TM_getValue = GM_getValue
 
-  unsafeWindow.apiKey = apiKey
   unsafeWindow.debugMode = debugMode
   unsafeWindow.apiUrl = apiUrl
 })()

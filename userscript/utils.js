@@ -11,5 +11,5 @@ function GM_addStyle (css) { // eslint-disable-line camelcase
 }
 
 module.exports = {
-  GM_addStyle
+  GM_addStyle // eslint-disable-line camelcase
 }

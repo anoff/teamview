@@ -43,5 +43,10 @@
       ".devcontainer/*"
     ],
     "exec": "node index.js | pino-pretty"
+  },
+  "standard": {
+    "ignore": [
+      "public/teamview.js"
+    ]
   }
 }

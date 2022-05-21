@@ -19,7 +19,7 @@ async function initDb () {
     CREATE OR REPLACE FUNCTION update_updated_at_column()
     RETURNS TRIGGER AS $$
     BEGIN
-     NEW."updatedAt"=now(); 
+     NEW."updated_at"=now(); 
      RETURN NEW;
     END;
     $$ language 'plpgsql';
@@ -37,10 +37,9 @@ async function initDb () {
           table.string('password')
           table.timestamps(false, true, true)
         }).raw(`
-          CREATE TRIGGER update_user_updated_at BEFORE UPDATE
-          ON ?? FOR EACH ROW EXECUTE PROCEDURE 
-          update_updated_at_column();
-        `, ['reports'])
+          CREATE TRIGGER update_tokens_updated_at BEFORE UPDATE
+          ON tokens FOR EACH ROW EXECUTE PROCEDURE 
+          update_updated_at_column();`)
     }
 
     // await knex.schema.dropTableIfExists('teams')
@@ -53,8 +52,11 @@ async function initDb () {
           table.increments('id')
           table.string('name').unique()
           table.string('code').unique().index()
-          table.timestamps(false, true, true)
-        })
+          table.timestamps(false, true)
+        }).raw(`
+        CREATE TRIGGER update_teams_updated_at BEFORE UPDATE
+        ON teams FOR EACH ROW EXECUTE PROCEDURE 
+        update_updated_at_column();`)
     }
     // await knex.schema.dropTableIfExists('planets')
     // await knex.schema.dropTableIfExists('players')
@@ -79,12 +81,11 @@ async function initDb () {
           table.integer('battlesLost').unsigned()
           table.integer('battlesWon').unsigned()
           table.integer('battlesDraw').unsigned()
-          table.timestamps(false, true, true)
+          table.timestamps(false, true)
         }).raw(`
-          CREATE TRIGGER update_user_updated_at BEFORE UPDATE
-          ON ?? FOR EACH ROW EXECUTE PROCEDURE 
-          update_updated_at_column();
-        `, ['reports'])
+          CREATE TRIGGER update_players_updated_at BEFORE UPDATE
+          ON players FOR EACH ROW EXECUTE PROCEDURE 
+          update_updated_at_column();`)
     }
 
     tableExists = await knex.schema.hasTable('planets')
@@ -105,10 +106,9 @@ async function initDb () {
           table.integer('playerIngameId').unsigned()
           table.timestamps(false, true, true)
         }).raw(`
-          CREATE TRIGGER update_user_updated_at BEFORE UPDATE
-          ON ?? FOR EACH ROW EXECUTE PROCEDURE 
-          update_updated_at_column();
-        `, ['reports'])
+          CREATE TRIGGER update_planets_updated_at BEFORE UPDATE
+          ON planets FOR EACH ROW EXECUTE PROCEDURE 
+          update_updated_at_column();`)
     }
     // await knex.schema.dropTableIfExists('teamMembers')
     tableExists = await knex.schema.hasTable('teamMembers')
@@ -122,10 +122,9 @@ async function initDb () {
           table.integer('teamId').unsigned().references('teams.id')
           table.timestamps(false, true, true)
         }).raw(`
-          CREATE TRIGGER update_user_updated_at BEFORE UPDATE
-          ON ?? FOR EACH ROW EXECUTE PROCEDURE 
-          update_updated_at_column();
-        `, ['reports'])
+          CREATE TRIGGER update_team_members_updated_at BEFORE UPDATE
+          ON team_members FOR EACH ROW EXECUTE PROCEDURE 
+          update_updated_at_column();`)
     }
 
     await knex.schema.dropTableIfExists('reports')
@@ -136,29 +135,21 @@ async function initDb () {
       await knex.schema
         .createTable('reports', table => {
           table.increments('id')
-          table.integer('reportId').unsigned()
-          table.string('reportType')
+          table.integer('report_id').unsigned()
+          table.string('report_type')
+          table.integer('submitted_by').references('tokens.id')
           table.datetime('date')
-          table.json('resources') // somehow knex creates text columns
+          table.json('resources')
           table.json('buildings')
           table.json('ships')
           table.json('research')
           table.json('defense')
-          table.integer('planetId').unsigned().references('planets.id')
-          table.timestamps(false, true, true)
-        })
-        .raw(`
-          CREATE TRIGGER update_user_updated_at BEFORE UPDATE
-          ON ?? FOR EACH ROW EXECUTE PROCEDURE 
-          update_updated_at_column();
-        `, ['reports'])
-        // .raw(`
-        //   ALTER TABLE reports
-        //   ADD COLUMN resources json,
-        //   ADD COLUMN buildings json,
-        //   ADD COLUMN ships json,
-        //   ADD COLUMN defense json,
-        //   ADD COLUMN research json`)
+          table.integer('planets_id').unsigned().references('planets.id')
+          table.timestamps(false, true)
+        }).raw(`
+          CREATE TRIGGER update_reports_updated_at BEFORE UPDATE
+          ON reports FOR EACH ROW EXECUTE PROCEDURE 
+          update_updated_at_column();`)
     }
   } catch (e) {
     console.error(e)

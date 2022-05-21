@@ -1,6 +1,7 @@
-/* globals TM_xmlhttpRequest */
+/* globals TM_xmlhttpRequest, TM_getValue */
 
 const TIMEOUT_S = 2 // timeout for request
+const APIKEY = TM_getValue('api_key')
 
 function getPlayerData (names) {
   const namesArray = names.join(',')
@@ -9,7 +10,7 @@ function getPlayerData (names) {
     method: 'GET',
     url: `${window.apiUrl}/v1/players/${namesArray}`,
     headers: {
-      token: window.apiKey
+      token: APIKEY
     },
     onload: function (res) {
       if (res.status === 200) {
@@ -29,7 +30,7 @@ function deletePlanet (planet) {
     method: 'DELETE',
     url: `${window.apiUrl}/v1/planets/${location}`,
     headers: {
-      token: window.apiKey,
+      token: APIKEY,
       'content-type': 'application/json; charset=utf-8'
     },
     timeout: TIMEOUT_S * 1000,
@@ -57,7 +58,7 @@ function uploadPlanets (data) {
     url: `${window.apiUrl}/v1/planets`,
     data: JSON.stringify({ planets: data }),
     headers: {
-      token: window.apiKey,
+      token: APIKEY,
       'content-type': 'application/json; charset=utf-8'
     },
     timeout: TIMEOUT_S * 1000,
@@ -85,7 +86,7 @@ function uploadReports (data) {
     url: `${window.apiUrl}/v1/reports`,
     data: JSON.stringify({ reports: data }),
     headers: {
-      token: window.apiKey,
+      token: APIKEY,
       'content-type': 'application/json; charset=utf-8'
     },
     timeout: TIMEOUT_S * 1000,
@@ -118,7 +119,7 @@ function getPlanetUploadStatus (locations) {
     method: 'GET',
     url: `${window.apiUrl}/v1/planets/${locationsConc}?type=exists`,
     headers: {
-      token: window.apiKey,
+      token: APIKEY,
       'content-type': 'application/json; charset=utf-8'
     },
     timeout: TIMEOUT_S * 1000,
