@@ -110,16 +110,16 @@ async function initDb () {
           ON planets FOR EACH ROW EXECUTE PROCEDURE 
           update_updated_at_column();`)
     }
-    // await knex.schema.dropTableIfExists('teamMembers')
-    tableExists = await knex.schema.hasTable('teamMembers')
+    // await knex.schema.dropTableIfExists('team_members')
+    tableExists = await knex.schema.hasTable('team_members')
     if (!tableExists) {
-      console.log('recreate teamMembers')
+      console.log('recreate team_members')
       // Create a table
       await knex.schema
-        .createTable('teamMembers', table => {
+        .createTable('team_members', table => {
           table.increments('id')
-          table.integer('tokenId').unsigned().references('tokens.id')
-          table.integer('teamId').unsigned().references('teams.id')
+          table.integer('tokens_id').unsigned().references('tokens.id')
+          table.integer('teams_id').unsigned().references('teams.id')
           table.timestamps(false, true, true)
         }).raw(`
           CREATE OR REPLACE TRIGGER update_team_members_updated_at BEFORE UPDATE
@@ -127,7 +127,7 @@ async function initDb () {
           update_updated_at_column();`)
     }
 
-    await knex.schema.dropTableIfExists('reports')
+    // await knex.schema.dropTableIfExists('reports')
     tableExists = await knex.schema.hasTable('reports')
     if (!tableExists) {
       console.log('recreate reports')

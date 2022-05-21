@@ -44,10 +44,10 @@ classDiagram
     name: string
     code: string
   }
-  class teamMembers {
+  class team_members {
     id: int
-    tokenId: int (tokens.id)
-    teamId: int (teams.id)
+    tokens_id: int (tokens.id)
+    teams_id: int (teams.id)
   }
   class planets {
     id: int
@@ -55,37 +55,46 @@ classDiagram
     galaxy: int
     system: int
     position: int
-    gamePlanetId: int
-    playerIngameId: int [soft ref]
+    has_moon: bool
+    debris_metal: int
+    debris_crystal: int
+    teams_id: int (teams.id)
+    players_ingame_id: int [soft ref]
   }
-  class spyReports {
+  class reports {
     id: int
-    reportId: int
-    reportType: string
+    report_id: int
+    report_type: string
     date: date
     resources: json
     buildings: json
-    fleet: json
+    ships: json
+    research: json
     defense: json
-    planetId: int (planets.id)
+    submitted_by: int (tokens.id)
+    planets_id: int (planets.id)
   }
   class players {
     id: int
     name: string
     alliance: string
     rank: int
-    pointsResearch: int
-    pointsDefense: int
-    pointsFleet: int
-    pointsBuilding: int
-    unitsDestroyed: int
-    unitsLost: int
-    battlesLost: int
-    battlesWon: int
-    battlesDraw: int
+    points_research: int
+    points_defense: int
+    points_fleet: int
+    points_building: int
+    units_destroyed: int
+    units_lost: int
+    battles_lost: int
+    battles_won: int
+    battles_draw: int
     research: json
   }
 ```
+
+The respective classes in `lib/data` use camelCase notation instead of snake_case.
+To convert to/from DB format each class has a .toDBformat() method that converts the case.
+To create a new object from a DB result, rather than using the constructor use the static method `Class.fromDB()`
 
 ## Todo
 
