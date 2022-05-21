@@ -107,6 +107,39 @@ function uploadReports (data) {
     onerror: e => reject(e)
   }))
 }
+
+/**
+ * Get the latest report ids that were submitted by a token
+ * @returns {Array[int]} list of report ids
+ */
+function getUploadedReports () {
+  const TIMEOUT_S = 2
+  return new Promise((resolve, reject) => TM_xmlhttpRequest({
+    method: 'GET',
+    url: `${window.apiUrl}/v1/reports?type=mine`,
+    headers: {
+      token: APIKEY,
+      'content-type': 'application/json; charset=utf-8'
+    },
+    timeout: TIMEOUT_S * 1000,
+    onload: function (res) {
+      if (res.status === 200) {
+        resolve(res)
+      } else {
+        const err = {
+          status: res.status,
+          statusText: res.statusText,
+          error: res.responseText
+        }
+        console.warn('Failed to request uploaded reports', err)
+        reject(new Error('Failed to request uploaded reports'))
+      }
+    },
+    ontimeout: () => reject(new Error(`Timeout: Response did not arrive in ${TIMEOUT_S} seconds`)),
+    onerror: e => reject(e)
+  }))
+}
+
 /**
  * Check which planets in a given system are already known
  * @param {Array[string]} locations a list of locations in format <SYSTEM>:<GALAXY>:[POSITION]
@@ -144,6 +177,7 @@ module.exports = {
   deletePlanet,
   uploadPlanets,
   uploadReports,
+  getUploadedReports,
   getPlanetUploadStatus,
   getPlayerData
 }

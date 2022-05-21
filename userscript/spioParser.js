@@ -1,3 +1,4 @@
+/* global TM_getValue, TM_setValue */
 const { setStatus, addStyles } = require('./teamviewSection')
 const req = require('./requests')
 
@@ -300,7 +301,11 @@ function uploadReports () {
         defense: r.jsons.defense
       }
     })
-  console.log(data)
+  // console.log(data)
+  const uploadedReports = TM_getValue('reports_uploaded')
+  uploadedReports.push(...data.map(e => e.reportId))
+  TM_setValue('reports_uploaded', uploadedReports)
+  colorReports()
   const p = req.uploadReports(data)
   p.then(res => {
     const { totalCount, successCount } = JSON.parse(res.response)
@@ -350,11 +355,42 @@ function addUploadSection () {
   })
 }
 
+function colorReports () {
+  const uploadedReports = TM_getValue('reports_uploaded')
+  const reportsOnPage = Array.from(document.querySelectorAll('.message_head')).map(e => parseInt(e.id.split('_')[1]))
+  for (const id of reportsOnPage) {
+    const title = document.querySelectorAll(`tr.message_${id}.message_head td`)[2]
+    if (uploadedReports.includes(id)) {
+      title.classList = 'status-ok text-black'
+    } else {
+      title.classList = 'status-outdated text-black'
+    }
+  }
+}
+
+function fetchUploadedReports () {
+  return req.getUploadedReports().then(res => {
+    const uploadedReports = TM_getValue('reports_uploaded')
+    const data = JSON.parse(res.response)
+    for (const id of data) {
+      if (!uploadedReports.includes(id)) {
+        uploadedReports.push(id)
+      }
+    }
+    TM_setValue('reports_uploaded', uploadedReports.slice(-50)) // limit to last 50 items
+  }).catch(e => {
+    setStatus('status-error', 'Error, see console')
+    console.error('Error while fetching uploaded reports', e)
+  })
+}
 function init () {
   const sp = new SpioParser()
+  if (!TM_getValue('reports_uploaded')) TM_setValue('reports_uploaded', [])
   if (sp.isSpioPage()) {
     addStyles()
     addUploadSection()
+    colorReports()
+    fetchUploadedReports().then(colorReports.bind(this))
   }
 }
 

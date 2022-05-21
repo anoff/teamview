@@ -11,6 +11,7 @@ function addStyles () {
   GM_addStyle('.status-outdated { background-color: #eeee00; }')
   GM_addStyle('.status-unknown { background-color: #fff; }')
   GM_addStyle('.status-working { animation: status-animation 0.7s infinite; animation-direction: alternate; }')
+  GM_addStyle('.text-black { color: #000; }')
   GM_addStyle('@keyframes status-animation { from {background-color: #fff;} to {background-color: #3ae;}}')
 }
 
