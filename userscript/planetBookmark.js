@@ -1,4 +1,4 @@
-/* globals  GM_setValue, GM_getValue */
+/* globals  TM_setValue, TM_getValue */
 
 function removeRows () {
   // all indexes 0-based
@@ -31,8 +31,7 @@ function insertBookmarkedRows () {
   Array.from(cols).slice(5).forEach(e => e.remove())
 
   const bookmarkOrderFn = b => b.position + b.system * 50 + b.galaxy * 400 * 50
-  const bookmarks = GM_getValue('bookmarks').sort((a, b) => bookmarkOrderFn(a) > bookmarkOrderFn(b) ? -1 : 1)
-  console.log(bookmarks)
+  const bookmarks = TM_getValue('bookmarks').sort((a, b) => bookmarkOrderFn(a) > bookmarkOrderFn(b) ? -1 : 1)
   for (const b of bookmarks) {
     let timeSinceLastScan = '-'
     if (b.lastScan) {
@@ -59,11 +58,11 @@ function insertBookmarkedRows () {
     colRow.insertAdjacentHTML('afterend', html)
 
     function removeBookmark (planetId) {
-      const bookmarks = GM_getValue('bookmarks')
+      const bookmarks = TM_getValue('bookmarks')
       const ix = bookmarks.findIndex(e => e.planetId === planetId)
       if (ix > -1) {
         bookmarks.splice(ix, 1)
-        GM_setValue('bookmarks', bookmarks)
+        TM_setValue('bookmarks', bookmarks)
         const row = document.getElementById(`row-${planetId}`)
         row.remove()
       }
@@ -118,7 +117,7 @@ function addBookmarkButton () {
 }
 
 function addBookmark (galaxy, system, position, planetId, planetName, playerName) {
-  let bookmarks = GM_getValue('bookmarks')
+  let bookmarks = TM_getValue('bookmarks')
   if (!bookmarks) {
     bookmarks = []
   }
@@ -128,11 +127,11 @@ function addBookmark (galaxy, system, position, planetId, planetName, playerName
   } else {
     bookmarks.push({ galaxy, system, position, planetId, planetName, playerName })
   }
-  GM_setValue('bookmarks', bookmarks)
+  TM_setValue('bookmarks', bookmarks)
 }
 
 function updateTimestamp (planetId) {
-  let bookmarks = GM_getValue('bookmarks')
+  let bookmarks = TM_getValue('bookmarks')
   if (!bookmarks) {
     bookmarks = []
   }
@@ -140,13 +139,21 @@ function updateTimestamp (planetId) {
   if (ix > -1) {
     bookmarks[ix].lastScan = new Date().toISOString()
   }
-  GM_setValue('bookmarks', bookmarks)
+  TM_setValue('bookmarks', bookmarks)
+}
+
+function init () {
+  if (TM_getValue('bookmarks') === undefined) {
+    TM_setValue('bookmarks', [])
+  }
+  addBookmarkButton()
+  addShowFavoritesButton()
 }
 
 module.exports = {
   addBookmarkButton,
   addShowFavoritesButton,
-  removeRows
+  init
 }
 
 // use these to combile planetBookmark standalone

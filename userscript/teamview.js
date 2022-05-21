@@ -25,8 +25,7 @@ addMenuButton()
 
 if (window.location.search.includes('page=galaxy')) {
   gv.init()
-  pb.addShowFavoritesButton()
-  pb.addBookmarkButton()
+  pb.init()
 }
 
 sp.init()
