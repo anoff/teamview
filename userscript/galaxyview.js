@@ -88,7 +88,7 @@ function checkPlanetStatus (systemData) {
           status = 'Inconsistent'
           statusClass = 'status-outdated'
         }
-        const ageS = serverData.map(e => (new Date() - new Date(e.updatedAt)) / 1000).sort()
+        const ageS = serverData.map(e => (new Date() - new Date(e.updated_at)) / 1000).sort()
         if (ageS / 3600 > MAX_AGE_PLANET_H) {
           status = 'Outdated'
           statusClass = 'status-outdated'

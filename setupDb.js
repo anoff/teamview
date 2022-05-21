@@ -37,7 +37,7 @@ async function initDb () {
           table.string('password')
           table.timestamps(false, true, true)
         }).raw(`
-          CREATE TRIGGER update_tokens_updated_at BEFORE UPDATE
+          CREATE OR REPLACE TRIGGER update_tokens_updated_at BEFORE UPDATE
           ON tokens FOR EACH ROW EXECUTE PROCEDURE 
           update_updated_at_column();`)
     }
@@ -54,7 +54,7 @@ async function initDb () {
           table.string('code').unique().index()
           table.timestamps(false, true)
         }).raw(`
-        CREATE TRIGGER update_teams_updated_at BEFORE UPDATE
+        CREATE OR REPLACE TRIGGER update_teams_updated_at BEFORE UPDATE
         ON teams FOR EACH ROW EXECUTE PROCEDURE 
         update_updated_at_column();`)
     }
@@ -67,23 +67,23 @@ async function initDb () {
       await knex.schema
         .createTable('players', table => {
           table.increments('id')
-          table.integer('ingameId').unsigned()
+          table.integer('ingame_id').unsigned()
           table.string('name').index()
           table.string('alliance')
           table.integer('rank').unsigned()
-          table.integer('pointsResearch').unsigned()
-          table.integer('pointsDefense').unsigned()
-          table.integer('pointsFleet').unsigned()
-          table.integer('pointsBuilding').unsigned()
+          table.integer('points_research').unsigned()
+          table.integer('points_defense').unsigned()
+          table.integer('points_fleet').unsigned()
+          table.integer('points_building').unsigned()
           table.integer('points').unsigned()
-          table.integer('unitsDestroyed').unsigned()
-          table.integer('unitsLost').unsigned()
-          table.integer('battlesLost').unsigned()
-          table.integer('battlesWon').unsigned()
-          table.integer('battlesDraw').unsigned()
+          table.integer('units_destroyed').unsigned()
+          table.integer('units_lost').unsigned()
+          table.integer('battles_lost').unsigned()
+          table.integer('battles_won').unsigned()
+          table.integer('battles_wraw').unsigned()
           table.timestamps(false, true)
         }).raw(`
-          CREATE TRIGGER update_players_updated_at BEFORE UPDATE
+          CREATE OR REPLACE TRIGGER update_players_updated_at BEFORE UPDATE
           ON players FOR EACH ROW EXECUTE PROCEDURE 
           update_updated_at_column();`)
     }
@@ -99,14 +99,14 @@ async function initDb () {
           table.integer('galaxy').unsigned().index()
           table.integer('system').unsigned().index()
           table.integer('position').unsigned().index()
-          table.bool('hasMoon')
-          table.integer('debrisMetal').unsigned()
-          table.integer('debrisCrystal').unsigned()
-          table.integer('teamId').unsigned().references('teams.id')
-          table.integer('playerIngameId').unsigned()
+          table.bool('has_moon')
+          table.integer('debris_metal').unsigned()
+          table.integer('debris_mrystal').unsigned()
+          table.integer('teams_id').unsigned().references('teams.id')
+          table.integer('players_ingame_id').unsigned()
           table.timestamps(false, true, true)
         }).raw(`
-          CREATE TRIGGER update_planets_updated_at BEFORE UPDATE
+          CREATE OR REPLACE TRIGGER update_planets_updated_at BEFORE UPDATE
           ON planets FOR EACH ROW EXECUTE PROCEDURE 
           update_updated_at_column();`)
     }
@@ -122,7 +122,7 @@ async function initDb () {
           table.integer('teamId').unsigned().references('teams.id')
           table.timestamps(false, true, true)
         }).raw(`
-          CREATE TRIGGER update_team_members_updated_at BEFORE UPDATE
+          CREATE OR REPLACE TRIGGER update_team_members_updated_at BEFORE UPDATE
           ON team_members FOR EACH ROW EXECUTE PROCEDURE 
           update_updated_at_column();`)
     }
@@ -147,7 +147,7 @@ async function initDb () {
           table.integer('planets_id').unsigned().references('planets.id')
           table.timestamps(false, true)
         }).raw(`
-          CREATE TRIGGER update_reports_updated_at BEFORE UPDATE
+          CREATE OR REPLACE TRIGGER update_reports_updated_at BEFORE UPDATE
           ON reports FOR EACH ROW EXECUTE PROCEDURE 
           update_updated_at_column();`)
     }

@@ -110,7 +110,7 @@ function uploadReports (data) {
 /**
  * Check which planets in a given system are already known
  * @param {Array[string]} locations a list of locations in format <SYSTEM>:<GALAXY>:[POSITION]
- * @returns {Array[string]} list of redacted planet info only containing location info and updatedAt time
+ * @returns {Array[string]} list of redacted planet info only containing location info and updated_at time
  */
 function getPlanetUploadStatus (locations) {
   const TIMEOUT_S = 2
