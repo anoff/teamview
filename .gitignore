@@ -4,3 +4,5 @@ data.db
 *.session.sql
 secrets
 dist/
+public/teamview.js
+importStats.hash
