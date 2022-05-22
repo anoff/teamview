@@ -6,3 +6,4 @@ secrets
 dist/
 public/teamview.js
 importStats.hash
+.DS_Store

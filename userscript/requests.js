@@ -141,16 +141,16 @@ function getUploadedReports () {
 }
 
 /**
- * Check which planets in a given system are already known
+ * Get information about uploaded planets incl spy reports
  * @param {Array[string]} locations a list of locations in format <SYSTEM>:<GALAXY>:[POSITION]
- * @returns {Array[string]} list of redacted planet info only containing location info and updated_at time
+ * @returns {Array[string]} list of redacted planet info only containing location info, updated_at time and latest report
  */
-function getPlanetUploadStatus (locations) {
+function getPlanetInfo (locations) {
   const TIMEOUT_S = 2
   const locationsConc = locations.join(',')
   return new Promise((resolve, reject) => TM_xmlhttpRequest({
     method: 'GET',
-    url: `${window.apiUrl}/v1/planets/${locationsConc}?type=exists`,
+    url: `${window.apiUrl}/v1/planets/${locationsConc}?type=report`,
     headers: {
       token: APIKEY,
       'content-type': 'application/json; charset=utf-8'
@@ -178,6 +178,6 @@ module.exports = {
   uploadPlanets,
   uploadReports,
   getUploadedReports,
-  getPlanetUploadStatus,
+  getPlanetInfo,
   getPlayerData
 }

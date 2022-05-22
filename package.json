@@ -1,5 +1,5 @@
 {
-  "name": "0game-teamview",
+  "name": "teamview",
   "version": "0.1.0",
   "description": "backend service for sharing player & planet infos within teams",
   "keywords": [

@@ -1,6 +1,7 @@
 /* globals location */
 const req = require('./requests')
 const { GM_addStyle } = require('./utils') // eslint-disable-line camelcase
+const { report2html } = require('./spioHtml')
 
 const MAX_AGE_PLANET_H = 72 // number of hours when a planet info is considered outdated
 
@@ -65,7 +66,7 @@ function checkPlanetStatus (systemData) {
   if (systemData.length === 0) {
     return
   }
-  req.getPlanetUploadStatus([`${systemData[0].galaxy}:${systemData[0].system}`])
+  req.getPlanetInfo([`${systemData[0].galaxy}:${systemData[0].system}`])
     .then(res => {
       serverData = JSON.parse(res.response)
       // console.log({ serverData, systemData })
@@ -95,6 +96,8 @@ function checkPlanetStatus (systemData) {
         }
       }
       setStatus(statusClass, status)
+
+      modifyTable(serverData, modifyAddPlanetReports)
     }).catch(e => {
       setStatus('status-error', 'Error, see console')
       console.error('Error while checking current system upload status', e)
@@ -142,6 +145,23 @@ function addColumn (addCount = 1, titles = []) {
   }
 }
 
+function modifyAddPlanetReports (data, cells, rowIx) {
+  const COLUMN_REPORT = 9
+  const planet = data.find(e => e.position === rowIx + 1)
+  if (planet?.report) {
+    let timeSinceScan = '-'
+    const seconds = Math.round((new Date() - new Date(planet.report.date)) / 1000)
+    let hours = 0
+    let minutes = 0
+    hours = Math.floor(seconds / 3600)
+    minutes = Math.floor((seconds - hours * 3600) / 60)
+    timeSinceScan = `${minutes} min`
+    if (hours) {
+      timeSinceScan = `${hours} hrs ${timeSinceScan}`
+    }
+    cells[COLUMN_REPORT].insertAdjacentHTML('afterbegin', `<a href="#" class="tooltip_sticky" data-tooltip-content="${report2html(planet.report)}">🛰 <span style="font-size: 85%;">${timeSinceScan}</span></a>`)
+  }
+}
 function modifyAddRankFromPopup (data, cells, rowIx) {
   function cleanName (name) {
     return name.split('(')[0].trim()
@@ -277,9 +297,9 @@ function modifyTable (data, modfiyFn) {
   const ROWS_HEADER = 2
   const ROWS_COUNT = 15
   const rowsWithPlanets = Array.from(document.querySelector('content table.table569').querySelectorAll('tr')).slice(ROWS_HEADER, ROWS_HEADER + ROWS_COUNT)
-  for (const row of rowsWithPlanets) {
+  for (const [ix, row] of rowsWithPlanets.entries()) {
     const cells = row.querySelectorAll('td')
-    modfiyFn(data, cells)
+    modfiyFn(data, cells, ix)
   }
 }
 
