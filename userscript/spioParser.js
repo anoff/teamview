@@ -98,13 +98,14 @@ class SpioParser {
     const date = parseDate(dateRaw).toISOString()
     const planet = parsePlanet(title)
     const jsons = parseData(content)
-    return {
+    const data = {
       id,
       reportType,
       date,
       planet,
-      jsons
+      ...jsons
     }
+    return data
   }
 }
 

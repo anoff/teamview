@@ -35,7 +35,7 @@ async function initDb () {
           table.string('name')
           table.string('value').unique().index()
           table.string('password')
-          table.timestamps(false, true, true)
+          table.timestamps(false, true)
         }).raw(`
           CREATE OR REPLACE TRIGGER update_tokens_updated_at BEFORE UPDATE
           ON tokens FOR EACH ROW EXECUTE PROCEDURE 
@@ -80,7 +80,7 @@ async function initDb () {
           table.integer('units_lost').unsigned()
           table.integer('battles_lost').unsigned()
           table.integer('battles_won').unsigned()
-          table.integer('battles_wraw').unsigned()
+          table.integer('battles_draw').unsigned()
           table.timestamps(false, true)
         }).raw(`
           CREATE OR REPLACE TRIGGER update_players_updated_at BEFORE UPDATE
@@ -101,10 +101,10 @@ async function initDb () {
           table.integer('position').unsigned().index()
           table.bool('has_moon')
           table.integer('debris_metal').unsigned()
-          table.integer('debris_mrystal').unsigned()
+          table.integer('debris_crystal').unsigned()
           table.integer('teams_id').unsigned().references('teams.id')
           table.integer('players_ingame_id').unsigned()
-          table.timestamps(false, true, true)
+          table.timestamps(false, true)
         }).raw(`
           CREATE OR REPLACE TRIGGER update_planets_updated_at BEFORE UPDATE
           ON planets FOR EACH ROW EXECUTE PROCEDURE 
@@ -120,7 +120,7 @@ async function initDb () {
           table.increments('id')
           table.integer('tokens_id').unsigned().references('tokens.id')
           table.integer('teams_id').unsigned().references('teams.id')
-          table.timestamps(false, true, true)
+          table.timestamps(false, true)
         }).raw(`
           CREATE OR REPLACE TRIGGER update_team_members_updated_at BEFORE UPDATE
           ON team_members FOR EACH ROW EXECUTE PROCEDURE 
