@@ -9,7 +9,8 @@
   "extensions": [
     "standard.vscode-standard",
     "mtxr.sqltools",
-    "mtxr.sqltools-driver-pg"
+    "mtxr.sqltools-driver-pg",
+    "bierner.markdown-mermaid"
   ],
   // Use 'forwardPorts' to make a list of ports inside the container available locally.
   "forwardPorts": [
