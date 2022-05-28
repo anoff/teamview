@@ -1,3 +1,5 @@
+const { pascalCase } = require('change-case')
+
 module.exports.report2html = function report2html (report) {
   function addSection (data) {
     let html = ''
@@ -9,16 +11,16 @@ module.exports.report2html = function report2html (report) {
         }
         html += '<div class="spyRaportContainerRow clearfix">\n'
       }
-      html += `<div class="spyRaportContainerCell">${k}</div>\n`
-      html += `<div class="spyRaportContainerCell">${data[k].toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.')}</div>\n`
+      html += `<div class="spyRaportContainerCell" style="font-size: 70%;">${pascalCase(k)}</div>\n`
+      html += `<div class="spyRaportContainerCell" style="font-size: 70%;">${data[k].toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.')}</div>\n`
       ix += 1
     }
     html += '</div>\n'
     return html
   }
   return `
-  <div class="spyRaport">
-  <div class="spyRaportHead">${report.date}</a></div>
+  <div class="spyRaport" style="width: 320px;">
+  <div class="spyRaportHead">${new Date(report.date).toLocaleString('sv')}</a></div>
   <div class="spyRaportContainer">
     <div class="spyRaportContainerHead spyRaportContainerHeadClass900">Resources</div>
     ${addSection(report.resources)}

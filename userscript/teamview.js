@@ -14,7 +14,7 @@ function addMenuButton () {
   listLink.onclick = showStation
   listLink.text = 'Teamview'
   listEntry.appendChild(listLink)
-  const ref = document.getElementById('menu').children[2]
+  const ref = document.getElementById('menu').children[12]
   ref.insertAdjacentElement('afterend', listEntry)
 }
 

@@ -1,0 +1,53 @@
+    .location-field {
+      max-width: 6em;
+    }
+
+    .name-field {
+      max-width: 9em;
+    }
+
+    .container {
+      width: 100%;
+      /* max-width: 600px; */
+      border: 2px solid black;
+      margin: 0 auto;
+      padding: 10px;
+    }
+
+    .row {
+      /* height: 100px; */
+      border: 2px solid blue;
+      width: 100%;
+      margin-bottom: 10px;
+      padding: 10px;
+    }
+
+    .col1 {
+      /* border: 2px solid red; */
+      width: 100%;
+      height: 100%;
+    }
+
+    .col2 {
+      /* border: 2px solid green; */
+      width: 49%;
+      float: left;
+      height: 100%;
+      margin-right: 2%;
+    }
+
+    .col2:last-child {
+      margin-right: 0;
+    }
+
+    .col3 {
+      /* border: 2px solid brown; */
+      width: 32%;
+      float: left;
+      height: 100%;
+      margin-right: 2%;
+    }
+
+    .col3:last-child {
+      margin-right: 0;
+    }

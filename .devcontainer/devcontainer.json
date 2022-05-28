@@ -7,11 +7,12 @@
   "settings": {},
   // Add the IDs of extensions you want installed when the container is created.
   "extensions": [
-    "standard.vscode-standard",
-    "mtxr.sqltools",
-    "mtxr.sqltools-driver-pg",
-    "bierner.markdown-mermaid"
-  ],
+	"standard.vscode-standard",
+	"mtxr.sqltools",
+	"mtxr.sqltools-driver-pg",
+	"bierner.markdown-mermaid",
+	"tht13.html-preview-vscode"
+],
   // Use 'forwardPorts' to make a list of ports inside the container available locally.
   "forwardPorts": [
     3000,

@@ -28,6 +28,15 @@
   s.src = `${apiUrl}/teamview.js`
   document.querySelector('body').appendChild(s)
 
+  const styles = ['teamview.css']
+  for (const ss of styles) {
+    const s = document.createElement('link')
+    s.type = 'text/css'
+    s.rel = 'stylesheet'
+    s.href = `${apiUrl}/${ss}`
+    document.querySelector('head').appendChild(s)
+  }
+
   // pass TM functions to window
   unsafeWindow.TM_xmlhttpRequest = GM_xmlhttpRequest
   unsafeWindow.TM_setValue = GM_setValue

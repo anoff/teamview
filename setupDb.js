@@ -138,7 +138,7 @@ async function tableTeamMembers (knex, forceDrop = false) { // eslint-disable-li
 
 async function tableReports (knex, forceDrop = false) {
   if (forceDrop) await knex.schema.dropTableIfExists('reports')
-  const tableExists = await knex.schema.dropTableIfExists('reports')
+  const tableExists = await knex.schema.hasTable('reports')
   if (!tableExists) {
     console.log('recreate reports')
     // Create a table
