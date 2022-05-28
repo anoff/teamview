@@ -53,11 +53,28 @@ function getVisibleSystem () {
       }
     }
     if (planetName && playerName) {
-      // ToDo: Exception bei eigenen planeten
       const playerHTML = cells[COLUMN_PLAYER].innerHTML
-      const playerId = parseInt(/Playercard\(([0-9]+)/.exec(playerHTML)[1])
+      const playerMatch = /Playercard\(([0-9]+)/.exec(playerHTML)
+      let playerId = -1
+      if (playerMatch) {
+        playerId = parseInt(playerMatch[1])
+      }
+      
       const planetHtml = cells[COLUMN_PLANETID].innerHTML
-      const planetId = parseInt(/javascript:doit\(6,([0-9]+)/.exec(planetHtml)[1])
+      const planetMatch = /javascript:doit\(6,([0-9]+)/.exec(planetHtml)
+      let planetId = -1
+      if (planetMatch) {
+        planetId = parseInt(planetMatch[1])
+      } else {
+        // ToDo get planetId from header
+        const planetInfo = Array.from(document.querySelector('#planetSelector').querySelectorAll('option'))
+        for (index = 0; index < planetInfo.length; index++) {
+          if (planetInfo[index].innerText.split(' ')[0] == planetName) {
+            console.log(planetInfo[index].value)
+            planetId = planetInfo[index].value
+          }
+        }
+      }
       entries.push({ id: planetId, name: planetName, playerId, galaxy, system, position: i + 1, moonId, debrisMetal, debrisCrystal })
     }
   }
