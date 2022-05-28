@@ -36,7 +36,8 @@ function deletePlanet (planet) {
     timeout: TIMEOUT_S * 1000,
     onload: function (res) {
       if (res.status === 200) {
-        resolve(res)
+        const data = JSON.parse(res.responseText)
+        resolve(data)
       } else {
         const err = {
           status: res.status,
@@ -64,7 +65,8 @@ function uploadPlanets (data) {
     timeout: TIMEOUT_S * 1000,
     onload: function (res) {
       if (res.status === 200) {
-        resolve(res)
+        const data = JSON.parse(res.responseText)
+        resolve(data)
       } else {
         const err = {
           status: res.status,
@@ -92,7 +94,8 @@ function uploadReports (data) {
     timeout: TIMEOUT_S * 1000,
     onload: function (res) {
       if (res.status === 200) {
-        resolve(res)
+        const data = JSON.parse(res.responseText)
+        resolve(data)
       } else {
         const err = {
           status: res.status,
@@ -124,7 +127,8 @@ function getUploadedReports () {
     timeout: TIMEOUT_S * 1000,
     onload: function (res) {
       if (res.status === 200) {
-        resolve(res)
+        const data = JSON.parse(res.responseText)
+        resolve(data)
       } else {
         const err = {
           status: res.status,
@@ -158,7 +162,8 @@ function getPlanetInfo (locations) {
     timeout: TIMEOUT_S * 1000,
     onload: function (res) {
       if (res.status === 200) {
-        resolve(res)
+        const data = JSON.parse(res.responseText)
+        resolve(data)
       } else {
         const err = {
           status: res.status,

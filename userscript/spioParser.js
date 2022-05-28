@@ -295,11 +295,11 @@ function uploadReports () {
         system: parseInt(r.planet.split(':')[1]),
         position: parseInt(r.planet.split(':')[2]),
         date: r.date,
-        resources: r.jsons.resources,
-        buildings: r.jsons.buildings,
-        ships: r.jsons.ships,
-        research: r.jsons.research,
-        defense: r.jsons.defense
+        resources: r.resources,
+        buildings: r.buildings,
+        ships: r.ships,
+        research: r.research,
+        defense: r.defense
       }
     })
   // console.log(data)
@@ -309,7 +309,7 @@ function uploadReports () {
   colorReports()
   const p = req.uploadReports(data)
   p.then(res => {
-    const { totalCount, successCount } = JSON.parse(res.response)
+    const { totalCount, successCount } = res
     setStatus('status-ok', `Submitted ${successCount}/${totalCount}`)
   }).catch(e => {
     setStatus('status-error', 'Failed, see console')
@@ -372,7 +372,7 @@ function colorReports () {
 function fetchUploadedReports () {
   return req.getUploadedReports().then(res => {
     const uploadedReports = TM_getValue('reports_uploaded')
-    const data = JSON.parse(res.response)
+    const data = res
     for (const id of data) {
       if (!uploadedReports.includes(id)) {
         uploadedReports.push(id)

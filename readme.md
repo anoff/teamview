@@ -31,23 +31,23 @@ Limitations:
 
 ```mermaid
 classDiagram
-  planets --> players
-  spyReports --> planets
+  planets ..> players: soft ref
+  reports --> planets
+  reports --> tokens
+  players_meta ..> players: soft ref
+
   class tokens {
     id: int
     name: string
     value: string
     password: string [hashed]
   }
-  class teams {
+  class players_meta {
     id: int
-    name: string
-    code: string
-  }
-  class team_members {
-    id: int
-    tokens_id: int (tokens.id)
-    teams_id: int (teams.id)
+    is_inactive: int
+    is_banned: bool
+    is_vacation: bool
+    players_ingame_id: int [soft ref]
   }
   class planets {
     id: int

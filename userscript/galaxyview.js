@@ -15,6 +15,14 @@ function getVisibleSystem () {
   function cleanName (name) {
     return name.split('(')[0].trim()
   }
+  function getStatus (cell) {
+    const classes = cell.querySelector('a span.galaxy-username')?.classList
+    if (classes && classes.length > 0) {
+      return Array.from(classes).map(e => e.replace('galaxy-username', '')).filter(e => e.length).map(e => e.slice(1))
+    } else {
+      return []
+    }
+  }
 
   if (systemData) {
     return systemData
@@ -35,6 +43,7 @@ function getVisibleSystem () {
     const cells = Array.from(row.querySelectorAll('td'))
     const planetName = cleanName(cells[COLUMN_PLANETNAME].innerText)
     const playerName = cleanName(cells[COLUMN_PLAYER].innerText)
+    const playerStatus = getStatus(cells[COLUMN_PLAYER])
     const hasMoon = cells[COLUMN_MOON].children.length > 0
     let debrisCrystal = 0
     let debrisMetal = 0
@@ -48,7 +57,7 @@ function getVisibleSystem () {
       }
     }
     if (planetName && playerName) {
-      entries.push({ name: planetName, playerName, galaxy, system, position: i + 1, hasMoon, debrisMetal, debrisCrystal })
+      entries.push({ name: planetName, playerName, playerStatus, galaxy, system, position: i + 1, hasMoon, debrisMetal, debrisCrystal })
     }
   }
   systemData = entries
@@ -68,7 +77,7 @@ function checkPlanetStatus (systemData) {
   }
   req.getPlanetInfo([`${systemData[0].galaxy}:${systemData[0].system}`])
     .then(res => {
-      serverData = JSON.parse(res.response)
+      serverData = res
       // console.log({ serverData, systemData })
       let status = 'OK'
       let statusClass = 'status-ok'
@@ -213,7 +222,7 @@ function doUploadPlanets () {
   setStatus('status-working', `Uploading ${data.length} planets`)
   const p = req.uploadPlanets(data)
   p.then(res => {
-    const { totalCount, successCount } = JSON.parse(res.response)
+    const { totalCount, successCount } = res
     setStatus('status-ok', `Updated ${successCount}/${totalCount}`)
   }).catch(e => {
     setStatus('status-error', 'Failed, see console')
