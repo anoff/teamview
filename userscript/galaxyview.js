@@ -71,7 +71,7 @@ function getVisibleSystem () {
         for (index = 0; index < planetInfo.length; index++) {
           if (planetInfo[index].innerText.split(' ')[0] == planetName) {
             console.log(planetInfo[index].value)
-            planetId = planetInfo[index].value
+            planetId = parseInt(planetInfo[index].value)
           }
         }
       }
