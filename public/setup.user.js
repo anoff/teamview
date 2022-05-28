@@ -1,7 +1,7 @@
 // ==UserScript==
-// @name         teamview_proxy
+// @name         teamview
 // @namespace    http://tampermonkey.net/
-// @version      1.0.0
+// @version      1.1.0
 // @description  augment your view by sharing info with your team
 // @author       joghurtrucksack
 // @match        https://pr0game.com/game.php*
@@ -10,7 +10,8 @@
 // @grant        GM_getValue
 // @grant        GM_xmlhttpRequest
 // @grant        unsafeWindow
-// @connect      http://localhost:3000/
+// @connect      localhost
+// @connect      teamview.mietemieze.de
 // ==/UserScript==
 
 /* globals unsafeWindow, GM_getValue, GM_setValue, GM_xmlhttpRequest */
