@@ -66,7 +66,6 @@ function getVisibleSystem () {
       if (planetMatch) {
         planetId = parseInt(planetMatch[1])
       } else {
-        // ToDo get planetId from header
         const planetInfo = Array.from(document.querySelector('#planetSelector').querySelectorAll('option'))
         for (index = 0; index < planetInfo.length; index++) {
           if (planetInfo[index].innerText.split(' ')[0] == planetName) {
