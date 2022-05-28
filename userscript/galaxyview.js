@@ -74,7 +74,7 @@ function getVisibleSystem () {
           }
         }
       }
-      entries.push({ id: planetId, name: planetName, playerId, galaxy, system, position: i + 1, moonId, debrisMetal, debrisCrystal })
+      entries.push({ id: planetId, name: planetName, playerId, playerName, galaxy, system, position: i + 1, moonId, debrisMetal, debrisCrystal })
     }
   }
   systemData = entries
