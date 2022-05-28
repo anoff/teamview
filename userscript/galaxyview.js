@@ -24,6 +24,7 @@ function getVisibleSystem () {
   const ROWS_HEADER = 2
   const ROWS_COUNT = 15
   const COLUMN_PLAYER = 5
+  const COLUMN_PLANETID = 1
   const COLUMN_PLANETNAME = 2
   const COLUMN_MOON = 3
   const COLUMN_DEBRIS = 4
@@ -35,7 +36,11 @@ function getVisibleSystem () {
     const cells = Array.from(row.querySelectorAll('td'))
     const planetName = cleanName(cells[COLUMN_PLANETNAME].innerText)
     const playerName = cleanName(cells[COLUMN_PLAYER].innerText)
-    const hasMoon = cells[COLUMN_MOON].children.length > 0
+    let moonId = 0
+    if (cells[COLUMN_MOON].children.length > 0) {
+      const moonHtml = cells[COLUMN_MOON].innerHTML
+      moonId = parseInt(/javascript:doit\(6,([0-9]+)/.exec(moonHtml)[1])
+    }
     let debrisCrystal = 0
     let debrisMetal = 0
     const debrisPopup = cells[COLUMN_DEBRIS].innerHTML
@@ -48,7 +53,12 @@ function getVisibleSystem () {
       }
     }
     if (planetName && playerName) {
-      entries.push({ name: planetName, playerName, galaxy, system, position: i + 1, hasMoon, debrisMetal, debrisCrystal })
+      // ToDo: Exception bei eigenen planeten
+      const playerHTML = cells[COLUMN_PLAYER].innerHTML
+      const playerId = parseInt(/Playercard\(([0-9]+)/.exec(playerHTML)[1])
+      const planetHtml = cells[COLUMN_PLANETID].innerHTML
+      const planetId = parseInt(/javascript:doit\(6,([0-9]+)/.exec(planetHtml)[1])
+      entries.push({ id: planetId, name: planetName, playerId, galaxy, system, position: i + 1, moonId, debrisMetal, debrisCrystal })
     }
   }
   systemData = entries
