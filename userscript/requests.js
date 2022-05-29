@@ -163,6 +163,7 @@ function getPlanetInfo (locations) {
     onload: function (res) {
       if (res.status === 200) {
         const data = JSON.parse(res.responseText)
+        console.log(data)
         resolve(data)
       } else {
         const err = {

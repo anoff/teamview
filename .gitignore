@@ -7,3 +7,4 @@ dist/
 public/teamview.js
 importStats.hash
 .DS_Store
+public/api
