@@ -81,6 +81,7 @@ async function tablePlanets (knex, forceDrop = false) {
     await knex.schema
       .createTable('planets', table => {
         table.increments('id')
+        table.int('ingame_id').unsigned().index()
         table.string('name')
         table.integer('galaxy').unsigned().index()
         table.integer('system').unsigned().index()
