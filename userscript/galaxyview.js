@@ -77,7 +77,7 @@ function getVisibleSystem () {
       } else {
         const planetInfo = Array.from(document.querySelector('#planetSelector').querySelectorAll('option'))
         for (let index = 0; index < planetInfo.length; index++) {
-          if (planetInfo[index].innerText.split(' ')[0] === planetName) {
+          if (planetInfo[index].innerText.split(' [')[0] === planetName) {
             console.log(planetInfo[index].value)
             planetId = parseInt(planetInfo[index].value)
           }
