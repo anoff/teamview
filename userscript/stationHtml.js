@@ -1,9 +1,19 @@
 module.exports.home = `
-  <div>
+<div>
     <div class="infos box container" id="search-planets">
-      <div class="row">
-        <div class="planeto title col1">
-          Search Reports <i class="fas fa-search"></i></i>
+      <div class="planeto title row" style="height: 50px;">
+        <div class="col2">
+          Search known planets <i class="fas fa-search"></i></i>
+        </div>
+        <div class="col2">
+          <div style="display: inline; margin-right: 2em;">
+            <input type="checkbox" id="require_report" unchecked>
+            <label for="require_report">Require report</label>
+          </div>
+          <div style="display: inline;">
+            <label for="report_maxage">Max age [hours]: </label>
+            <input type="number" id="report_maxage" value="72" min="0" max="500" class="location-field">
+          </div>
         </div>
       </div>
       <div class="row">
