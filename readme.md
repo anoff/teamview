@@ -1,31 +1,29 @@
 # Teamview for pr0game
 
-## Other Scripts
 
-- `setupDb.js`: run once to initialize local postgresdb, credentials provided via `.env`
-- `importStats.js`: loads the /stats.json file from the server and dumps it into the players table (does not update, creates new entry each time)
-- `createToken.js`: bootstrap your DB with a first token
+## Repo structure
 
-## Required use cases
+```
+teamview/
+├─ index.js             Main entry file to start the backend server
+├─ lib/
+│  ├─ data/             Data models that are used to represent the game data, called by API methods and access the database
+│  ├─ routes/           Express route definitions
+│  ├─ db.js             Returns a shared instance of knex database driver already connected.  
+│  ├─ server.js         Express server object
+├─ public/              Contains the setup.user.js proxy script for tampermonkey and the output of running the userscript build (teamview.js)
+├─ userscript/          Userscript files and build instructions. Execute npm run build in the userscript folder to create public/teamview.js file
+│  ├─ teamview.js       Main entry point for userscript
+│  ├─ ..
+├─ docker-compose.yml   (Production) config for teamview
+├─ setupDb.js           Run once to initialize local postgresdb, credentials provided via `.env`
+├─ importStats.js       Loads the /stats.json file from the server and dumps it into the players table (does not update, creates new entry each time), only inserts if new data is available
+├─ createToken.js       Create a new user token, value will be logged to stdout
+```
 
-| usecase | auth level | payload (H:eader) | route | returns |
-|---------|------------|------------|-------|---------|
-| create API token (=new user) | none | H:password, username/comment | POST /`v1/tokens` | token |
-| delete API token | password | H:password | DELETE `/v1/tokens/<token>`| success |
-| create a team | token | token, teamName | POST /v1/teams | team ID, teamCode (required to join) |
-| retrieve a teams passcode | none (you must be part of the team) | none | GET `/v1/teams/<teamID>/passcode` | passcode
-| join a team | password | H:password, H:teamCode, token | POST `/v1/teams/join` | success |
-| leave a team | password | H:password, token | DELETE `/v1/teams/<teamID>/members` | success |
-| add planet data | none | array of planet info, token | POST `/v1/planets`
-| add player data | none | array of player info, token | POST `/v1/players`
+## API Spec
 
-Limitations:
-1. deleting an API token or leaving a team does not remove the data that has been already sent
-1. there is no way to delete submitted data
-1. an API tokens password cannot be recovered
-1. deleting a team is only possible for the last remaining member
-1. each token can only be assigned to one team, each browser plugin can only have one token (=one player can belong to one team only)
-1. maximum number of members in a team is limited to 30
+See apidoc or run `npm run apidoc` and browse the `public/api` folder.
 
 ## DB structure
 
@@ -98,9 +96,8 @@ To create a new object from a DB result, rather than using the constructor use t
 
 ## Todo
 
-- [ ] check that valid player id is taken for planets (players get inserted over and over..should not reference old entry)
-- [ ] remove team feature
 - [ ] add team feature
+
 ## Ideas
 
 ### Prevent API spam by implementing rate limit

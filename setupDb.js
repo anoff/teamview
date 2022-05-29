@@ -89,51 +89,12 @@ async function tablePlanets (knex, forceDrop = false) {
         table.bool('has_moon')
         table.integer('debris_metal').unsigned()
         table.integer('debris_crystal').unsigned()
-        table.integer('teams_id').unsigned().references('teams.id')
         table.integer('players_ingame_id').unsigned()
         table.timestamps(false, true)
       }).raw(`
         CREATE OR REPLACE TRIGGER update_planets_updated_at BEFORE UPDATE
         ON planets FOR EACH ROW EXECUTE PROCEDURE 
         update_updated_at_column();`)
-  }
-}
-
-async function tableTeams (knex, forceDrop = false) { // eslint-disable-line no-unused-vars
-  if (forceDrop) await knex.schema.dropTableIfExists('teams')
-  const tableExists = await knex.schema.hasTable('teams')
-  if (!tableExists) {
-    console.log('recreate teams')
-    // Create a table
-    await knex.schema
-      .createTable('teams', table => {
-        table.increments('id')
-        table.string('name').unique()
-        table.string('code').unique().index()
-        table.timestamps(false, true)
-      }).raw(`
-        CREATE OR REPLACE TRIGGER update_teams_updated_at BEFORE UPDATE
-        ON teams FOR EACH ROW EXECUTE PROCEDURE 
-        update_updated_at_column();`)
-  }
-}
-
-async function tableTeamMembers (knex, forceDrop = false) { // eslint-disable-line no-unused-vars
-  if (forceDrop) await knex.schema.dropTableIfExists('team_members')
-  const tableExists = await knex.schema.hasTable('team_members')
-  if (!tableExists) {
-    console.log('recreate team_members')
-    // Create a table
-    await knex.schema
-      .createTable('team_members', table => {
-        table.increments('id')
-        table.integer('tokens_id').unsigned().references('tokens.id')
-        table.integer('teams_id').unsigned().references('teams.id')
-        table.timestamps(false, true)
-      }).raw(`
-          CREATE OR REPLACE TRIGGER update_team_members_updated_at BEFORE UPDATE
-          ON team_members FOR EACH ROW EXECUTE PROCEDURE 
-          update_updated_at_column();`)
   }
 }
 
@@ -193,8 +154,6 @@ async function initDb () {
     await tablePlayers(knex, forceDrop)
     await tablePlayersMeta(knex, forceDrop)
     await tablePlanets(knex, forceDrop)
-    // await tableTeams(knex, forceDrop)
-    // await tableTeamMembers(knex, forceDrop)
     await tableReports(knex, forceDrop)
   } catch (e) {
     console.error(e)
