@@ -1,6 +1,24 @@
 # Teamview for pr0game
 
 
+## Development
+
+For active development run the userscript build and server in development mode:
+
+```sh
+npm run dev # starts and autoreleads server on localhost:3000
+# second session
+cd userscript
+npm run dev # autobuilds userscript in case of changes
+```
+
+### Recommended tools
+Use vscode for devcontainer with port forwarding to host
+
+Install https://github.com/sqlectron/sqlectron-gui/releases for working with the database.
+PostgreSQL port is forwarded from devcontainer to host.
+Simply connect to `localhost:5432` with username/password/dbname = `postgres`
+
 ## Repo structure
 
 ```
@@ -106,8 +124,3 @@ Especially for POST/DELETE operations
 
 - either via proxy https://faun.pub/prevent-ddos-attacks-with-traefik-2-44fb32eeac4f
 - or in app https://www.npmjs.com/package/express-slow-down
-
-## Development
-
-- use vscode for devcontainer magic
-- use https://github.com/sqlectron/sqlectron-gui/releases for working with the database
