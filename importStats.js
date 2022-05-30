@@ -33,7 +33,7 @@ async function main () {
     writeFileSync(HASH_FILE, hash)
     for (const s of stats) {
       const p = new Player({
-        ingameId: s.playerId,
+        playerId: s.playerId,
         name: s.playerName,
         alliance: s.allianceName,
         rank: parseInt(s.rank),
@@ -49,7 +49,9 @@ async function main () {
         battlesDraw: parseInt(s.battlesDraw)
       })
       // logger.info(`Processing ${n}/${len}`)
-      await p.save()
+      await p.save('players_history')
+      await p.sync('players')
+      await p.save('players')
     }
   }
 }

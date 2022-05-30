@@ -50,20 +50,12 @@ classDiagram
   planets ..> players: soft ref
   reports --> planets
   reports --> tokens
-  players_meta ..> players: soft ref
 
   class tokens {
     id: int
     name: string
     value: string
     password: string [hashed]
-  }
-  class players_meta {
-    id: int
-    is_inactive: int
-    is_banned: bool
-    is_vacation: bool
-    players_ingame_id: int [soft ref]
   }
   class planets {
     id: int
@@ -75,7 +67,7 @@ classDiagram
     debris_metal: int
     debris_crystal: int
     teams_id: int (teams.id)
-    players_ingame_id: int [soft ref]
+    player_id: int [soft ref]
   }
   class reports {
     id: int
@@ -91,6 +83,25 @@ classDiagram
     planets_id: int (planets.id)
   }
   class players {
+    id: int
+    name: string
+    alliance: string
+    rank: int
+    points_research: int
+    points_defense: int
+    points_fleet: int
+    points_building: int
+    units_destroyed: int
+    units_lost: int
+    battles_lost: int
+    battles_won: int
+    battles_draw: int
+    research: json
+    is_inactive: int
+    is_banned: bool
+    is_vacation: bool
+  }
+  class players_history {
     id: int
     name: string
     alliance: string

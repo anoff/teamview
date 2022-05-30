@@ -29,7 +29,41 @@ async function tablePlayers (knex, forceDrop = false) {
     await knex.schema
       .createTable('players', table => {
         table.increments('id')
-        table.integer('ingame_id').unsigned()
+        table.integer('player_id').unsigned()
+        table.string('name').index()
+        table.string('alliance')
+        table.integer('rank').unsigned()
+        table.integer('points_research').unsigned()
+        table.integer('points_defense').unsigned()
+        table.integer('points_fleet').unsigned()
+        table.integer('points_building').unsigned()
+        table.integer('points').unsigned()
+        table.integer('units_destroyed').unsigned()
+        table.integer('units_lost').unsigned()
+        table.integer('battles_lost').unsigned()
+        table.integer('battles_won').unsigned()
+        table.integer('battles_draw').unsigned()
+        table.integer('is_inactive').unsigned() // 0 = no, 1 = short, 2 = long
+        table.bool('is_banned')
+        table.bool('is_vacation')
+        table.timestamps(false, true)
+      }).raw(`
+          CREATE OR REPLACE TRIGGER update_players_updated_at BEFORE UPDATE
+          ON players FOR EACH ROW EXECUTE PROCEDURE 
+          update_updated_at_column();`)
+  }
+}
+
+async function tablePlayersHistory (knex, forceDrop = false) {
+  if (forceDrop) await knex.schema.dropTableIfExists('players_history')
+  const tableExists = await knex.schema.hasTable('players_history')
+  if (!tableExists) {
+    console.log('recreate players_history')
+    // Create a table
+    await knex.schema
+      .createTable('players_history', table => {
+        table.increments('id')
+        table.integer('player_id').unsigned()
         table.string('name').index()
         table.string('alliance')
         table.integer('rank').unsigned()
@@ -48,27 +82,7 @@ async function tablePlayers (knex, forceDrop = false) {
           CREATE OR REPLACE TRIGGER update_players_updated_at BEFORE UPDATE
           ON players FOR EACH ROW EXECUTE PROCEDURE 
           update_updated_at_column();`)
-  }
-}
-
-async function tablePlayersMeta (knex, forceDrop = false) {
-  if (forceDrop) await knex.schema.dropTableIfExists('players_meta')
-  const tableExists = await knex.schema.hasTable('players_meta')
-  if (!tableExists) {
-    console.log('recreate players_meta')
-    // Create a table
-    await knex.schema
-      .createTable('players_meta', table => {
-        table.increments('id')
-        table.integer('players_ingame_id').unsigned()
-        table.integer('is_inactive').unsigned() // 0 = no, 1 = short, 2 = long
-        table.bool('is_banned')
-        table.bool('is_vacation')
-        table.timestamps(false, true)
-      }).raw(`
-          CREATE OR REPLACE TRIGGER update_planets_updated_at BEFORE UPDATE
-          ON players_meta FOR EACH ROW EXECUTE PROCEDURE 
-          update_updated_at_column();`)
+      .raw('CREATE INDEX players_history_created_at_index ON players_history (created_at DESC);')
   }
 }
 
@@ -89,7 +103,7 @@ async function tablePlanets (knex, forceDrop = false) {
         table.bool('has_moon')
         table.integer('debris_metal').unsigned()
         table.integer('debris_crystal').unsigned()
-        table.integer('players_ingame_id').unsigned()
+        table.integer('player_id').unsigned()
         table.timestamps(false, true)
       }).raw(`
         CREATE OR REPLACE TRIGGER update_planets_updated_at BEFORE UPDATE
@@ -152,7 +166,7 @@ async function initDb () {
 
     await tableTokens(knex, forceDrop)
     await tablePlayers(knex, forceDrop)
-    await tablePlayersMeta(knex, forceDrop)
+    await tablePlayersHistory(knex, forceDrop)
     await tablePlanets(knex, forceDrop)
     await tableReports(knex, forceDrop)
   } catch (e) {
