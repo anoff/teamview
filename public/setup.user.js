@@ -23,10 +23,18 @@
 
   // remove trailing slashes
   apiUrl = apiUrl.replace(/\/+$/, '')
-  const s = document.createElement('script')
-  s.type = 'text/javascript'
-  s.src = `${apiUrl}/teamview.js`
-  document.querySelector('body').appendChild(s)
+
+  // add one script to header to modify DOM before render
+  const sheader = document.createElement('script')
+  sheader.type = 'text/javascript'
+  sheader.src = `${apiUrl}/teamview.header.bundle.js`
+  document.querySelector('header').appendChild(sheader)
+
+  // and one to body to modify after content is there (data loaded completetely)
+  const sbody = document.createElement('script')
+  sbody.type = 'text/javascript'
+  sbody.src = `${apiUrl}/teamview.body.bundle.js`
+  document.querySelector('body').appendChild(sbody)
 
   const styles = ['teamview.css']
   for (const ss of styles) {

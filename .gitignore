@@ -8,3 +8,5 @@ public/teamview.js
 importStats.hash
 .DS_Store
 public/api
+public/teamview.body.bundle.js
+public/teamview.header.bundle.js
