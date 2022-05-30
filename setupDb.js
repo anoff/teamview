@@ -125,12 +125,15 @@ async function tableReports (knex, forceDrop = false) {
         table.string('report_type')
         table.integer('submitted_by').references('tokens.id')
         table.datetime('date')
+        table.integer('galaxy').unsigned().index()
+        table.integer('system').unsigned().index()
+        table.integer('position').unsigned().index()
         table.json('resources')
         table.json('buildings')
         table.json('ships')
         table.json('research')
         table.json('defense')
-        table.integer('planets_id').unsigned().references('planets.id')
+        table.integer('planet_id').unsigned()
         table.timestamps(false, true)
       }).raw(`
           CREATE OR REPLACE TRIGGER update_reports_updated_at BEFORE UPDATE
