@@ -56,18 +56,22 @@ classDiagram
     name: string
     value: string
     password: string [hashed]
+    created_at: date
+    updated_at: date
   }
   class planets {
     id: int
-    universe: int
+    planet_id: int
+    moon_id: int
+    planet_name: string
     galaxy: int
     system: int
     position: int
-    has_moon: bool
     debris_metal: int
     debris_crystal: int
-    teams_id: int (teams.id)
     player_id: int [soft ref]
+    created_at: date
+    updated_at: date
   }
   class reports {
     id: int
@@ -81,10 +85,13 @@ classDiagram
     defense: json
     submitted_by: int (tokens.id)
     planets_id: int (planets.id)
+    created_at: date
+    updated_at: date
   }
   class players {
     id: int
-    name: string
+    player_name: string
+    player_id: int
     alliance: string
     rank: int
     points_research: int
@@ -96,14 +103,15 @@ classDiagram
     battles_lost: int
     battles_won: int
     battles_draw: int
-    research: json
     is_inactive: int
     is_banned: bool
     is_vacation: bool
+    created_at: date
+    updated_at: date
   }
   class players_history {
     id: int
-    name: string
+    player_name: string
     alliance: string
     rank: int
     points_research: int
@@ -115,7 +123,8 @@ classDiagram
     battles_lost: int
     battles_won: int
     battles_draw: int
-    research: json
+    created_at: date
+    updated_at: date
   }
 ```
 

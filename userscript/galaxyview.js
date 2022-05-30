@@ -83,7 +83,7 @@ function getVisibleSystem () {
           }
         }
       }
-      entries.push({ id: planetId, name: planetName, playerStatus, playerId, playerName, galaxy, system, position: i + 1, moonId, debrisMetal, debrisCrystal })
+      entries.push({ planetId, planetName, playerStatus, playerId, playerName, galaxy, system, position: i + 1, moonId, debrisMetal, debrisCrystal })
     }
   }
   systemData = entries
@@ -258,11 +258,9 @@ function doUploadPlanets () {
 
   // trigger deletions for planets that do not exist
   if (serverData) {
-    console.log('delete check')
     for (const p of serverData) {
       const pos = p.position
       const match = data.find(e => e.position === pos)
-      console.log(p, match)
       if (!match) {
         req.deletePlanet(p)
       }

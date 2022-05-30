@@ -34,7 +34,7 @@ async function main () {
     for (const s of stats) {
       const p = new Player({
         playerId: s.playerId,
-        name: s.playerName,
+        playerName: s.playerName,
         alliance: s.allianceName,
         rank: parseInt(s.rank),
         pointsResearch: parseInt(s.researchScore),

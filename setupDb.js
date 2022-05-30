@@ -30,7 +30,7 @@ async function tablePlayers (knex, forceDrop = false) {
       .createTable('players', table => {
         table.increments('id')
         table.integer('player_id').unsigned()
-        table.string('name').index()
+        table.string('player_name').index()
         table.string('alliance')
         table.integer('rank').unsigned()
         table.integer('points_research').unsigned()
@@ -64,7 +64,7 @@ async function tablePlayersHistory (knex, forceDrop = false) {
       .createTable('players_history', table => {
         table.increments('id')
         table.integer('player_id').unsigned()
-        table.string('name').index()
+        table.string('player_name').index()
         table.string('alliance')
         table.integer('rank').unsigned()
         table.integer('points_research').unsigned()
@@ -95,12 +95,12 @@ async function tablePlanets (knex, forceDrop = false) {
     await knex.schema
       .createTable('planets', table => {
         table.increments('id')
-        table.int('ingame_id').unsigned().index()
-        table.string('name')
+        table.int('planet_id').unsigned().index()
+        table.int('moon_id').unsigned().index()
+        table.string('planet_name')
         table.integer('galaxy').unsigned().index()
         table.integer('system').unsigned().index()
         table.integer('position').unsigned().index()
-        table.bool('has_moon')
         table.integer('debris_metal').unsigned()
         table.integer('debris_crystal').unsigned()
         table.integer('player_id').unsigned()
