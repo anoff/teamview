@@ -11,11 +11,31 @@ function showStation () {
 
 function search () {
   function getQuery () {
-    const fields = ['player_name', 'rank_min', 'rank_max', 'alliance_name', 'galaxy_min', 'galaxy_max', 'system_min', 'system_max', 'inactive', 'vacation', 'banned']
+    const fields = ['player_name', 'rank_min', 'rank_max', 'alliance_name', 'galaxy_min', 'galaxy_max', 'system_min', 'system_max', 'inactive', 'vacation', 'banned', 'require_report', 'report_maxage']
     const query = {}
     for (const f of fields) {
       const elm = document.querySelector(`#${f}`)
-      query[f] = elm.value
+      switch (elm.type.toLowerCase()) {
+        case 'checkbox':
+          query[f] = elm.value === 'on'
+          break
+        case 'select-one':
+          switch (elm.value.toLowerCase()) {
+            case 'yes':
+              query[f] = true
+              break
+            case 'no':
+              query[f] = false
+              break
+            // otherwise do not add filter
+          }
+          break
+        case 'number':
+          if (elm.value) query[f] = parseInt(elm.value)
+          break
+        default:
+          query[f] = elm.value
+      }
     }
     return query
   }
@@ -71,15 +91,14 @@ function insertResults (planets) {
     const html = `<tr id="row-${p.planetId}">
     <td><a href="game.php?page=galaxy&galaxy=${p.galaxy}&system=${p.system}">${p.galaxy}:${p.system}:${p.position}</a></td>
     <td>${p.planetName}</td>
-    <td>${p.playerName}</td>
+    <td>${p.player.playerName}</td>
     <td>${p.moonId ? '🌝' : ''}</td>
     <td>🪨${p.debrisMetal} / 🔮 ${p.debrisCrystal}</td>
     <td>
       <a id="scan-${p.planetId}" alt="spy on plane" href="javascript:doit(6,${p.planetId},{'210':'2'});"> 🔍 </a>
       <a href="#" class="tooltip_sticky" data-tooltip-content="${report2html(p.report)}" style="${!p.report ? 'display: none;' : ''}">${p.report ? ' 🛰 ' : ''}<span style="font-size: 85%;">${calcTimeDeltaString(p.report?.date)}</span></a>
     </td>
-    <td>
-    </td>
+    <td>${p.player.alliance}</td>
     </tr>`
     colRow.insertAdjacentHTML('afterend', html)
   }
