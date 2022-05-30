@@ -179,11 +179,52 @@ function getPlanetInfo (locations) {
     onerror: e => reject(e)
   }))
 }
+
+/**
+ * Search the database for planets and reports.
+ * @param {Object} query query parameters in object notation
+ * @returns {Array[Object]} list of results
+ */
+function searchPlanets (query) {
+  let q = ''
+  console.log(query)
+  for (const [k, v] of Object.entries(query)) {
+    q += `${k}=${v}&`
+  }
+  console.log('search query', q)
+  return new Promise((resolve, reject) => TM_xmlhttpRequest({
+    method: 'GET',
+    url: `${window.apiUrl}/v1/planets?${q}`,
+    headers: {
+      token: APIKEY,
+      'content-type': 'application/json; charset=utf-8'
+    },
+    timeout: TIMEOUT_S * 1000,
+    onload: function (res) {
+      if (res.status === 200) {
+        const data = JSON.parse(res.responseText)
+        console.log(data)
+        resolve(data)
+      } else {
+        const err = {
+          status: res.status,
+          statusText: res.statusText,
+          error: res.responseText
+        }
+        console.warn('Failed to search teamview server for planets', err)
+        reject(new Error('Failed to search teamview server for planets'))
+      }
+    },
+    ontimeout: () => reject(new Error(`Timeout: Response did not arrive in ${TIMEOUT_S} seconds`)),
+    onerror: e => reject(e)
+  }))
+}
 module.exports = {
   deletePlanet,
   uploadPlanets,
   uploadReports,
   getUploadedReports,
   getPlanetInfo,
-  getPlayerData
+  getPlayerData,
+  searchPlanets
 }

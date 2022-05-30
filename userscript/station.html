@@ -24,12 +24,12 @@
       <div class="row">
         <div class="col3">
           <label for="player_name">Playername: </label>
-          <input type="text" name="byplayer_name" id="player_name" value="" class="name-field">
+          <input type="text" id="player_name" value="" class="name-field">
         </div>
         <div class="col3">
           <label for="rank_min">Rank: </label>
-          <input type="number" id="rank_min" value="0" min="0" max="9999" class="location-field"> -
-          <input type="number" id="rank_max" value="0" min="0" max="9999" class="location-field">
+          <input type="number" id="rank_min" value="200" min="0" max="9999" class="location-field"> -
+          <input type="number" id="rank_max" value="1400" min="0" max="9999" class="location-field">
         </div>
         <div class="col3">
           <label for="alliance_name">Alliance name: </label><input type="text" id="alliance_name" value=""
@@ -38,12 +38,12 @@
       </div>
       <div class="row">
         <div class="col1">
-          <label for="galaxy_min">Galaxy: </label><input type="number" id="galaxy_min" min="1" max="9" value="1"
+          <label for="galaxy_min">Galaxy: </label><input type="number" id="galaxy_min" min="1" max="9" value=""
             class="location-field"> -
-          <input type="number" id="galaxy_max" value="1" min="1" max="9" class="location-field">
-          <label for="system_min">System: </label><input type="number" id="system_min" value="1" min="1" max="400"
+          <input type="number" id="galaxy_max" value="" min="1" max="9" class="location-field">
+          <label for="system_min">System: </label><input type="number" id="system_min" value="" min="1" max="400"
             class="location-field"> -
-          <input type="number" id="system_max" value="1" min="1" max="400" class="location-field">
+          <input type="number" id="system_max" value="" min="1" max="400" class="location-field">
         </div>
       </div>
       <div class="row">
@@ -74,7 +74,7 @@
           </div>
         </div <div class="row">
         <div class="col1">
-          <button>search</button>
+          <button id="station-search">search</button>
         </div>
       </div>
     </div>
