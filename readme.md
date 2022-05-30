@@ -84,7 +84,7 @@ classDiagram
     research: json
     defense: json
     submitted_by: int (tokens.id)
-    planets_id: int (planets.id)
+    planet_id: int [soft ref]
     created_at: date
     updated_at: date
   }
