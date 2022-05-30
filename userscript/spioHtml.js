@@ -1,6 +1,7 @@
 const { pascalCase } = require('change-case')
 
 module.exports.report2html = function report2html (report) {
+  if (!report) return ''
   function addSection (data) {
     let html = ''
     let ix = 0

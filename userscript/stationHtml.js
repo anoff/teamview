@@ -18,7 +18,7 @@ module.exports.home = `
     </div>
     <div class="row">
       <div class="col3">
-        <label for="player_name">Playername: </label>
+        <label for="player_name">Player: </label>
         <input type="text" id="player_name" value="" class="name-field">
       </div>
       <div class="col3">
@@ -27,7 +27,7 @@ module.exports.home = `
         <input type="number" id="rank_max" value="1400" min="0" max="9999" class="location-field">
       </div>
       <div class="col3">
-        <label for="alliance_name">Alliance name: </label><input type="text" id="alliance_name" value=""
+        <label for="alliance_name">Alliance: </label><input type="text" id="alliance_name" value=""
           class="name-field">
       </div>
     </div>
