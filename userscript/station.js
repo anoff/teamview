@@ -1,5 +1,6 @@
 const { home: homeHtml } = require('./stationHtml')
 const { report2html } = require('./spioHtml')
+const { addBookmark } = require('./planetBookmark')
 const req = require('./requests')
 
 function showStation () {
@@ -7,6 +8,10 @@ function showStation () {
   document.querySelector('content').insertAdjacentHTML('afterbegin', homeHtml)
   const btn = document.querySelector('button#station-search')
   btn.addEventListener('click', search.bind(this))
+
+  const [galaxy] = getCurrentPosition()
+  document.querySelector('#galaxy_min').value = galaxy
+  document.querySelector('#galaxy_max').value = galaxy
 }
 
 function search () {
@@ -61,18 +66,10 @@ function removeRows () {
 }
 
 function calcTimeDeltaString (date) {
-  let deltastring = '-'
   const seconds = Math.round((new Date() - new Date(date)) / 1000)
-  if (!seconds) return deltastring
-  let hours = 0
-  let minutes = 0
-  hours = Math.floor(seconds / 3600)
-  minutes = Math.floor((seconds - hours * 3600) / 60)
-  deltastring = `${minutes} min`
-  if (hours) {
-    deltastring = `${hours} hrs ${deltastring}`
-  }
-  return deltastring
+  if (!seconds) return '-'
+  const hours = Math.floor(seconds / 360) / 10
+  return `${hours}h`
 }
 
 function insertResults (planets) {
@@ -84,7 +81,7 @@ function insertResults (planets) {
   // const COL_DEBRIS = 4
   // const COL_PLAYER = 5
   // const COL_ALLIANCE = 6
-  const colRow = document.querySelector('table#search-results').querySelectorAll('tr')[ROWS_HEADER - 1]
+  let anchor = document.querySelector('table#search-results').querySelectorAll('tr')[ROWS_HEADER - 1]
   const playerStatus2Indicator = (player) => {
     const text = ['isInactive', 'isBanned', 'isVacation']
       .filter(k => player[k])
@@ -102,21 +99,47 @@ function insertResults (planets) {
   }
   for (const p of planets) {
     const html = `<tr id="row-${p.planetId}">
-    <td><a href="game.php?page=galaxy&galaxy=${p.galaxy}&system=${p.system}">${p.galaxy}:${p.system}:${p.position}</a></td>
-    <td>${p.player.playerName}${p.player ? ' ' + playerStatus2Indicator(p.player) : ''}</td>
+    <td>
+    <a href="game.php?page=galaxy&galaxy=${p.galaxy}&system=${p.system}" title="Goto System">[${p.galaxy}:${p.system}:${p.position}]</a>
+    </td>
+    <td>
+    <a href="#" title="Open Playercard" onclick="return Dialog.Playercard(${p.player.playerId});">${p.player.playerName}${p.player ? ' ' + playerStatus2Indicator(p.player) : ''} <span style="font-size: 80%; color: yellow;"> (${p.player.rank})</span></a>
+    </td>
     <td>${p.planetName}</td>
     <td>${p.moonId ? '🌝' : ''}</td>
-    <td>${debris2Text(p.debrisMetal, p.debrisCrystal)}</td>
     <td>${p.player.alliance || ''}</td>
     <td>
-      <a id="scan-${p.planetId}" alt="spy on plane" href="javascript:doit(6,${p.planetId},{'210':'2'});">${p.planetId ? ' 🔍 ' : ''}</a>
-      <a href="#" class="tooltip_sticky" data-tooltip-content="${report2html(p.report)}" style="${!p.report ? 'display: none;' : ''}">${p.report ? ' 🛰 ' : ''}<span style="font-size: 85%;">${calcTimeDeltaString(p.report?.date)}</span></a>
+      <a href="#" class="tooltip_sticky" data-tooltip-content="${report2html(p.report)}" style="${!p.report ? 'display: none;' : ''}font-size: 130%; position: relative; top: 2px;">${p.report ? ' 📃 ' : ''}<span style="font-size: 60%;">${calcTimeDeltaString(p.report?.date)}</span></a>
+    </td>
+    <td>
+      <a id="scan-${p.planetId}" title="Spy on planet" href="javascript:doit(6,${p.planetId},{'210':'2'});" style="font-size: 130%; position: relative; top: 2px;">${p.planetId ? ' 🛰 ' : ''}</a>
     </td>
     </tr>`
-    colRow.insertAdjacentHTML('afterend', html)
+    anchor.insertAdjacentHTML('afterend', html)
+
+    const newRow = Array.from(document.querySelector('table#search-results').querySelectorAll('tr')).slice(-1)[0]
+    // inject addbookmark button
+    const a = document.createElement('a')
+    a.textContent = '🔖'
+    a.href = '#'
+    a.setAttribute('title', 'Add planet as bookmark')
+    a.style = 'font-size: 130%; position: relative; top: 2px;'
+    a.onclick = addBookmark.bind(window, p.galaxy, p.system, p.position, p.planetId, p.planetName, p.player.playerName)
+    Array.from(newRow.children).slice(-1)[0].insertAdjacentElement('afterbegin', a)
+
+    // update anchor row so rows get inserted always after newly added row
+    anchor = newRow
   }
 }
 
+/**
+ * Read the current active planet position from the planet menu.
+ * @returns Array[int] Galaxy, System, Position
+ */
+function getCurrentPosition () {
+  const [g, s, p] = Array.from(document.querySelector('#planetSelector').children).find(e => e.selected).text.split(' [')[1].slice(0, -1).split(':').map(e => parseInt(e))
+  return [g, s, p]
+}
 module.exports = {
   showStation
 }

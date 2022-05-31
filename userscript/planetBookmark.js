@@ -46,12 +46,12 @@ function insertBookmarkedRows () {
       }
     }
     const html = `<tr id="row-${b.planetId}">
-    <td><a href="game.php?page=galaxy&galaxy=${b.galaxy}&system=${b.system}">${b.galaxy}:${b.system}:${b.position}</a></td>
+    <td><a href="game.php?page=galaxy&galaxy=${b.galaxy}&system=${b.system}" title="Goto System">${b.galaxy}:${b.system}:${b.position}</a></td>
     <td colspan="2">${b.planetName}</td>
     <td colspan="2">${b.playerName}</td>
     <td>
-      <a id="scan-${b.planetId}" href="javascript:doit(6,${b.planetId},{'210':'2'});">🔍</a>
-      <a id="delete-${b.planetId}" href="#">❌</a>
+      <a id="scan-${b.planetId}" title="Spy on planet" href="javascript:doit(6,${b.planetId},{'210':'2'});">🔍</a>
+      <a id="delete-${b.planetId}" title="Delete Bookmark" href="#">❌</a>
     </td>
     <td colspan="${colspan - 1 - 2 - 2 - 1}">${timeSinceLastScan}</td>
     </tr>`
@@ -151,6 +151,7 @@ function init () {
 }
 
 module.exports = {
+  addBookmark,
   addBookmarkButton,
   addShowFavoritesButton,
   init
