@@ -84,12 +84,12 @@ module.exports.home = `
         </tr>
         <tr>
           <th style="white-space: nowrap">Pos.</th>
+          <th style="white-space: nowrap">Player</th>
           <th style="white-space: nowrap">Planet</th>
-          <th style="white-space: nowrap">Name</th>
           <th style="white-space: nowrap">Moon</th>
           <th style="white-space: nowrap">Debris</th>
-          <th style="white-space: nowrap">Player</th>
           <th style="white-space: nowrap">Alliance</th>
+          <th style="white-space: nowrap">Action</th>
         </tr>
         <tr>
           <td style="white-space: nowrap">Posadsf</td>

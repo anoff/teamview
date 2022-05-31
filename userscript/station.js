@@ -87,18 +87,34 @@ function insertResults (planets) {
   // const COL_ALLIANCE = 6
 
   const colRow = document.querySelector('table#search-results').querySelectorAll('tr')[ROWS_HEADER - 1]
+  const playerStatus2Indicator = (player) => {
+    const text = ['isInactive', 'isBanned', 'isVacation']
+      .filter(k => player[k])
+      .map(k => k.split('')[2].toLocaleLowerCase())
+      .join(',')
+    if (!text) return ''
+    return `(${text})`
+  }
+  const debris2Text = (metal, crystal) => {
+    if (metal + crystal > 0) {
+      return `🪨${metal} / 🔮${crystal}`
+    } else {
+      return ''
+    }
+  }
   for (const p of planets) {
+    console.log(p.player.playerStatus)
     const html = `<tr id="row-${p.planetId}">
     <td><a href="game.php?page=galaxy&galaxy=${p.galaxy}&system=${p.system}">${p.galaxy}:${p.system}:${p.position}</a></td>
+    <td>${p.player.playerName}${p.player ? ' ' + playerStatus2Indicator(p.player) : ''}</td>
     <td>${p.planetName}</td>
-    <td>${p.player.playerName}</td>
     <td>${p.moonId ? '🌝' : ''}</td>
-    <td>🪨${p.debrisMetal} / 🔮 ${p.debrisCrystal}</td>
+    <td>${debris2Text(p.debrisMetal, p.debrisCrystal)}</td>
+    <td>${p.player.alliance || ''}</td>
     <td>
       <a id="scan-${p.planetId}" alt="spy on plane" href="javascript:doit(6,${p.planetId},{'210':'2'});"> 🔍 </a>
       <a href="#" class="tooltip_sticky" data-tooltip-content="${report2html(p.report)}" style="${!p.report ? 'display: none;' : ''}">${p.report ? ' 🛰 ' : ''}<span style="font-size: 85%;">${calcTimeDeltaString(p.report?.date)}</span></a>
     </td>
-    <td>${p.player.alliance}</td>
     </tr>`
     colRow.insertAdjacentHTML('afterend', html)
   }
