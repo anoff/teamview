@@ -12,7 +12,7 @@ module.exports.home = `
         </div>
         <div style="display: inline;">
           <label for="report_maxage">Max age [hours]: </label>
-          <input type="number" id="report_maxage" value="72" min="0" max="500" class="location-field" disabled>
+          <input type="number" id="report_maxage" value="72" min="0" max="500" class="location-field">
         </div>
       </div>
     </div>
