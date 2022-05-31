@@ -1,7 +1,7 @@
 module.exports.home = `
 <div>
   <div class="infos box container" id="search-planets">
-    <div class="planeto title row">
+    <div class="planeto title row" style="height: 38px;">
       <div class="col2">
         Search known planets <i class="fas fa-search"></i></i>
       </div>
@@ -12,7 +12,7 @@ module.exports.home = `
         </div>
         <div style="display: inline;">
           <label for="report_maxage">Max age [hours]: </label>
-          <input type="number" id="report_maxage" value="72" min="0" max="500" class="location-field">
+          <input type="number" id="report_maxage" value="72" min="0" max="500" class="location-field" disabled>
         </div>
       </div>
     </div>

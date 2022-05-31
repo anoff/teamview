@@ -17,7 +17,7 @@ function search () {
       const elm = document.querySelector(`#${f}`)
       switch (elm.type.toLowerCase()) {
         case 'checkbox':
-          query[f] = elm.value === 'on'
+          query[f] = elm.checked
           break
         case 'select-one':
           switch (elm.value.toLowerCase()) {
