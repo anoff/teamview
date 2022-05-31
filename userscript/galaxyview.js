@@ -115,12 +115,11 @@ function checkPlanetStatus (systemData) {
           status = 'Inconsistent'
           statusClass = 'status-outdated'
         }
-        console.log({ serverData, systemData })
       } else {
         const knownPlanets = serverData.map(e => `${e.galaxy}:${e.system}:${e.position}`).sort()
         const visiblePlanets = systemData.map(e => `${e.galaxy}:${e.system}:${e.position}`).sort()
         if (!arrayEquals(knownPlanets, visiblePlanets)) {
-          console.log({ serverData, systemData })
+          // console.log({ serverData, systemData })
           status = 'Inconsistent'
           statusClass = 'status-outdated'
         }
@@ -225,7 +224,7 @@ function modifyAddPlayerStats (data, cells, rowIx) {
   const isInactive = cells[COLUMN_PLAYER].innerText.includes('i)')
   if (playerName) {
     // only modify if this row contains a player
-    const d = data.find(e => e.name === playerName)
+    const d = data.find(e => e.playerName === playerName)
     const s = document.createElement('span')
     if (!d) {
       console.warn('Could not find player information for player: ', playerName)

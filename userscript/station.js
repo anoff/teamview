@@ -43,7 +43,6 @@ function search () {
   const query = getQuery()
   req.searchPlanets(query)
     .then(res => {
-      console.log(res)
       removeRows()
       insertResults(res)
     })
@@ -102,7 +101,6 @@ function insertResults (planets) {
     }
   }
   for (const p of planets) {
-    console.log(p.player.playerStatus)
     const html = `<tr id="row-${p.planetId}">
     <td><a href="game.php?page=galaxy&galaxy=${p.galaxy}&system=${p.system}">${p.galaxy}:${p.system}:${p.position}</a></td>
     <td>${p.player.playerName}${p.player ? ' ' + playerStatus2Indicator(p.player) : ''}</td>

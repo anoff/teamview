@@ -5,7 +5,7 @@ const APIKEY = TM_getValue('api_key')
 
 function getPlayerData (names) {
   const namesArray = names.join(',')
-  console.log('sending request', namesArray)
+  // console.log('sending request', namesArray)
   return new Promise((resolve, reject) => TM_xmlhttpRequest({
     method: 'GET',
     url: `${window.apiUrl}/v1/players/${namesArray}`,
@@ -163,7 +163,6 @@ function getPlanetInfo (locations) {
     onload: function (res) {
       if (res.status === 200) {
         const data = JSON.parse(res.responseText)
-        console.log(data)
         resolve(data)
       } else {
         const err = {
@@ -187,11 +186,9 @@ function getPlanetInfo (locations) {
  */
 function searchPlanets (query) {
   let q = ''
-  console.log(query)
   for (const [k, v] of Object.entries(query)) {
     q += `${k}=${v}&`
   }
-  console.log('search query', q)
   return new Promise((resolve, reject) => TM_xmlhttpRequest({
     method: 'GET',
     url: `${window.apiUrl}/v1/planets?${q}`,
