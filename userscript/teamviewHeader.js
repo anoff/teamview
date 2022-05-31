@@ -1,12 +1,11 @@
 'use strict'
-
 const { showStation } = require('./station')
 
 function addMenuButton () {
   // add button to menu
   const listEntry = document.createElement('li')
   const listLink = document.createElement('a')
-  listLink.href = '#teamview-station'
+  listLink.href = '/game.php?page=galaxy#teamview-station'
   listLink.onclick = showStation
   listLink.text = 'Teamview'
   listEntry.appendChild(listLink)
@@ -16,6 +15,9 @@ function addMenuButton () {
 
 function init () {
   addMenuButton()
+  if (window.location.hash === '#teamview-station') {
+    showStation()
+  }
 }
 
 init()

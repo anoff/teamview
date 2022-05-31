@@ -85,7 +85,6 @@ function insertResults (planets) {
   // const COL_DEBRIS = 4
   // const COL_PLAYER = 5
   // const COL_ALLIANCE = 6
-
   const colRow = document.querySelector('table#search-results').querySelectorAll('tr')[ROWS_HEADER - 1]
   const playerStatus2Indicator = (player) => {
     const text = ['isInactive', 'isBanned', 'isVacation']
@@ -112,7 +111,7 @@ function insertResults (planets) {
     <td>${debris2Text(p.debrisMetal, p.debrisCrystal)}</td>
     <td>${p.player.alliance || ''}</td>
     <td>
-      <a id="scan-${p.planetId}" alt="spy on plane" href="javascript:doit(6,${p.planetId},{'210':'2'});"> 🔍 </a>
+      <a id="scan-${p.planetId}" alt="spy on plane" href="javascript:doit(6,${p.planetId},{'210':'2'});">${p.planetId ? ' 🔍 ' : ''}</a>
       <a href="#" class="tooltip_sticky" data-tooltip-content="${report2html(p.report)}" style="${!p.report ? 'display: none;' : ''}">${p.report ? ' 🛰 ' : ''}<span style="font-size: 85%;">${calcTimeDeltaString(p.report?.date)}</span></a>
     </td>
     </tr>`

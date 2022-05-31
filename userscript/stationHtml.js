@@ -1,3 +1,4 @@
+// copy only body part of station.html inside here
 module.exports.home = `
 <div>
   <div class="infos box container" id="search-planets">
@@ -91,14 +92,12 @@ module.exports.home = `
           <th style="white-space: nowrap">Alliance</th>
           <th style="white-space: nowrap">Action</th>
         </tr>
-        <tr>
-          <td style="white-space: nowrap">Posadsf</td>
-          <td style="white-space: nowrap">adsf</td>
-          <td style="white-space: nowrap">adsf</td>
-          <td style="white-space: nowrap">adsf</td>
-          <td style="white-space: nowrap">adsf</td>
-          <td style="white-space: nowrap">adsf</td>
-          <td style="white-space: nowrap">adsf</td>
+      </tbody>
+    </table>
+    <table id="fleet-status" class="">
+      <tbody>
+        <tr style="display: none;" id="fleetstatusrow">
+          <th>Fleets</th>
         </tr>
       </tbody>
     </table>

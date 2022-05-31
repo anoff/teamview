@@ -24,7 +24,7 @@ function addTokenOption () {
   }
 }
 
-if (window.location.search.includes('page=galaxy')) {
+if (window.location.search.includes('page=galaxy') && window.location.hash !== '#teamview-station') {
   gv.init()
   pb.init()
 }
