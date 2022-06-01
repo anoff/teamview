@@ -271,12 +271,12 @@ function doUploadPlanets () {
 }
 function addUploadSection () {
   const sectionHTML = `
-    <td class="transparent" id="teamview-section">
+  <tr>
+    <td class="transparent" id="teamview-section" colspan="2">
       <table>
-        <tbody><tr>
-            <th colspan="4">Teamview</th>
-          </tr>
+        <tbody>
           <tr>
+            <th>Teamview</th>
             <td><button type="button" id="teamview-upload">Upload</button></td>
             <td><span style="font-weight: bold;">Status</span></div></td>
             <td><span id="teamview-status-icon" class="dot status-unknown"></td>
@@ -284,8 +284,9 @@ function addUploadSection () {
         </tr>
       </tbody></table>
     </td>
+  </tr>
   `
-  document.querySelectorAll('#galaxy_form table tr')[0].insertAdjacentHTML('beforeend', sectionHTML)
+  document.querySelectorAll('#galaxy_form table tr')[0].insertAdjacentHTML('afterend', sectionHTML)
   document.getElementById('teamview-upload').addEventListener('click', doUploadPlanets)
 
   const button = document.getElementById('teamview-upload')
