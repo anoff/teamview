@@ -2,6 +2,7 @@ const homeHtml = require('./station.html').default
 const { report2html } = require('./spioHtml')
 const { addBookmark } = require('./planetBookmark')
 const req = require('./requests')
+const { getCurrentPosition } = require('./utils')
 
 function showStation () {
   Array.from(document.querySelector('content').children).forEach(c => c.remove())
@@ -132,14 +133,6 @@ function insertResults (planets) {
   }
 }
 
-/**
- * Read the current active planet position from the planet menu.
- * @returns Array[int] Galaxy, System, Position
- */
-function getCurrentPosition () {
-  const [g, s, p] = Array.from(document.querySelector('#planetSelector').children).find(e => e.selected).text.split(' [')[1].slice(0, -1).split(':').map(e => parseInt(e))
-  return [g, s, p]
-}
 module.exports = {
   showStation
 }

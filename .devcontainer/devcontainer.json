@@ -11,7 +11,8 @@
 	"mtxr.sqltools",
 	"mtxr.sqltools-driver-pg",
 	"bierner.markdown-mermaid",
-	"tht13.html-preview-vscode"
+	"tht13.html-preview-vscode",
+	"naumovs.color-highlight"
 ],
   // Use 'forwardPorts' to make a list of ports inside the container available locally.
   "forwardPorts": [
