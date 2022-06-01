@@ -32,7 +32,7 @@ async function main () {
   } else {
     writeFileSync(HASH_FILE, hash)
     for (const s of stats) {
-      const p = new Player({
+      const data = {
         playerId: s.playerId,
         playerName: s.playerName,
         alliance: s.allianceName,
@@ -47,11 +47,13 @@ async function main () {
         battlesLost: parseInt(s.battlesLost),
         battlesWon: parseInt(s.battlesWon),
         battlesDraw: parseInt(s.battlesDraw)
-      })
+      }
+      const p1 = new Player(data)
+      await p1.save('players_history')
       // logger.info(`Processing ${n}/${len}`)
-      await p.save('players_history')
-      await p.sync('players')
-      await p.save('players')
+      const p2 = new Player(data)
+      await p2.sync('players')
+      await p2.save('players')
     }
   }
 }
