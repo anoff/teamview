@@ -312,7 +312,12 @@ function uploadReports () {
     const { totalCount, successCount } = res
     setStatus('status-ok', `Submitted ${successCount}/${totalCount}`)
   }).catch(e => {
-    setStatus('status-error', 'Failed, see console')
+    let errMessage = 'Error'
+    if (e.status) {
+      errMessage += ` [${e.status}]`
+    }
+    errMessage += ', see console'
+    setStatus('status-error', errMessage)
     console.error(e)
   })
 }

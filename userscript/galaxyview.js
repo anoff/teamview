@@ -78,7 +78,6 @@ function getVisibleSystem () {
         const planetInfo = Array.from(document.querySelector('#planetSelector').querySelectorAll('option'))
         for (let index = 0; index < planetInfo.length; index++) {
           if (planetInfo[index].innerText.split(' [')[0] === planetName) {
-            console.log(planetInfo[index].value)
             planetId = parseInt(planetInfo[index].value)
           }
         }
@@ -133,7 +132,12 @@ function checkPlanetStatus (systemData) {
 
       modifyTable(serverData, modifyAddPlanetReports)
     }).catch(e => {
-      setStatus('status-error', 'Error, see console')
+      let errMessage = 'Error'
+      if (e.status) {
+        errMessage += ` [${e.status}]`
+      }
+      errMessage += ', see console'
+      setStatus('status-error', errMessage)
       console.error('Error while checking current system upload status', e)
     })
 }
