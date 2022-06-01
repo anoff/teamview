@@ -1,4 +1,4 @@
-const { home: homeHtml } = require('./stationHtml')
+const homeHtml = require('./station.html').default
 const { report2html } = require('./spioHtml')
 const { addBookmark } = require('./planetBookmark')
 const req = require('./requests')

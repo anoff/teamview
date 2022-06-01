@@ -14,5 +14,16 @@ module.exports = {
     path: pathOut,
     filename: 'teamview.[name].bundle.js'
   },
-  devtool: false
+  devtool: false,
+  module: {
+    rules: [
+      {
+        test: /\.html$/,
+        loader: 'html-loader',
+        options: {
+          minimize: true
+        }
+      }
+    ]
+  }
 }

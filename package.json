@@ -34,6 +34,7 @@
   },
   "devDependencies": {
     "apidoc": "^0.51.1",
+    "html-loader": "^3.1.0",
     "nodemon": "^2.0.16",
     "pino-pretty": "^7.6.1",
     "standard": "^17.0.0"
