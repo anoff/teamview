@@ -15,7 +15,7 @@ services:
     container_name: teamview-db
     image: postgres:latest
     volumes:
-      - postgres-data:/var/lib/postgresql/data
+      - .docker/postgres:/var/lib/postgresql/data
     environment:
       POSTGRES_USER: postgres
       POSTGRES_DB: postgres
@@ -23,6 +23,3 @@ services:
     ports:
       - "5433:5432"
     restart: unless-stopped
-
-volumes:
-  postgres-data:
