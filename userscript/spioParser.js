@@ -393,7 +393,6 @@ function init () {
   const sp = new SpioParser()
   if (!TM_getValue('reports_uploaded')) TM_setValue('reports_uploaded', [])
   if (sp.isSpioPage()) {
-    addStyles()
     addUploadSection()
     colorReports()
     fetchUploadedReports().then(colorReports.bind(this))

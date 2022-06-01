@@ -1,6 +1,5 @@
 /* globals location */
 const req = require('./requests')
-const { GM_addStyle } = require('./utils') // eslint-disable-line camelcase
 const { report2html } = require('./spioHtml')
 
 const MAX_AGE_PLANET_H = 72 // number of hours when a planet info is considered outdated
@@ -341,18 +340,6 @@ function modifyTable (data, modfiyFn) {
 }
 
 function init () {
-  GM_addStyle('.fadein-text { -webkit-animation: fadein 2s; animation: fadein 2s;}')
-  GM_addStyle('@keyframes fadein { from { opacity: 0; } to { opacity: 1; }}')
-  GM_addStyle('@-webkit-keyframes fadein { from { opacity: 0; } to { opacity: 1; }}')
-
-  GM_addStyle('.dot { height: 7px; width: 7px; border-radius: 50%; display: inline-block;}')
-  GM_addStyle('.status-ok { background-color: #00ee00; }')
-  GM_addStyle('.status-error { background-color: #ee0000; }')
-  GM_addStyle('.status-outdated { background-color: #eeee00; }')
-  GM_addStyle('.status-unknown { background-color: #fff; }')
-  GM_addStyle('.status-working { animation: status-animation 0.7s infinite; animation-direction: alternate; }')
-  GM_addStyle('@keyframes status-animation { from {background-color: #fff;} to {background-color: #3ae;}}')
-
   addColumn(2, ['Player Stats', 'Spio Info'])
   addUploadSection()
   modifyTable({}, modifyAddRankFromPopup)
