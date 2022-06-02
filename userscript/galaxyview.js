@@ -5,6 +5,7 @@ const { report2html } = require('./spioHtml')
 const MAX_AGE_PLANET_H = 72 // number of hours when a planet info is considered outdated
 
 let serverData, systemData
+let startedNavigation = false // global var to dected if navigation was started
 
 /**
  * Parse planet information out of current visible system in the galaxy view table
@@ -292,19 +293,25 @@ function addUploadSection () {
   const button = document.getElementById('teamview-upload')
   document.onkeydown = function (e) {
     e = e || window.event
-    switch (e.which || e.keyCode) {
-      case 13 : // enter
-      case 32: // space
-        button.click()
-        break
-      case 72: // l
-        button.click()
-        location.assign("javascript:galaxy_submit('systemLeft')")
-        break
-      case 76: // h
-        button.click()
-        location.assign("javascript:galaxy_submit('systemRight')")
-        break
+    if (!startedNavigation) {
+      switch (e.key || e.keyCode) {
+        case 'Enter':
+        case ' ':
+          button.click()
+          break
+        case 'a':
+        case 'ArrowLeft':
+          button.click()
+          location.assign("javascript:galaxy_submit('systemLeft')")
+          startedNavigation = true
+          break
+        case 'd':
+        case 'ArrowRight':
+          button.click()
+          location.assign("javascript:galaxy_submit('systemRight')")
+          startedNavigation = true
+          break
+      }
     }
   }
 
