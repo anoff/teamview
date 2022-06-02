@@ -1,5 +1,5 @@
 'use strict'
-const { showStation } = require('./teamview')
+const { showStation, init: initMain } = require('./teamview')
 
 function addMenuButton () {
   // add button to menu
@@ -21,3 +21,4 @@ function init () {
 }
 
 init()
+initMain()

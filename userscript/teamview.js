@@ -63,14 +63,17 @@ function activatePage (id) {
   document.querySelector(`#station-page-selector button#selector-${id}`).classList.add('selected')
 }
 
-if (window.location.search.includes('page=galaxy') && window.location.hash !== '#teamview-station') {
-  gv.init()
-  pb.init()
+function init () {
+  if (window.location.search.includes('page=galaxy') && window.location.hash !== '#teamview-station') {
+    gv.init()
+    pb.init()
+  }
+
+  addTokenOption()
+  sp.init()
 }
 
-addTokenOption()
-sp.init()
-
 module.exports = {
-  showStation
+  showStation,
+  init
 }
