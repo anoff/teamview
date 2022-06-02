@@ -46,7 +46,10 @@ class SpioParser {
     }
 
     function parseData (content) {
-      const map = languageMap.spyitems_en
+      let map = languageMap.spyitems_en
+      if (content.includes('Rohstoffe')) {
+        map = languageMap.spyitems_de
+      }
       const json = {
         buildings: {},
         resources: {},
