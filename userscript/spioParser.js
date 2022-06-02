@@ -305,7 +305,6 @@ function uploadReports () {
         defense: r.defense
       }
     })
-  // console.log(data)
   const uploadedReports = TM_getValue('reports_uploaded')
   uploadedReports.push(...data.map(e => e.reportId))
   TM_setValue('reports_uploaded', uploadedReports)

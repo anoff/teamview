@@ -125,6 +125,10 @@
   color: #fafafa;
 }
 
+.color-orange {
+  color: #e93;
+}
+
 @keyframes status-animation {
   from {
     background-color: #fff;

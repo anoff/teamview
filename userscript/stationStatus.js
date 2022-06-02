@@ -44,10 +44,13 @@ function addRows (planets) {
     for (let colIx = 1; colIx <= 20; colIx++) {
       const system = rowIx * 20 + colIx
       const planetCount = planets.filter(e => e.s === system).length
+      const oldest = planets.filter(e => e.s === system).map(e => e.d).sort()[0]
+      const oldestAge = (new Date() - new Date(oldest)) / 1000 / 3600 // [h]
       let cls = 'color-gray'
       if (planetCount === 1) cls = 'color-white'
       else if (planetCount === 2) cls = 'color-blue'
       else if (planetCount >= 3) cls = 'color-green'
+      if (oldestAge > 24 * 5) cls = 'color-orange'
       html += `<td><a href="game.php?page=galaxy&galaxy=${galaxy}&system=${system}" class="${cls}">${system}</a></td>`
     }
     html += '</tr>'
