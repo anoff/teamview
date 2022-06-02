@@ -24,11 +24,12 @@ function insertBookmarkedRows () {
   cols[1].setAttribute('colspan', 2)
   cols[2].innerText = 'Name'
   cols[2].setAttribute('colspan', 2)
-  cols[3].innerText = 'Actions'
+  cols[3].innerText = 'Scan'
   cols[4].innerText = 'Last Scan'
-  cols[4].setAttribute('colspan', colspan - 1 - 2 - 2 - 1)
+  cols[5].innerText = 'Delete'
+  cols[5].setAttribute('colspan', colspan - 2 - 2 - 1 * 4)
 
-  Array.from(cols).slice(5).forEach(e => e.remove())
+  Array.from(cols).slice(6).forEach(e => e.remove())
 
   const bookmarkOrderFn = b => b.position + b.system * 50 + b.galaxy * 400 * 50
   const bookmarks = TM_getValue('bookmarks').sort((a, b) => bookmarkOrderFn(a) > bookmarkOrderFn(b) ? -1 : 1)
@@ -51,9 +52,9 @@ function insertBookmarkedRows () {
     <td colspan="2">${b.playerName}</td>
     <td>
       <a id="scan-${b.planetId}" title="Spy on planet" href="javascript:doit(6,${b.planetId},{'210':'2'});">🔍</a>
-      <a id="delete-${b.planetId}" title="Delete Bookmark" href="#">❌</a>
     </td>
-    <td colspan="${colspan - 1 - 2 - 2 - 1}">${timeSinceLastScan}</td>
+    <td colspan="${colspan - 2 - 2 - 1 * 4}">${timeSinceLastScan}</td>
+    <td><a id="delete-${b.planetId}" title="Delete Bookmark" href="#">❌</a></td>
     </tr>`
     colRow.insertAdjacentHTML('afterend', html)
 
