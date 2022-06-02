@@ -109,6 +109,22 @@
   color: #000;
 }
 
+.color-green {
+  color: #3e6;
+}
+
+.color-blue {
+  color: #4bf;
+}
+
+.color-gray {
+  color: #666;
+}
+
+.color-white {
+  color: #fafafa;
+}
+
 @keyframes status-animation {
   from {
     background-color: #fff;
@@ -117,4 +133,8 @@
   to {
     background-color: #3ae;
   }
+}
+
+.hidden {
+  display: none;
 }

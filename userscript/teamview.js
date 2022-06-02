@@ -4,6 +4,10 @@
 const gv = require('./galaxyview')
 const pb = require('./planetBookmark')
 const sp = require('./spioParser')
+const { capitalCase } = require('change-case')
+
+const stationSearch = require('./stationSearch')
+const stationStatus = require('./stationStatus')
 
 function addTokenOption () {
   if (window.location.search.includes('page=settings')) {
@@ -24,6 +28,41 @@ function addTokenOption () {
   }
 }
 
+function showStation () {
+  Array.from(document.querySelector('content').children).forEach(c => c.remove())
+
+  const anchor = document.querySelector('content')
+  insertSelectorHtml(anchor)
+  stationSearch.insertHtml(anchor)
+  stationStatus.insertHtml(anchor)
+
+  activatePage('search-planets')
+}
+
+function insertSelectorHtml (anchor) {
+  const pages = ['search-planets', 'status'] // should be the top div id in the corresponding html, see stationSearch.html
+  let html = '<div class="planeto" id="station-page-selector">'
+  for (const [ix, p] of Object.entries(pages)) {
+    if (ix > 0) html += '<span> | </span>'
+    html += `<button id='selector-${p}'>${capitalCase(p)}</button>`
+  }
+  html += '</div>'
+  anchor.insertAdjacentHTML('beforeend', html)
+
+  Array.from(document.querySelectorAll('#station-page-selector button')).forEach(btn => {
+    const target = btn.id.replace(/^selector-/, '')
+    btn.addEventListener('click', activatePage.bind(this, target))
+  })
+}
+
+function activatePage (id) {
+  Array.from(document.querySelectorAll('.station.page')).forEach(e => { e.classList.add('hidden') })
+  document.querySelector(`.station.page#${id}`).classList.remove('hidden')
+
+  Array.from(document.querySelectorAll('#station-page-selector button')).forEach(e => { e.classList.remove('selected') })
+  document.querySelector(`#station-page-selector button#selector-${id}`).classList.add('selected')
+}
+
 if (window.location.search.includes('page=galaxy') && window.location.hash !== '#teamview-station') {
   gv.init()
   pb.init()
@@ -31,3 +70,7 @@ if (window.location.search.includes('page=galaxy') && window.location.hash !== '
 
 addTokenOption()
 sp.init()
+
+module.exports = {
+  showStation
+}

@@ -1,19 +1,9 @@
-const homeHtml = require('./station.html').default
+
 const { report2html } = require('./spioHtml')
 const { addBookmark } = require('./planetBookmark')
 const req = require('./requests')
+const searchHtml = require('./stationSearch.html').default
 const { getCurrentPosition } = require('./utils')
-
-function showStation () {
-  Array.from(document.querySelector('content').children).forEach(c => c.remove())
-  document.querySelector('content').insertAdjacentHTML('afterbegin', homeHtml)
-  const btn = document.querySelector('button#station-search')
-  btn.addEventListener('click', search.bind(this))
-
-  const [galaxy] = getCurrentPosition()
-  document.querySelector('#galaxy_min').value = galaxy
-  document.querySelector('#galaxy_max').value = galaxy
-}
 
 function search () {
   function getQuery () {
@@ -133,6 +123,16 @@ function insertResults (planets) {
   }
 }
 
+function insertHtml (anchorElement) {
+  anchorElement.insertAdjacentHTML('beforeend', searchHtml)
+  const btn = document.querySelector('button#station-search')
+  btn.addEventListener('click', search.bind(this))
+
+  const [galaxy] = getCurrentPosition()
+  document.querySelector('#galaxy_min').value = galaxy
+  document.querySelector('#galaxy_max').value = galaxy
+}
 module.exports = {
-  showStation
+  search,
+  insertHtml
 }

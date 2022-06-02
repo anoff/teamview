@@ -1,5 +1,5 @@
 'use strict'
-const { showStation } = require('./station')
+const { showStation } = require('./teamview')
 
 function addMenuButton () {
   // add button to menu

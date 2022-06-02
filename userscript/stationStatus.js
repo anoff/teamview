@@ -1,4 +1,4 @@
-const statusHtml = require('./status.html').default
+const statusHtml = require('./stationStatus.html').default
 const req = require('./requests')
 const { getCurrentPosition } = require('./utils')
 
@@ -10,9 +10,8 @@ function fetchAndDisplay (galaxy) {
     })
 }
 
-function showStatus () {
-  Array.from(document.querySelector('content').children).forEach(c => c.remove())
-  document.querySelector('content').insertAdjacentHTML('afterbegin', statusHtml)
+function insertHtml (anchor) {
+  anchor.insertAdjacentHTML('beforeend', statusHtml)
 
   document.querySelector('select#galaxy').addEventListener('change', e => {
     const galaxy = e.target.value
@@ -45,14 +44,13 @@ function addRows (planets) {
     for (let colIx = 1; colIx <= 20; colIx++) {
       const system = rowIx * 20 + colIx
       const planetCount = planets.filter(e => e.s === system).length
-      let color = '#666'
-      if (planetCount === 1) color = '#fff'
-      else if (planetCount === 2) color = '#36f'
-      else if (planetCount >= 3) color = '#3e6'
-      html += `<td><a href="game.php?page=galaxy&galaxy=${galaxy}&system=${system}" style="color: ${color};">${system}</a></td>`
+      let cls = 'color-gray'
+      if (planetCount === 1) cls = 'color-white'
+      else if (planetCount === 2) cls = 'color-blue'
+      else if (planetCount >= 3) cls = 'color-green'
+      html += `<td><a href="game.php?page=galaxy&galaxy=${galaxy}&system=${system}" class="${cls}">${system}</a></td>`
     }
     html += '</tr>'
-    console.log(html)
     anchor.insertAdjacentHTML('afterend', html)
     const newRow = Array.from(document.querySelector('table#galaxy-status').querySelectorAll('tr')).slice(-1)[0]
     anchor = newRow
@@ -60,5 +58,5 @@ function addRows (planets) {
 }
 
 module.exports = {
-  showStatus
+  insertHtml
 }
