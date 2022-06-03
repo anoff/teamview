@@ -41,6 +41,7 @@ function search () {
   req.searchReports(query)
     .then(res => {
       removeRows()
+      console.log(res)
       insertResults(res)
     })
 }
@@ -130,11 +131,11 @@ function insertResults (reports) {
   }
 
   const res2class = (res, quantiles) => {
-    console.log(res, quantiles)
     if (res > quantiles['0.8']) return 'color-green'
     else if (res > quantiles['0.5']) return 'color-blue'
     return 'color-white'
   }
+
   for (const e of reports) {
     const html = `<tr id="row-${e.planetId}">
     <td>   
@@ -143,7 +144,7 @@ function insertResults (reports) {
     <td>
       <a href="#" title="Open Playercard" onclick="return Dialog.Playercard(${e.player?.playerId});" style="${!e.player ? 'display: none;' : ''}">${e.player?.playerName || '-'}${e.player ? ' ' + playerStatus2Indicator(e.player) : ''}  <span style="font-size: 80%; color: yellow;"> (${e.player?.rank})</span></a>
     </td>
-    <td></td>
+    <td><span>${e.planetName || ''}</span></td>
     <td><span title="Metal Standard Units using 4:1:1" class="${res2class(res2mse(e.resources), quantiles.mse)}">${res2text(res2mse(e.resources))}</span></td>
     <td><span class="${res2class(e.resources.metal, quantiles.metal)}">${res2text(e.resources.metal)}</span></td>
     <td><span class="${res2class(e.resources.crystal, quantiles.crystal)}">${res2text(e.resources.crystal)}</span></td>
