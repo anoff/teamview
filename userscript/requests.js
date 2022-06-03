@@ -92,6 +92,19 @@ function searchPlanets (query) {
   }
   return genericRequest(`/v1/planets?${q}`, 'GET')
 }
+
+/**
+ * Search the database for specific reports.
+ * @param {Object} query query parameters in object notation
+ * @returns {Array[Object]} list of results
+ */
+function searchReports (query) {
+  let q = ''
+  for (const [k, v] of Object.entries(query)) {
+    q += `${k}=${v}&`
+  }
+  return genericRequest(`/v1/reports?${q}&type=search`, 'GET')
+}
 module.exports = {
   deletePlanet,
   uploadPlanets,
@@ -99,5 +112,6 @@ module.exports = {
   getUploadedReports,
   getPlanetInfo,
   getPlayerData,
-  searchPlanets
+  searchPlanets,
+  searchReports
 }

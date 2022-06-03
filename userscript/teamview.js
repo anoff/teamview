@@ -8,6 +8,7 @@ const { capitalCase } = require('change-case')
 
 const stationSearch = require('./stationSearch')
 const stationStatus = require('./stationStatus')
+const stationSearchReports = require('./stationSearchReports')
 
 function addTokenOption () {
   if (window.location.search.includes('page=settings')) {
@@ -34,13 +35,14 @@ function showStation () {
   const anchor = document.querySelector('content')
   insertSelectorHtml(anchor)
   stationSearch.insertHtml(anchor)
+  stationSearchReports.insertHtml(anchor)
   stationStatus.insertHtml(anchor)
 
   activatePage('search-planets')
 }
 
 function insertSelectorHtml (anchor) {
-  const pages = ['search-planets', 'status'] // should be the top div id in the corresponding html, see stationSearch.html
+  const pages = ['search-planets', 'search-reports', 'status'] // should be the top div id in the corresponding html, see stationSearch.html
   let html = '<div class="planeto" id="station-page-selector">'
   for (const [ix, p] of Object.entries(pages)) {
     if (ix > 0) html += '<span> | </span>'

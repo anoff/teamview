@@ -1,16 +1,16 @@
-<div class="station page" id="search-planets">
+<div class="station page" id="search-reports">
   <div>
     <table>
       <tbody>
         <tr>
           <th colspan="3">
-            Search known Planets <span id="loading" style="display:none;">(Loading ...)</span>
+            Analyze Intelligence Reports<span id="loading" style="display:none;">(Loading ...)</span>
           </th>
         </tr>
         <tr>
           <td>
-            <input type="checkbox" id="require_report" unchecked>
-            <label for="require_report">Require report</label>
+            <input type="checkbox" id="by_me" checked>
+            <label for="by_me">only my reports</label>
           </td>
           <td>
             <label for="report_maxage">Max age [hours]: </label>
@@ -29,8 +29,8 @@
           </td>
           <td>
             <label for="rank_min">Rank: </label>
-            <input type="number" id="rank_min" value="200" min="0" max="9999" class="location-field"> -
-            <input type="number" id="rank_max" value="1400" min="0" max="9999" class="location-field">
+            <input type="number" id="rank_min" value="" min="0" max="9999" class="location-field"> -
+            <input type="number" id="rank_max" value="" min="0" max="9999" class="location-field">
           </td>
         </tr>
         <tr>
@@ -73,6 +73,52 @@
           </td>
         </tr>
         <tr>
+          <th colspan="3">Intelligence details</th>
+        </tr>
+        <tr>
+          <td>
+            <label title="minimum resources, converted to metal standard units using 4:1:1 ratio"
+              for="min_resources">Min.
+              MSE
+              [k]: </label>
+            <input type="number" id="min_resources" value="100" min="0" max="100000" class="location-field">
+          </td>
+          <td>
+            <label for="min_crystal">Min. Crystal [k]: </label>
+            <input type="number" id="min_crystal" value="0" min="0" max="100000" class="location-field">
+          </td>
+          <td>
+            <label for="min_deuterium">Min. Deuterium [k]: </label>
+            <input type="number" id="min_deuterium" value="0" min="0" max="100000" class="location-field">
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <label for="min_ships" title="minimum total number of ships on the planet">Min. Ships: </label>
+            <input type="number" id="min_ships" value="0" min="0" max="100000" class="location-field">
+          </td>
+          <td>
+            <input type="checkbox" id="check_old_ships" unchecked>
+            <label for="check_old_ships">search all older reports</label>
+          </td>
+          <td>
+            <label for="report_ships_maxage">Max age [hours]: </label>
+            <input type="number" id="report_ships_maxage" value="240" min="0" max="500" class="location-field">
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <label for="max_def" title="maximum total number of defense buildings">Max. Defense: </label>
+            <input type="number" id="max_def" value="1000" min="0" max="100000" class="location-field">
+          </td>
+          <td>
+            <label for="max_tech" title="maximum research level for any of weapons/shields/armor">Max. Battletech:
+            </label>
+            <input type="number" id="max_tech" value="10" min="0" max="30" class="location-field">
+          </td>
+          <td></td>
+        </tr>
+        <tr>
           <td colspan="3">
             <button id="search">search</button>
           </td>
@@ -93,9 +139,10 @@
           <th style="white-space: nowrap">Pos.</th>
           <th style="white-space: nowrap">Player (Rank)</th>
           <th style="white-space: nowrap">Planet</th>
-          <th style="white-space: nowrap">M</th>
-          <th style="white-space: nowrap">Alliance</th>
-          <th style="white-space: nowrap">Infos</th>
+          <th style="white-space: nowrap">Resources</th>
+          <th style="white-space: nowrap">Fleet</th>
+          <th style="white-space: nowrap">Defense</th>
+          <th style="white-space: nowrap">Intel Age</th>
           <th style="white-space: nowrap">Action</th>
         </tr>
       </tbody>
@@ -103,7 +150,7 @@
     <table id="fleet-status" class="">
       <tbody>
         <tr style="display: none;" id="fleetstatusrow">
-          <th>Fleets</th>
+          <th colspan="8">Fleets</th>
         </tr>
       </tbody>
     </table>
