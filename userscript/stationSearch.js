@@ -9,7 +9,7 @@ const PAGE_ID = '#search-planets' // top level div id to identify this page
 
 function search () {
   function getQuery () {
-    const fields = ['player_name', 'rank_min', 'rank_max', 'alliance_name', 'galaxy_min', 'galaxy_max', 'system_min', 'system_max', 'inactive', 'vacation', 'banned', 'require_report', 'report_maxage']
+    const fields = ['player_name', 'rank_min', 'rank_max', 'alliance_name', 'galaxy_min', 'galaxy_max', 'system_min', 'system_max', 'inactive', 'vacation', 'banned', 'require_report', 'report_maxage', 'has_moon']
     const query = {}
     for (const f of fields) {
       const elm = document.querySelector(`${PAGE_ID} #${f}`)
@@ -83,13 +83,7 @@ function insertResults (planets) {
     if (!text) return ''
     return `(${text})`
   }
-  const debris2Text = (metal, crystal) => {
-    if (metal + crystal > 0) {
-      return `🪨${metal} / 🔮${crystal}`
-    } else {
-      return ''
-    }
-  }
+
   for (const p of planets) {
     const html = `<tr id="row-${p.planetId}">
     <td>
