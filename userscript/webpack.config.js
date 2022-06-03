@@ -21,7 +21,8 @@ module.exports = {
         test: /\.html$/,
         loader: 'html-loader',
         options: {
-          minimize: true
+          minimize: true,
+          sources: false // Disables attributes processing
         }
       }
     ]

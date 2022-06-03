@@ -67,6 +67,7 @@ function calcTimeDeltaString (date) {
 function insertResults (reports) {
   const ROWS_HEADER = 2
   let anchor = document.querySelector(`${PAGE_ID} table#search-results`).querySelectorAll('tr')[ROWS_HEADER - 1]
+
   const playerStatus2Indicator = (player) => {
     const text = ['isInactive', 'isBanned', 'isVacation']
       .filter(k => player[k])
@@ -85,7 +86,55 @@ function insertResults (reports) {
   }
 
   const res2text = value => `${Math.floor(value / 100) / 10}k`
-  // Pos. 	Player (Rank) 	Planet 	Resources 	Fleet 	Defense 	Intel Age 	Action
+  const res2mse = (obj, ratio = [4, 1, 1]) => {
+    const m = obj.metal
+    const c = obj.crystal * ratio[0] / ratio[1]
+    const d = obj.crystal * ratio[0] / ratio[2]
+    return m + c + d
+  }
+  const quantile = (arr, q) => {
+    const sorted = arr.sort((a, b) => a - b)
+    const pos = (sorted.length - 1) * q
+    const base = Math.floor(pos)
+    const rest = pos - base
+    if (sorted[base + 1] !== undefined) {
+      return sorted[base] + rest * (sorted[base + 1] - sorted[base])
+    } else {
+      return sorted[base]
+    }
+  }
+  const allRes = {
+    mse: reports.filter(e => e.resources.metal).map(e => res2mse(e.resources)),
+    metal: reports.filter(e => e.resources.metal).map(e => e.resources.metal),
+    crystal: reports.filter(e => e.resources.metal).map(e => e.resources.crystal),
+    deuterium: reports.filter(e => e.resources.metal).map(e => e.resources.deuterium)
+  }
+
+  const quantiles = {
+    mse: {
+      0.5: quantile(allRes.mse, 0.5),
+      0.8: quantile(allRes.mse, 0.8)
+    },
+    metal: {
+      0.5: quantile(allRes.metal, 0.5),
+      0.8: quantile(allRes.metal, 0.8)
+    },
+    crystal: {
+      0.5: quantile(allRes.crystal, 0.5),
+      0.8: quantile(allRes.crystal, 0.8)
+    },
+    deuterium: {
+      0.5: quantile(allRes.deuterium, 0.5),
+      0.8: quantile(allRes.deuterium, 0.8)
+    }
+  }
+
+  const res2class = (res, quantiles) => {
+    console.log(res, quantiles)
+    if (res > quantiles['0.8']) return 'color-green'
+    else if (res > quantiles['0.5']) return 'color-blue'
+    return 'color-white'
+  }
   for (const e of reports) {
     const html = `<tr id="row-${e.planetId}">
     <td>   
@@ -95,7 +144,10 @@ function insertResults (reports) {
       <a href="#" title="Open Playercard" onclick="return Dialog.Playercard(${e.player?.playerId});" style="${!e.player ? 'display: none;' : ''}">${e.player?.playerName || '-'}${e.player ? ' ' + playerStatus2Indicator(e.player) : ''}  <span style="font-size: 80%; color: yellow;"> (${e.player?.rank})</span></a>
     </td>
     <td></td>
-    <td><span class="report-details">M${res2text(e.resources.metal)} / K${res2text(e.resources.crystal)} / D${res2text(e.resources.deuterium)}</span></td>
+    <td><span title="Metal Standard Units using 4:1:1" class="${res2class(res2mse(e.resources), quantiles.mse)}">${res2text(res2mse(e.resources))}</span></td>
+    <td><span class="${res2class(e.resources.metal, quantiles.metal)}">${res2text(e.resources.metal)}</span></td>
+    <td><span class="${res2class(e.resources.crystal, quantiles.crystal)}">${res2text(e.resources.crystal)}</span></td>
+    <td><span class="${res2class(e.resources.deuterium, quantiles.deuterium)}">${res2text(e.resources.deuterium)}</span></td>
     <td><span class="report-details">${obj2text(e.ships)}</span></td>
     <td><span class="report-details">${obj2text(e.defense)}</span></td>
     <td>
