@@ -4,6 +4,7 @@
 const gv = require('./galaxyview')
 const pb = require('./planetBookmark')
 const sp = require('./spioParser')
+const fm = require('./fleetmenu')
 const { capitalCase } = require('change-case')
 
 const stationSearch = require('./stationSearch')
@@ -73,6 +74,7 @@ function init () {
 
   addTokenOption()
   sp.init()
+  fm.init()
 }
 
 module.exports = {
