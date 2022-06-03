@@ -50,7 +50,7 @@ function removeRows () {
   // const ROW_SYSTEM = 0
   const ROWS_HEADER = 2
   const ROWS_BOTTOM_KEEP = 0
-  const rows = Array.from(document.querySelector('table#search-results').querySelectorAll('tr'))
+  const rows = Array.from(document.querySelector(`${PAGE_ID} table#search-results`).querySelectorAll('tr'))
   const rowsWithPlanets = rows.slice(ROWS_HEADER, rows.length - ROWS_BOTTOM_KEEP)
   for (const row of rowsWithPlanets) {
     row.remove()
@@ -83,23 +83,29 @@ function insertResults (reports) {
     }
     return str
   }
+
+  const res2text = value => `${Math.floor(value / 100) / 10}k`
   // Pos. 	Player (Rank) 	Planet 	Resources 	Fleet 	Defense 	Intel Age 	Action
   for (const e of reports) {
     const html = `<tr id="row-${e.planetId}">
-    <td>
+    <td>   
     <a href="game.php?page=galaxy&galaxy=${e.galaxy}&system=${e.system}" title="Goto System">[${e.galaxy}:${e.system}:${e.position}]</a>
     </td>
     <td>
-    <a href="#" title="Open Playercard" onclick="return Dialog.Playercard(${e.player.playerId});">${e.player.playerName}${e.player ? ' ' + playerStatus2Indicator(e.player) : ''} <span style="font-size: 80%; color: yellow;"> (${e.player.rank})</span></a>
-    </td>
-    <td>${e.resources.metal / 1000}k / ${e.resources.crystal / 1e3}k / ${e.resources.deuterium / 1e3}k</td>
-    <td>${obj2text(e.ships)}</td>
-    <td>${obj2text(e.defense)}</td>
-    <td>${calcTimeDeltaString(e.date)}</td>
-    <td>
-      <a id="scan-${e.planetId}" title="Spy on planet" href="javascript:doit(6,${e.planetId},{'210':'2'});" style="font-size: 130%; position: relative; top: 2px;">${e.planetId ? ' 🛰 ' : ''}</a>
+      <a href="#" title="Open Playercard" onclick="return Dialog.Playercard(${e.player?.playerId});" style="${!e.player ? 'display: none;' : ''}">${e.player?.playerName || '-'}${e.player ? ' ' + playerStatus2Indicator(e.player) : ''}  <span style="font-size: 80%; color: yellow;"> (${e.player?.rank})</span></a>
     </td>
     <td></td>
+    <td><span class="report-details">M${res2text(e.resources.metal)} / K${res2text(e.resources.crystal)} / D${res2text(e.resources.deuterium)}</span></td>
+    <td><span class="report-details">${obj2text(e.ships)}</span></td>
+    <td><span class="report-details">${obj2text(e.defense)}</span></td>
+    <td>
+      <a href="#" class="tooltip_sticky" data-tooltip-content="${report2html(e)}" font-size: 130%; position: relative; top: 2px;">${calcTimeDeltaString(e.date)}</a>
+    </td>
+    <td>
+      <a id="attack-${e.planetId}" title="Attack" href="https://pr0game.com/game.php?page=fleetTable&galaxy=${e.galaxy}&system=${e.system}&planet=${e.position}&planettype=1&target_mission=1"> ⚔️ </a>
+      <span> | </span>
+      <a id="scan-${e.planetId}" title="Spy on planet" href="javascript:doit(6,${e.planetId},{'210':'2'});" style="font-size: 130%; position: relative; top: 2px;">${e.planetId ? ' 🛰 ' : ''}</a>
+    </td>
     </tr>`
     anchor.insertAdjacentHTML('afterend', html)
 

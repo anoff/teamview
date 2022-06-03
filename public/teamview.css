@@ -142,3 +142,7 @@
 .hidden {
   display: none;
 }
+
+.report-details {
+  font-size: 85%;
+}
