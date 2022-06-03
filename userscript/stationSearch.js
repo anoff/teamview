@@ -106,6 +106,7 @@ function insertResults (planets) {
     </td>
     <td>
       <a id="scan-${p.planetId}" title="Spy on planet" href="javascript:doit(6,${p.planetId},{'210':'2'});" style="font-size: 130%; position: relative; top: 2px;">${p.planetId ? ' 🛰 ' : ''}</a>
+      <span> | </span>
     </td>
     </tr>`
     anchor.insertAdjacentHTML('afterend', html)
@@ -118,7 +119,7 @@ function insertResults (planets) {
     a.setAttribute('title', 'Add planet as bookmark')
     a.style = 'font-size: 130%; position: relative; top: 2px;'
     a.onclick = addBookmark.bind(window, p.galaxy, p.system, p.position, p.planetId, p.planetName, p.player.playerName)
-    Array.from(newRow.children).slice(-1)[0].insertAdjacentElement('afterbegin', a)
+    Array.from(newRow.children).slice(-1)[0].insertAdjacentElement('beforeend', a)
 
     // update anchor row so rows get inserted always after newly added row
     anchor = newRow
