@@ -17,6 +17,7 @@ class ApiError extends Error {
 }
 
 function genericRequest (urlPath, method = 'GET', data = {}) {
+  console.log(data)
   return new Promise((resolve, reject) => TM_xmlhttpRequest({
     method,
     url: `${APIURL}${urlPath}`,

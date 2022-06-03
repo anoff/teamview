@@ -1,6 +1,5 @@
 const { capitalCase } = require('change-case')
 const { report2html } = require('./spioHtml')
-const { addBookmark } = require('./planetBookmark')
 const req = require('./requests')
 const searchHtml = require('./stationSearchReports.html').default
 const { getCurrentPosition } = require('./utils')
@@ -8,7 +7,7 @@ const { getCurrentPosition } = require('./utils')
 const PAGE_ID = '#search-reports' // top level div id to identify this page
 function search () {
   function getQuery () {
-    const fields = ['by_me', 'report_maxage', 'player_name', 'alliance_name', 'rank_min', 'rank_max', 'galaxy_min', 'galaxy_max', 'system_min', 'system_max', 'inactive', 'vacation', 'banned', 'min_resources', 'min_crystal', 'min_deuterium', 'min_ships', 'check_old_ships', 'report_ships_maxage', 'max_def', 'max_tech']
+    const fields = ['by_me', 'report_maxage', 'player_name', 'alliance_name', 'rank_min', 'rank_max', 'galaxy_min', 'galaxy_max', 'system_min', 'system_max', 'inactive', 'vacation', 'banned', 'min_mse', 'min_crystal', 'min_deuterium', 'min_ships', 'check_old_ships', 'report_ships_maxage', 'max_def', 'max_tech']
     const query = {}
     for (const f of fields) {
       const elm = document.querySelector(`${PAGE_ID} #${f}`)

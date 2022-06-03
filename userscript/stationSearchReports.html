@@ -77,11 +77,10 @@
         </tr>
         <tr>
           <td>
-            <label title="minimum resources, converted to metal standard units using 4:1:1 ratio"
-              for="min_resources">Min.
+            <label title="minimum resources, converted to metal standard units using 4:1:1 ratio" for="min_mse">Min.
               MSE
               [k]: </label>
-            <input type="number" id="min_resources" value="100" min="0" max="100000" class="location-field">
+            <input type="number" id="min_mse" value="100" min="0" max="100000" class="location-field">
           </td>
           <td>
             <label for="min_crystal">Min. Crystal [k]: </label>
@@ -92,14 +91,14 @@
             <input type="number" id="min_deuterium" value="0" min="0" max="100000" class="location-field">
           </td>
         </tr>
-        <tr>
+        <tr style="display: none;">
           <td>
-            <label for="min_ships" title="minimum total number of ships on the planet">Min. Ships: </label>
-            <input type="number" id="min_ships" value="0" min="0" max="100000" class="location-field">
+            <label disabled for="min_ships" title="minimum total number of ships on the planet">Min. Ships: </label>
+            <input disabled type="number" id="min_ships" value="0" min="0" max="100000" class="location-field">
           </td>
           <td>
-            <input type="checkbox" id="check_old_ships" unchecked>
-            <label for="check_old_ships">search all older reports</label>
+            <input disabled type="checkbox" id="check_old_ships" unchecked>
+            <label disabledfor="check_old_ships">search all older reports</label>
           </td>
           <td>
             <label for="report_ships_maxage">Max age [hours]: </label>
@@ -108,8 +107,10 @@
         </tr>
         <tr>
           <td>
-            <label for="max_def" title="maximum total number of defense buildings">Max. Defense: </label>
-            <input type="number" id="max_def" value="1000" min="0" max="100000" class="location-field">
+            <label style="display: none;" disabled for="max_def" title="maximum total number of defense buildings">Max.
+              Defense: </label>
+            <input style="display: none;" disabled type="number" id="max_def" value="1000" min="0" max="100000"
+              class="location-field">
           </td>
           <td>
             <label for="max_tech" title="maximum research level for any of weapons/shields/armor">Max. Battletech:
@@ -156,7 +157,7 @@
         </tr>
       </tbody>
     </table>
-    <table id="fleet-status" class="">
+    <table id="fleet-status">
       <tbody>
         <tr style="display: none;" id="fleetstatusrow">
           <th colspan="8">Fleets</th>
