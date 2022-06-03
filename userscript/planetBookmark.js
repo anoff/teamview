@@ -46,10 +46,14 @@ function insertBookmarkedRows () {
         timeSinceLastScan = `${hours} hrs ${timeSinceLastScan}`
       }
     }
+    let playerColorCls = 'color-blue'
+    if (b.playerName.includes('i)')) {
+      playerColorCls = 'color-white'
+    }
     const html = `<tr id="row-${b.planetId}">
     <td><a href="game.php?page=galaxy&galaxy=${b.galaxy}&system=${b.system}" title="Goto System">${b.galaxy}:${b.system}:${b.position}</a></td>
     <td colspan="2">${b.planetName}</td>
-    <td colspan="2">${b.playerName}</td>
+    <td colspan="2" class=${playerColorCls}>${b.playerName}</td>
     <td>
       <a id="scan-${b.planetId}" title="Spy on planet" href="javascript:doit(6,${b.planetId},{'210':'2'});">🔍</a>
     </td>
