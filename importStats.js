@@ -14,7 +14,6 @@ function isNewHash (hash) {
     return true
   } else {
     const oldHash = readFileSync(HASH_FILE, 'ascii')
-    console.log(oldHash)
     return oldHash !== hash
   }
 }

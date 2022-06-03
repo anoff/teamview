@@ -40,7 +40,6 @@ function search () {
   req.searchReports(query)
     .then(res => {
       removeRows()
-      console.log(res)
       insertResults(res)
     })
 }
