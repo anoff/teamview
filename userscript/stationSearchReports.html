@@ -73,6 +73,18 @@
           </td>
         </tr>
         <tr>
+          <td>
+            <label for="fleetpoints_min">Fleet Pts Min: </label>
+            <input type="number" id="fleetpoints_min" value="" min="0" max="9999999" class="location-field">
+          </td>
+          <td>
+            <label for="defensepoints_max">Defense Pts Max: </label>
+            <input type="number" id="defensepoints_max" value="" min="0" max="9999999" class="location-field">
+          </td>
+          <td>
+          </td>
+        </tr>
+        <tr>
           <th colspan="3">Intelligence details</th>
         </tr>
         <tr>
@@ -91,7 +103,7 @@
             <input type="number" id="min_deuterium" value="0" min="0" max="100000" class="location-field">
           </td>
         </tr>
-        <tr style="display: none;">
+        <!-- <tr>
           <td>
             <label disabled for="min_ships" title="minimum total number of ships on the planet">Min. Ships: </label>
             <input disabled type="number" id="min_ships" value="0" min="0" max="100000" class="location-field">
@@ -104,12 +116,12 @@
             <label for="report_ships_maxage">Max age [hours]: </label>
             <input type="number" id="report_ships_maxage" value="240" min="0" max="500" class="location-field">
           </td>
-        </tr>
+        </tr> -->
         <tr>
           <td>
-            <label style="display: none;" disabled for="max_def" title="maximum total number of defense buildings">Max.
+            <label style="display: none;" for="max_def" title="maximum total number of defense buildings">Max.
               Defense: </label>
-            <input style="display: none;" disabled type="number" id="max_def" value="1000" min="0" max="100000"
+            <input style="display: none;" type="number" id="max_def" value="1000" min="0" max="100000"
               class="location-field">
           </td>
           <td>
@@ -117,7 +129,12 @@
             </label>
             <input type="number" id="max_tech" value="10" min="0" max="30" class="location-field">
           </td>
-          <td></td>
+          <td>
+            <label style="display: none;" for="min_ships" title="minimum total number of ships on the planet">Min.
+              Ships: </label>
+            <input style="display: none;" type="number" id="min_ships" value="0" min="0" max="100000"
+              class="location-field">
+          </td>
         </tr>
         <tr>
           <td colspan="3">

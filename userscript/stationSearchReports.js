@@ -7,7 +7,7 @@ const { res2str, obj2str, shipStructurePoints, defenseStructurePoints } = requir
 const PAGE_ID = '#search-reports' // top level div id to identify this page
 function search () {
   function getQuery () {
-    const fields = ['by_me', 'report_maxage', 'player_name', 'alliance_name', 'rank_min', 'rank_max', 'galaxy_min', 'galaxy_max', 'system_min', 'system_max', 'inactive', 'vacation', 'banned', 'min_mse', 'min_crystal', 'min_deuterium', 'min_ships', 'check_old_ships', 'report_ships_maxage', 'max_def', 'max_tech']
+    const fields = ['by_me', 'report_maxage', 'player_name', 'alliance_name', 'rank_min', 'rank_max', 'galaxy_min', 'galaxy_max', 'system_min', 'system_max', 'inactive', 'vacation', 'banned', 'min_mse', 'min_crystal', 'min_deuterium', 'min_ships', 'max_def', 'max_tech', 'fleetpoints_min', 'defensepoints_max']
     const query = {}
     for (const f of fields) {
       const elm = document.querySelector(`${PAGE_ID} #${f}`)
@@ -142,7 +142,9 @@ function insertResults (reports) {
     <a href="game.php?page=galaxy&galaxy=${e.galaxy}&system=${e.system}" title="Goto System">[${e.galaxy}:${e.system}:${e.position}]</a>
     </td>
     <td>
-      <a href="#" title="Open Playercard" onclick="return Dialog.Playercard(${e.player?.playerId});" style="${!e.player ? 'display: none;' : ''}">${e.player?.playerName || '-'}${e.player ? ' ' + playerStatus2Indicator(e.player) : ''}  <span style="font-size: 80%; color: yellow;"> (${e.player?.rank})</span></a>
+      <a href="#" title="Open Playercard" onclick="return Dialog.Playercard(${e.player?.playerId});" style="${!e.player?.playerId ? 'display: none;' : ''}">${e.player?.playerName || '-'}${e.player ? ' ' + playerStatus2Indicator(e.player) : ''}</a>
+      <span style="${e.player?.playerId ? 'display: none;' : ''}">${e.player?.playerName || '-'}${e.player ? ' ' + playerStatus2Indicator(e.player) : ''}</span>
+        <span style="font-size: 80%; color: yellow;"> (${e.player?.rank})</span>
     </td>
     <td><span>${e.planetName || ''}</span></td>
     <td><span title="Metal Standard Units using 4:1:1" class="${res2class(res2mse(e.resources), quantiles.mse)}">${res2str(res2mse(e.resources))}</span></td>

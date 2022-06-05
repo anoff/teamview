@@ -9,7 +9,7 @@ const PAGE_ID = '#search-planets' // top level div id to identify this page
 
 function search () {
   function getQuery () {
-    const fields = ['player_name', 'rank_min', 'rank_max', 'alliance_name', 'galaxy_min', 'galaxy_max', 'system_min', 'system_max', 'inactive', 'vacation', 'banned', 'require_report', 'report_maxage', 'has_moon']
+    const fields = ['player_name', 'rank_min', 'rank_max', 'alliance_name', 'galaxy_min', 'galaxy_max', 'system_min', 'system_max', 'inactive', 'vacation', 'banned', 'require_report', 'report_maxage', 'has_moon', 'fleetpoints_min', 'defensepoints_max']
     const query = {}
     for (const f of fields) {
       const elm = document.querySelector(`${PAGE_ID} #${f}`)
