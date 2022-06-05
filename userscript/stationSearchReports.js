@@ -1,8 +1,8 @@
-const { capitalCase } = require('change-case')
 const { report2html } = require('./spioHtml')
 const req = require('./requests')
 const searchHtml = require('./stationSearchReports.html').default
-const { getCurrentPosition } = require('./utils')
+const { getCurrentPosition, quantile } = require('./utils')
+const { res2str, obj2str, shipStructurePoints, defenseStructurePoints } = require('./gameUtils')
 
 const PAGE_ID = '#search-reports' // top level div id to identify this page
 function search () {
@@ -76,32 +76,13 @@ function insertResults (reports) {
     return `(${text})`
   }
 
-  const obj2text = obj => {
-    let str = ''
-    for (const key in obj) {
-      str += `${capitalCase(key)}: ${obj[key]}<br>`
-    }
-    return str
-  }
-
-  const res2text = value => `${Math.floor(value / 100) / 10}k`
   const res2mse = (obj, ratio = [4, 1, 1]) => {
     const m = obj.metal
     const c = obj.crystal * ratio[0] / ratio[1]
     const d = obj.crystal * ratio[0] / ratio[2]
     return m + c + d
   }
-  const quantile = (arr, q) => {
-    const sorted = arr.sort((a, b) => a - b)
-    const pos = (sorted.length - 1) * q
-    const base = Math.floor(pos)
-    const rest = pos - base
-    if (sorted[base + 1] !== undefined) {
-      return sorted[base] + rest * (sorted[base + 1] - sorted[base])
-    } else {
-      return sorted[base]
-    }
-  }
+
   const allRes = {
     mse: reports.filter(e => e.resources.metal).map(e => res2mse(e.resources)),
     metal: reports.filter(e => e.resources.metal).map(e => e.resources.metal),
@@ -136,6 +117,26 @@ function insertResults (reports) {
 
   for (const e of reports) {
     const resourcePotential = 0.5 * Math.max(e.resources.metal + e.resources.crystal + e.resources.deuterium, Math.min(0.75 * (2 * e.resources.metal + e.resources.crystal + e.resources.deuterium), 2 * e.resources.metal + e.resources.deuterium))
+
+    let fleetSp = 0
+    if (e.ships) {
+      for (const sk in e.ships) {
+        fleetSp += shipStructurePoints[sk] * e.ships[sk]
+      }
+    }
+    let fleetSpClass = 'color-white'
+    if (fleetSp * 0.3 > 1e6) fleetSpClass = 'color-blue'
+    if (fleetSp * 0.3 > 3e6) fleetSpClass = 'color-green'
+    let defSp = 0
+    if (e.defense) {
+      for (const sk in e.defense) {
+        defSp += defenseStructurePoints[sk] * e.defense[sk]
+      }
+    }
+    const def2fleet = defSp / Math.max(fleetSp, 1)
+    let def2fleetClass = 'color-orange'
+    if (def2fleet < 1) def2fleetClass = 'color-green'
+    else if (def2fleet < 2) def2fleetClass = 'color-blue'
     const html = `<tr id="row-${e.planetId}">
     <td>   
     <a href="game.php?page=galaxy&galaxy=${e.galaxy}&system=${e.system}" title="Goto System">[${e.galaxy}:${e.system}:${e.position}]</a>
@@ -144,12 +145,20 @@ function insertResults (reports) {
       <a href="#" title="Open Playercard" onclick="return Dialog.Playercard(${e.player?.playerId});" style="${!e.player ? 'display: none;' : ''}">${e.player?.playerName || '-'}${e.player ? ' ' + playerStatus2Indicator(e.player) : ''}  <span style="font-size: 80%; color: yellow;"> (${e.player?.rank})</span></a>
     </td>
     <td><span>${e.planetName || ''}</span></td>
-    <td><span title="Metal Standard Units using 4:1:1" class="${res2class(res2mse(e.resources), quantiles.mse)}">${res2text(res2mse(e.resources))}</span></td>
-    <td><span class="${res2class(e.resources.metal, quantiles.metal)}">${res2text(e.resources.metal)}</span></td>
-    <td><span class="${res2class(e.resources.crystal, quantiles.crystal)}">${res2text(e.resources.crystal)}</span></td>
-    <td><span class="${res2class(e.resources.deuterium, quantiles.deuterium)}">${res2text(e.resources.deuterium)}</span></td>
-    <td><span class="report-details">${obj2text(e.ships)}</span></td>
-    <td><span class="report-details">${obj2text(e.defense)}</span></td>
+    <td><span title="Metal Standard Units using 4:1:1" class="${res2class(res2mse(e.resources), quantiles.mse)}">${res2str(res2mse(e.resources))}</span></td>
+    <td><span class="${res2class(e.resources.metal, quantiles.metal)}">${res2str(e.resources.metal)}</span></td>
+    <td><span class="${res2class(e.resources.crystal, quantiles.crystal)}">${res2str(e.resources.crystal)}</span></td>
+    <td><span class="${res2class(e.resources.deuterium, quantiles.deuterium)}">${res2str(e.resources.deuterium)}</span></td>
+    <td>
+      <span style="${fleetSp === 0 ? 'display: none;' : ''}" class="${fleetSpClass}">
+        <img src="./styles/theme/nova/planeten/debris.jpg" alt="TF for entire fleet" width="16" height="16">
+        ${Math.round(fleetSp * 0.3 / 1e5) / 10}M<br>
+      </span>
+      <span class="report-details">
+        ${obj2str(e.ships)}
+      </span>
+    </td>
+    <td><span style="${Math.min(defSp, fleetSp) === 0 ? 'display: none;' : ''}" class="${def2fleetClass}">Def/Fleet: ${Math.round(def2fleet * 10) / 10}<br></span><span class="report-details">${obj2str(e.defense)}</span></td>
     <td>
       <a href="#" class="tooltip_sticky" data-tooltip-content="${report2html(e)}" font-size: 130%; position: relative; top: 2px;">${calcTimeDeltaString(e.date)}</a>
     </td>

@@ -19,7 +19,26 @@ function getCurrentPosition () {
   return [g, s, p]
 }
 
+/**
+ * Calculate the n-th quantile for the given values.
+ * @param {Array[Number]} arr Input array containing all values
+ * @param {Number} q Quantile 0..1
+ * @returns {Number} The value where q% of all values are included
+ */
+function quantile (arr, q) {
+  const sorted = arr.sort((a, b) => a - b)
+  const pos = (sorted.length - 1) * q
+  const base = Math.floor(pos)
+  const rest = pos - base
+  if (sorted[base + 1] !== undefined) {
+    return sorted[base] + rest * (sorted[base + 1] - sorted[base])
+  } else {
+    return sorted[base]
+  }
+}
+
 module.exports = {
   getCurrentPosition,
-  GM_addStyle // eslint-disable-line camelcase
+  GM_addStyle, // eslint-disable-line camelcase
+  quantile
 }
