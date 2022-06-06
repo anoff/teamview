@@ -5,6 +5,8 @@
 
 For active development run the userscript build and server in development mode:
 
+First create a `.env` filed based on the template.
+
 ```sh
 npm run dev # starts and autoreleads server on localhost:3000
 # second session
@@ -13,6 +15,7 @@ npm run dev # autobuilds userscript in case of changes
 ```
 
 ### Recommended tools
+
 Use vscode for devcontainer with port forwarding to host
 
 Install https://github.com/sqlectron/sqlectron-gui/releases for working with the database.
@@ -78,6 +81,9 @@ classDiagram
     report_id: int
     report_type: string
     date: date
+    galaxy: int
+    system: int
+    position: int
     resources: json
     buildings: json
     ships: json
@@ -90,14 +96,15 @@ classDiagram
   }
   class players {
     id: int
-    player_name: string
     player_id: int
+    player_name: string
     alliance: string
     rank: int
     points_research: int
     points_defense: int
     points_fleet: int
     points_building: int
+    points: int
     units_destroyed: int
     units_lost: int
     battles_lost: int
@@ -111,6 +118,7 @@ classDiagram
   }
   class players_history {
     id: int
+    player_id: int
     player_name: string
     alliance: string
     rank: int
@@ -118,6 +126,7 @@ classDiagram
     points_defense: int
     points_fleet: int
     points_building: int
+    points: int
     units_destroyed: int
     units_lost: int
     battles_lost: int
@@ -131,6 +140,101 @@ classDiagram
 The respective classes in `lib/data` use camelCase notation instead of snake_case.
 To convert to/from DB format each class has a .toDBformat() method that converts the case.
 To create a new object from a DB result, rather than using the constructor use the static method `Class.fromDB()`
+
+### Format of espionage report objects (in DB and API)
+
+Content of espionage reports is aggregated into JSON objects for `resources`, `buildings`, `ships`, `defense`, `research`.
+
+Translations from espionage report to these keywords is defined in `userscript/spioParser.js`.
+
+#### Resources
+```
+metal
+crystal
+deuterium
+```
+
+#### Buildings
+
+```
+metalMine
+crystalMine
+deuteriumRefinery
+solarPowerPlant
+university
+deuteriumPowerPlant
+robotFactory
+naniteFactory
+shipyard
+metalStorage
+crystalStorage
+deuteriumStorage
+researchLab
+terraformer
+allianceDepot
+moonBase
+phalanxSensor
+jumpgate
+missileSilo
+```
+
+#### Ships
+
+```
+lightCargo
+heavyCargo
+lightFighter
+heavyFighter
+cruiser
+battleship
+colonyShip
+recycler
+spyProbe
+planetBomber
+solarSatellite
+starFighter
+battleFortress
+battleCruiser
+```
+
+#### Defense
+
+```
+missileLauncher
+lightLaserTurret
+heavyLaserTurret
+gaussCannon
+ionCannon
+plasmaCannon
+smallShieldDome
+largeShieldDome
+interceptor
+interplanetaryMissiles
+```
+
+#### Research
+
+```
+spyTechnology
+computerTechnology
+weaponsTechnology
+shieldTechnology
+armourTechnology
+energyTechnology
+hyperspaceTechnology
+combustionEngine
+impulseEngine
+hyperspaceEngine
+laserTechnology
+ionTechnology
+plasmaTechnology
+intergalacticResearchNetwork
+expeditionResearch
+mineralResearch
+semiCrystalsResearch
+fuelResearch
+gravitonResearch
+```
 
 ## Todo
 
