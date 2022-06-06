@@ -51,7 +51,7 @@ function getPlayerData (names) {
 
 function deletePlanet (planet) {
   const location = `${planet.galaxy}:${planet.system}:${planet.position}`
-  return genericRequest(`/v1/planets/${location}`, 'GET')
+  return genericRequest(`/v1/planets/${location}`, 'DELETE')
 }
 
 function uploadPlanets (data) {
