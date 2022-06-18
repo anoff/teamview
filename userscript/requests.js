@@ -16,31 +16,35 @@ class ApiError extends Error {
   }
 }
 
-function genericRequest (urlPath, method = 'GET', data = {}) {
-  return new Promise((resolve, reject) => TM_xmlhttpRequest({
-    method,
-    url: `${APIURL}${urlPath}`,
-    data,
-    headers: {
-      token: APIKEY,
-      'content-type': 'application/json; charset=utf-8'
-    },
-    timeout: TIMEOUT_S * 1000,
-    onload: function (res) {
-      if (res.status === 200) {
-        const data = JSON.parse(res.responseText)
-        resolve(data)
-      } else {
-        const err = new ApiError(`Failed to ${method} ${urlPath}: ${res.statusText}`, res)
+function genericRequest (urlPath, method = 'GET', data = null) {
+  return new Promise((resolve, reject) => {
+    const options = {
+      method,
+      url: `${APIURL}${urlPath}`,
+      data,
+      headers: {
+        token: APIKEY,
+        'content-type': 'application/json; charset=utf-8'
+      },
+      timeout: TIMEOUT_S * 1000,
+      onload: function (res) {
+        if (res.status === 200) {
+          const data = JSON.parse(res.responseText)
+          resolve(data)
+        } else {
+          const err = new ApiError(`Failed to ${method} ${urlPath}: ${res.statusText}`, res)
+          reject(err)
+        }
+      },
+      ontimeout: function (e) {
+        const err = new ApiError(`Failed to ${method} ${urlPath}: Request Timeout`, { status: 408, statusText: 'Request Timeout' })
         reject(err)
-      }
-    },
-    ontimeout: function (e) {
-      const err = new ApiError(`Failed to ${method} ${urlPath}: Request Timeout`, { status: 408, statusText: 'Request Timeout' })
-      reject(err)
-    },
-    onerror: e => reject(e)
-  }))
+      },
+      onerror: e => reject(e)
+    }
+    if (!data) delete options.data
+    return TM_xmlhttpRequest(options)
+  })
 }
 
 function getPlayerData (names) {
