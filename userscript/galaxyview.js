@@ -48,7 +48,14 @@ function getVisibleSystem () {
     let moonId = 0
     if (cells[COLUMN_MOON].children.length > 0) {
       const moonHtml = cells[COLUMN_MOON].innerHTML
-      moonId = parseInt(/javascript:doit\(6,([0-9]+)/.exec(moonHtml)[1])
+      // can't parse own moonId without moonName
+      // ToDo parse moon and store it similar like a planet
+      const moonMatch = /javascript:doit\(6,([0-9]+)/.exec(moonHtml)
+      if (moonMatch) {
+        moonId = parseInt(moonMatch[1])
+      } else {
+        moonId = -1
+      }
     }
     let debrisCrystal = 0
     let debrisMetal = 0
