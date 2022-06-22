@@ -248,3 +248,9 @@ Especially for POST/DELETE operations
 
 - either via proxy https://faun.pub/prevent-ddos-attacks-with-traefik-2-44fb32eeac4f
 - or in app https://www.npmjs.com/package/express-slow-down
+
+### Fleet Menu
+
+1. Add column (and SUM row) for expected incoming res for attacks, based on latest spy report and available cargo space (ignore battle)
+1. Add simulate button to reports view (maybe as popup to spy report?)
+1. Add overlay to galaxy / player card to search for all spy reports abouut this person / search all planets

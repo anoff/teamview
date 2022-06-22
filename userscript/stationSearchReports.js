@@ -79,7 +79,7 @@ function insertResults (reports) {
   const res2mse = (obj, ratio = [4, 1, 1]) => {
     const m = obj.metal
     const c = obj.crystal * ratio[0] / ratio[1]
-    const d = obj.crystal * ratio[0] / ratio[2]
+    const d = obj.deuterium * ratio[0] / ratio[2]
     return m + c + d
   }
 
@@ -116,7 +116,7 @@ function insertResults (reports) {
   }
 
   for (const e of reports) {
-    const resourcePotential = 0.5 * Math.max(e.resources.metal + e.resources.crystal + e.resources.deuterium, Math.min(0.75 * (2 * e.resources.metal + e.resources.crystal + e.resources.deuterium), 2 * e.resources.metal + e.resources.deuterium))
+    const requiredCargo = 0.5 * Math.max(e.resources.metal + e.resources.crystal + e.resources.deuterium, Math.min(0.75 * (2 * e.resources.metal + e.resources.crystal + e.resources.deuterium), 2 * e.resources.metal + e.resources.deuterium))
 
     let fleetSp = 0
     if (e.ships) {
@@ -165,7 +165,7 @@ function insertResults (reports) {
       <a href="#" class="tooltip_sticky" data-tooltip-content="${report2html(e)}" font-size: 130%; position: relative; top: 2px;">${calcTimeDeltaString(e.date)}</a>
     </td>
     <td>
-      <a id="attack-${e.planetId}" title="Attack" href="https://pr0game.com/game.php?page=fleetTable&galaxy=${e.galaxy}&system=${e.system}&planet=${e.position}&planettype=1&target_mission=1#send_ship[202]=${Math.ceil(resourcePotential / 5000)}" target="_blank"> ⚔️ </a>
+      <a id="attack-${e.planetId}" title="Attack" href="https://pr0game.com/game.php?page=fleetTable&galaxy=${e.galaxy}&system=${e.system}&planet=${e.position}&planettype=1&target_mission=1#send_ship[202]=${Math.ceil(requiredCargo / 5000)}" target="_blank"> ⚔️ </a>
       <span> | </span>
       <a id="scan-${e.planetId}" title="Spy on planet" href="javascript:doit(6,${e.planetId},{'210':'2'});" style="font-size: 130%; position: relative; top: 2px;">${e.planetId ? ' 🛰 ' : ''}</a>
     </td>
