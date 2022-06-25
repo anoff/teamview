@@ -1,5 +1,5 @@
 /* global TM_getValue, TM_setValue */
-const { setStatus, addStyles } = require('./teamviewSection')
+const { setStatus } = require('./teamviewSection')
 const req = require('./requests')
 
 class SpioParser {
@@ -61,7 +61,7 @@ class SpioParser {
       for (const line of content) {
         if (matchKey) {
           const [group, item] = map[matchKey].split('_')
-          const value = parseInt(line.replace('.', '').replace(',', ''))
+          const value = parseInt(line.replace(/\./g, '').replace(/,/g, ''))
           if (value !== 0) { // skip 0s
             switch (group) {
               case 'b':
