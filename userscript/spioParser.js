@@ -308,11 +308,11 @@ function uploadReports () {
   const uploadedReports = TM_getValue('reports_uploaded')
   uploadedReports.push(...data.map(e => e.reportId))
   TM_setValue('reports_uploaded', uploadedReports)
-  colorReports()
   const p = req.uploadReports(data)
   p.then(res => {
     const { totalCount, successCount } = res
     setStatus('status-ok', `Submitted ${successCount}/${totalCount}`)
+    colorReports()
   }).catch(e => {
     let errMessage = 'Error'
     if (e.status) {
