@@ -104,10 +104,10 @@ function checkPlanetStatus (systemData) {
   function arrayEquals (a, b) {
     return a.length === b.length && a.every((v, i) => v === b[i])
   }
-  if (systemData.length === 0) {
-    return
-  }
-  req.getPlanetInfo([`${systemData[0].galaxy}:${systemData[0].system}`])
+  const systemCoords = Array.from(document.querySelector('content table.table569').querySelectorAll('tr'))[0].innerText
+  const [galaxy, system] = systemCoords.split(' ')[1].split(':').map(e => parseInt(e))
+
+  req.getPlanetInfo([`${galaxy}:${system}`])
     .then(res => {
       serverData = res
       // console.log({ serverData, systemData })
