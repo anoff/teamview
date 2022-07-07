@@ -109,6 +109,38 @@ function insertResults (planets) {
   }
 }
 
+function markPlanetAsSpied (coords) {
+  const rows = document.querySelectorAll('table#search-results tr')
+  for (const row of rows) {
+    const isMatch = row.children[0].textContent.includes(coords)
+    if (isMatch) {
+      row.style.opacity = 0.3
+    }
+  }
+}
+
+function readFleetStatus () {
+  const stati = document.querySelectorAll('table#fleet-status td')
+  for (const status of stati) {
+    const success = Array.from(status.classList).includes('success')
+    const coords = status.textContent.match(/([0-9]+:[0-9]+:[0-9]+)/)
+    if (success && coords.length) {
+      markPlanetAsSpied(coords[1])
+    }
+  }
+}
+
+let FLEET_STATUS_TIMER = null
+function startFleetStatusTimer () {
+  if (!FLEET_STATUS_TIMER) {
+    FLEET_STATUS_TIMER = setInterval(() => {
+      readFleetStatus()
+    }, 700)
+  }
+}
+
+startFleetStatusTimer()
+
 function insertHtml (anchorElement) {
   anchorElement.insertAdjacentHTML('beforeend', searchHtml)
   const btn = document.querySelector(`${PAGE_ID} button#search`)
