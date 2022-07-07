@@ -2,7 +2,7 @@ const { report2html } = require('./spioHtml')
 const req = require('./requests')
 const searchHtml = require('./stationSearchReports.html').default
 const { getCurrentPosition, quantile } = require('./utils')
-const { res2str, obj2str, shipStructurePoints, defenseStructurePoints } = require('./gameUtils')
+const { res2str, obj2str, shipStructurePoints, defenseStructurePoints, itemIds } = require('./gameUtils')
 
 const PAGE_ID = '#search-reports' // top level div id to identify this page
 function search () {
@@ -61,6 +61,36 @@ function calcTimeDeltaString (date) {
   if (!seconds) return '-'
   const hours = Math.floor(seconds / 360) / 10
   return `${hours}h`
+}
+
+function simLink (resources, defenses, ships, research) {
+  // "game.php?page=battleSimulator&amp;im[901]=99529.132749689&amp;im[902]=43196.327424206&amp;im[903]=8452.2665329167&amp;im[911]=3329&amp;im[1]=22&amp;im[2]=20&amp;im[3]=15&amp;im[4]=20&amp;im[12]=8&amp;im[14]=6&amp;im[21]=6&amp;im[22]=6&amp;im[23]=6&amp;im[24]=6&amp;im[31]=3&amp;im[44]=1&amp;im[106]=7&amp;im[108]=10&amp;im[109]=10&amp;im[110]=7&amp;im[111]=8&amp;im[113]=8&amp;im[114]=8&amp;im[115]=9&amp;im[117]=5&amp;im[118]=6&amp;im[120]=12&amp;im[121]=5&amp;im[122]=7&amp;im[123]=1&amp;im[124]=7&amp;im[131]=9&amp;im[132]=9&amp;im[133]=7"
+  let url = 'game.php?page=battleSimulator&'
+  for (const r in resources) {
+    const id = itemIds[`res_${r}`]
+    if (id) {
+      url += `im[${id}]=${resources[r]}&`
+    }
+  }
+  for (const d in defenses) {
+    const id = itemIds[`def_${d}`]
+    if (id) {
+      url += `im[${id}]=${defenses[d]}&`
+    }
+  }
+  for (const s in ships) {
+    const id = itemIds[`sh_${s}`]
+    if (id) {
+      url += `im[${id}]=${ships[s]}&`
+    }
+  }
+  for (const r in research) {
+    const id = itemIds[`r_${r}`]
+    if (id) {
+      url += `im[${id}]=${research[r]}&`
+    }
+  }
+  return url
 }
 
 function insertResults (reports) {
@@ -166,8 +196,14 @@ function insertResults (reports) {
     </td>
     <td>
       <a id="attack-${e.planetId}" title="Attack" href="https://pr0game.com/game.php?page=fleetTable&galaxy=${e.galaxy}&system=${e.system}&planet=${e.position}&planettype=1&target_mission=1#send_ship[202]=${Math.ceil(requiredCargo / 5000)}" target="_blank"> ⚔️ </a>
-      <span> | </span>
+      <br>
+      <span>⸺</span>
+      <br>
       <a id="scan-${e.planetId}" title="Spy on planet" href="javascript:doit(6,${e.planetId},{'210':'2'});" style="font-size: 130%; position: relative; top: 2px;">${e.planetId ? ' 🛰 ' : ''}</a>
+      <br>
+      <span>⸺</span>
+      <br>
+      <a id="sim-${e.planetId}" title="Simulate" href="${simLink(e.resources, e.defense, e.ships, e.research)}" style="font-size: 130%; position: relative; top: 2px;" target="_blank">${e.planetId ? ' 🔮 ' : ''}</a>
     </td>
     </tr>`
     anchor.insertAdjacentHTML('afterend', html)
