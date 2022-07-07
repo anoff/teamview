@@ -1,6 +1,5 @@
 
 const { report2html } = require('./spioHtml')
-const { addBookmark } = require('./planetBookmark')
 const req = require('./requests')
 const searchHtml = require('./stationSearch.html').default
 const { getCurrentPosition } = require('./utils')
