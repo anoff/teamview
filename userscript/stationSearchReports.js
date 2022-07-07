@@ -2,9 +2,13 @@ const { report2html } = require('./spioHtml')
 const req = require('./requests')
 const searchHtml = require('./stationSearchReports.html').default
 const { getCurrentPosition, quantile } = require('./utils')
-const { res2str, obj2str, shipStructurePoints, defenseStructurePoints } = require('./gameUtils')
+const { res2str, obj2str, shipStructurePoints, defenseStructurePoints, itemIds } = require('./gameUtils')
 
 const PAGE_ID = '#search-reports' // top level div id to identify this page
+
+/**
+ * Trigger search on the API and insert results into DOM.
+ */
 function search () {
   function getQuery () {
     const fields = ['by_me', 'report_maxage', 'player_name', 'alliance_name', 'rank_min', 'rank_max', 'galaxy_min', 'galaxy_max', 'system_min', 'system_max', 'inactive', 'vacation', 'banned', 'min_mse', 'min_crystal', 'min_deuterium', 'min_ships', 'max_def', 'max_tech', 'fleetpoints_min', 'defensepoints_max']
@@ -44,6 +48,9 @@ function search () {
     })
 }
 
+/**
+ * Remove all result rows.
+ */
 function removeRows () {
   // all indexes 0-based
   // const ROW_SYSTEM = 0
@@ -56,6 +63,11 @@ function removeRows () {
   }
 }
 
+/**
+ * Calculate string representing delta time in hours.
+ * @param {Date} date (past) date object as reference
+ * @returns {String} delta time in format of 4.2h
+ */
 function calcTimeDeltaString (date) {
   const seconds = Math.round((new Date() - new Date(date)) / 1000)
   if (!seconds) return '-'
@@ -63,6 +75,47 @@ function calcTimeDeltaString (date) {
   return `${hours}h`
 }
 
+/**
+ * Generate battle simulator link based on planet espionage information.
+ * @param {object} resources list of planet resources
+ * @param {object} defenses list of planet defenses
+ * @param {object} ships list of ships on planet
+ * @param {object} research list of research levels
+ * @returns {string} relative url for simulator with configured planet info
+ */
+function simLink (resources, defenses, ships, research) {
+  let url = 'game.php?page=battleSimulator&'
+  for (const r in resources) {
+    const id = itemIds[`res_${r}`]
+    if (id) {
+      url += `im[${id}]=${resources[r]}&`
+    }
+  }
+  for (const d in defenses) {
+    const id = itemIds[`def_${d}`]
+    if (id) {
+      url += `im[${id}]=${defenses[d]}&`
+    }
+  }
+  for (const s in ships) {
+    const id = itemIds[`sh_${s}`]
+    if (id) {
+      url += `im[${id}]=${ships[s]}&`
+    }
+  }
+  for (const r in research) {
+    const id = itemIds[`r_${r}`]
+    if (id) {
+      url += `im[${id}]=${research[r]}&`
+    }
+  }
+  return url
+}
+
+/**
+ * Insert reports into DOM.
+ * @param {Array[Object]} reports List of planet espionage reports
+ */
 function insertResults (reports) {
   const ROWS_HEADER = 2
   let anchor = document.querySelector(`${PAGE_ID} table#search-results`).querySelectorAll('tr')[ROWS_HEADER - 1]
@@ -166,8 +219,14 @@ function insertResults (reports) {
     </td>
     <td>
       <a id="attack-${e.planetId}" title="Attack" href="https://pr0game.com/game.php?page=fleetTable&galaxy=${e.galaxy}&system=${e.system}&planet=${e.position}&planettype=1&target_mission=1#send_ship[202]=${Math.ceil(requiredCargo / 5000)}" target="_blank"> ⚔️ </a>
-      <span> | </span>
+      <br>
+      <span>⸺</span>
+      <br>
       <a id="scan-${e.planetId}" title="Spy on planet" href="javascript:doit(6,${e.planetId},{'210':'2'});" style="font-size: 130%; position: relative; top: 2px;">${e.planetId ? ' 🛰 ' : ''}</a>
+      <br>
+      <span>⸺</span>
+      <br>
+      <a id="sim-${e.planetId}" title="Simulate" href="${simLink(e.resources, e.defense, e.ships, e.research)}" style="font-size: 130%; position: relative; top: 2px;" target="_blank">${e.planetId ? ' 🔮 ' : ''}</a>
     </td>
     </tr>`
     anchor.insertAdjacentHTML('afterend', html)
@@ -179,6 +238,10 @@ function insertResults (reports) {
   }
 }
 
+/**
+ * Inject this features HTML content into the page.
+ * @param {DOM} anchorElement anchor element that is used to place additional HTML
+ */
 function insertHtml (anchorElement) {
   anchorElement.insertAdjacentHTML('beforeend', searchHtml)
   const btn = document.querySelector(`${PAGE_ID} button#search`)

@@ -38,6 +38,7 @@ function showStation () {
   stationSearch.insertHtml(anchor)
   stationSearchReports.insertHtml(anchor)
   stationStatus.insertHtml(anchor)
+  insertFleetStatusHtml(anchor)
 
   activatePage('search-planets')
 }
@@ -56,6 +57,19 @@ function insertSelectorHtml (anchor) {
     const target = btn.id.replace(/^selector-/, '')
     btn.addEventListener('click', activatePage.bind(this, target))
   })
+}
+
+function insertFleetStatusHtml (anchor) {
+  const html = `<div>
+    <table id="fleet-status" class="">
+      <tbody>
+        <tr style="display: none;" id="fleetstatusrow">
+          <th colspan="8">Fleets</th>
+        </tr>
+      </tbody>
+    </table>
+  </div>`
+  anchor.insertAdjacentHTML('beforeend', html)
 }
 
 function activatePage (id) {
