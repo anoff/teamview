@@ -5,6 +5,10 @@ const { getCurrentPosition, quantile } = require('./utils')
 const { res2str, obj2str, shipStructurePoints, defenseStructurePoints, itemIds } = require('./gameUtils')
 
 const PAGE_ID = '#search-reports' // top level div id to identify this page
+
+/**
+ * Trigger search on the API and insert results into DOM.
+ */
 function search () {
   function getQuery () {
     const fields = ['by_me', 'report_maxage', 'player_name', 'alliance_name', 'rank_min', 'rank_max', 'galaxy_min', 'galaxy_max', 'system_min', 'system_max', 'inactive', 'vacation', 'banned', 'min_mse', 'min_crystal', 'min_deuterium', 'min_ships', 'max_def', 'max_tech', 'fleetpoints_min', 'defensepoints_max']
@@ -44,6 +48,9 @@ function search () {
     })
 }
 
+/**
+ * Remove all result rows.
+ */
 function removeRows () {
   // all indexes 0-based
   // const ROW_SYSTEM = 0
@@ -56,6 +63,11 @@ function removeRows () {
   }
 }
 
+/**
+ * Calculate string representing delta time in hours.
+ * @param {Date} date (past) date object as reference
+ * @returns {String} delta time in format of 4.2h
+ */
 function calcTimeDeltaString (date) {
   const seconds = Math.round((new Date() - new Date(date)) / 1000)
   if (!seconds) return '-'
@@ -63,8 +75,15 @@ function calcTimeDeltaString (date) {
   return `${hours}h`
 }
 
+/**
+ * Generate battle simulator link based on planet espionage information.
+ * @param {object} resources list of planet resources
+ * @param {object} defenses list of planet defenses
+ * @param {object} ships list of ships on planet
+ * @param {object} research list of research levels
+ * @returns {string} relative url for simulator with configured planet info
+ */
 function simLink (resources, defenses, ships, research) {
-  // "game.php?page=battleSimulator&amp;im[901]=99529.132749689&amp;im[902]=43196.327424206&amp;im[903]=8452.2665329167&amp;im[911]=3329&amp;im[1]=22&amp;im[2]=20&amp;im[3]=15&amp;im[4]=20&amp;im[12]=8&amp;im[14]=6&amp;im[21]=6&amp;im[22]=6&amp;im[23]=6&amp;im[24]=6&amp;im[31]=3&amp;im[44]=1&amp;im[106]=7&amp;im[108]=10&amp;im[109]=10&amp;im[110]=7&amp;im[111]=8&amp;im[113]=8&amp;im[114]=8&amp;im[115]=9&amp;im[117]=5&amp;im[118]=6&amp;im[120]=12&amp;im[121]=5&amp;im[122]=7&amp;im[123]=1&amp;im[124]=7&amp;im[131]=9&amp;im[132]=9&amp;im[133]=7"
   let url = 'game.php?page=battleSimulator&'
   for (const r in resources) {
     const id = itemIds[`res_${r}`]
@@ -93,6 +112,10 @@ function simLink (resources, defenses, ships, research) {
   return url
 }
 
+/**
+ * Insert reports into DOM.
+ * @param {Array[Object]} reports List of planet espionage reports
+ */
 function insertResults (reports) {
   const ROWS_HEADER = 2
   let anchor = document.querySelector(`${PAGE_ID} table#search-results`).querySelectorAll('tr')[ROWS_HEADER - 1]
@@ -215,6 +238,10 @@ function insertResults (reports) {
   }
 }
 
+/**
+ * Inject this features HTML content into the page.
+ * @param {DOM} anchorElement anchor element that is used to place additional HTML
+ */
 function insertHtml (anchorElement) {
   anchorElement.insertAdjacentHTML('beforeend', searchHtml)
   const btn = document.querySelector(`${PAGE_ID} button#search`)
