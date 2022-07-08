@@ -78,6 +78,13 @@ function activatePage (id) {
 
   Array.from(document.querySelectorAll('#station-page-selector button')).forEach(e => { e.classList.remove('selected') })
   document.querySelector(`#station-page-selector button#selector-${id}`).classList.add('selected')
+
+  removeFleetStatus()
+}
+
+function removeFleetStatus () {
+  const rows = document.querySelectorAll('table#fleet-status td')
+  rows.forEach(r => r.parentElement.remove())
 }
 
 function init () {
