@@ -1,3 +1,4 @@
+/* globals  TM_setValue, TM_getValue */
 function GM_addStyle (css) { // eslint-disable-line camelcase
   const style = document.getElementById('GM_addStyleBy8626') || (function () {
     const style = document.createElement('style')
@@ -37,8 +38,30 @@ function quantile (arr, q) {
   }
 }
 
+function saveSearchSettings (TMvarName, settingsMap) {
+  const settings = TM_getValue(TMvarName) || {}
+  for (const [name, [selector, fn]] of Object.entries(settingsMap)) {
+    let value = document.querySelector(selector).value
+    if (fn) value = fn(value)
+    settings[name] = value
+  }
+  TM_setValue(TMvarName, settings)
+}
+
+function loadSearchSettings (TMvarName, settingsMap) {
+  const settings = TM_getValue(TMvarName) || {}
+  for (const [name, [selector]] of Object.entries(settingsMap)) {
+    const value = settings[name]
+    if (value) {
+      document.querySelector(selector).value = settings[name]
+    }
+  }
+}
+
 module.exports = {
   getCurrentPosition,
   GM_addStyle, // eslint-disable-line camelcase
-  quantile
+  quantile,
+  loadSearchSettings,
+  saveSearchSettings
 }
