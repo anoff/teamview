@@ -2,9 +2,16 @@
 const { report2html } = require('./spioHtml')
 const req = require('./requests')
 const searchHtml = require('./stationSearch.html').default
-const { getCurrentPosition } = require('./utils')
+const { getCurrentPosition, saveSearchSettings, loadSearchSettings } = require('./utils')
 
 const PAGE_ID = '#search-planets' // top level div id to identify this page
+const SETTINGS_NAME = 'search_settings_planets'
+const SETTINGS_MAP = {
+  // name of the setting : [document queryselector, opt:parse function]
+  rankMin: [`${PAGE_ID} #rank_min`, parseInt],
+  rankMax: [`${PAGE_ID} #rank_max`, parseInt],
+  inactive: [`${PAGE_ID} #inactive`]
+}
 
 function search () {
   function getQuery () {
@@ -37,6 +44,7 @@ function search () {
     return query
   }
 
+  saveSearchSettings(SETTINGS_NAME, SETTINGS_MAP)
   const query = getQuery()
   req.searchPlanets(query)
     .then(res => {
@@ -142,13 +150,19 @@ function startFleetStatusTimer () {
 startFleetStatusTimer()
 
 function insertHtml (anchorElement) {
+  const SYSTEM_OFFSET = 60
+
   anchorElement.insertAdjacentHTML('beforeend', searchHtml)
   const btn = document.querySelector(`${PAGE_ID} button#search`)
   btn.addEventListener('click', search.bind(this))
 
-  const [galaxy] = getCurrentPosition()
+  const [galaxy, system] = getCurrentPosition()
   document.querySelector(`${PAGE_ID} #galaxy_min`).value = galaxy
   document.querySelector(`${PAGE_ID} #galaxy_max`).value = galaxy
+  document.querySelector(`${PAGE_ID} #system_min`).value = Math.max(system - SYSTEM_OFFSET, 1)
+  document.querySelector(`${PAGE_ID} #system_max`).value = system + SYSTEM_OFFSET
+  // set based on previously saved values
+  loadSearchSettings(SETTINGS_NAME, SETTINGS_MAP)
 }
 module.exports = {
   search,

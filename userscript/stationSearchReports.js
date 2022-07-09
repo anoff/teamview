@@ -1,10 +1,21 @@
 const { report2html } = require('./spioHtml')
 const req = require('./requests')
 const searchHtml = require('./stationSearchReports.html').default
-const { getCurrentPosition, quantile } = require('./utils')
+const { getCurrentPosition, quantile, saveSearchSettings, loadSearchSettings } = require('./utils')
 const { res2str, obj2str, shipStructurePoints, defenseStructurePoints, itemIds } = require('./gameUtils')
 
 const PAGE_ID = '#search-reports' // top level div id to identify this page
+const SETTINGS_NAME = 'search_settings_planets'
+const SETTINGS_MAP = {
+  // name of the setting : [document queryselector, opt:parse function]
+  minMse: [`${PAGE_ID} #min_mse`],
+  minCrystal: [`${PAGE_ID} #min_crystal`],
+  minDeuterium: [`${PAGE_ID} #min_deuterium`],
+  maxTech: [`${PAGE_ID} #max_tech`],
+  reportMaxAge: [`${PAGE_ID} #report_maxage`],
+  fleetpointsMin: [`${PAGE_ID} #fleetpoints_min`],
+  defensepointsMax: [`${PAGE_ID} #defensepoints_max`]
+}
 
 /**
  * Trigger search on the API and insert results into DOM.
@@ -40,6 +51,7 @@ function search () {
     return query
   }
 
+  saveSearchSettings(SETTINGS_NAME, SETTINGS_MAP)
   const query = getQuery()
   req.searchReports(query)
     .then(res => {
@@ -250,6 +262,8 @@ function insertHtml (anchorElement) {
   const [galaxy] = getCurrentPosition()
   document.querySelector(`${PAGE_ID} #galaxy_min`).value = galaxy
   document.querySelector(`${PAGE_ID} #galaxy_max`).value = galaxy
+  // set based on previously saved values
+  loadSearchSettings(SETTINGS_NAME, SETTINGS_MAP)
 }
 module.exports = {
   search,
