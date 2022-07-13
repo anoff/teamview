@@ -101,12 +101,19 @@ class SpioParser {
     const date = parseDate(dateRaw).toISOString()
     const planet = parsePlanet(title)
     const jsons = parseData(content)
+    let isMoon = false
+    if (reportType === 'espionage') {
+      if (jsons.buildings?.moonBase || jsons.buildings?.phalanxSensor || !jsons.resources?.energy) {
+        isMoon = true
+      }
+    }
     const data = {
       id,
       reportType,
       date,
       planet,
-      ...jsons
+      ...jsons,
+      isMoon
     }
     return data
   }
@@ -345,13 +352,12 @@ function addUploadSection () {
 
   setStatus('status-outdated', 'ready to upload')
 
-  const button = document.getElementById('teamview-upload')
   document.onkeydown = function (e) {
     e = e || window.event
     switch (e.which || e.keyCode) {
       case 13 : // enter
       case 32: // space
-        button.click()
+        uploadReports()
         break
     }
   }
@@ -359,7 +365,7 @@ function addUploadSection () {
   // make sure that clicking the default navigation buttons also uploads data
   const pagination = document.querySelector('#messagestable').querySelectorAll('.right a')
   pagination.forEach(link => {
-    link.addEventListener('click', button.click.bind(this))
+    link.addEventListener('click', uploadReports.bind(this))
   })
 }
 
