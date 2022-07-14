@@ -5,7 +5,7 @@ const { getCurrentPosition, quantile, saveSearchSettings, loadSearchSettings } =
 const { res2str, obj2str, shipStructurePoints, defenseStructurePoints, itemIds } = require('./gameUtils')
 
 const PAGE_ID = '#search-reports' // top level div id to identify this page
-const SETTINGS_NAME = 'search_settings_planets'
+const SETTINGS_NAME = 'search_settings_reports'
 const SETTINGS_MAP = {
   // name of the setting : [document queryselector, opt:parse function]
   minMse: [`${PAGE_ID} #min_mse`],
