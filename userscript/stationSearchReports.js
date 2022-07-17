@@ -181,6 +181,7 @@ function insertResults (reports) {
   }
 
   for (const e of reports) {
+    console.log(e)
     const requiredCargo = 0.5 * Math.max(e.resources.metal + e.resources.crystal + e.resources.deuterium, Math.min(0.75 * (2 * e.resources.metal + e.resources.crystal + e.resources.deuterium), 2 * e.resources.metal + e.resources.deuterium))
 
     let fleetSp = 0
@@ -204,14 +205,14 @@ function insertResults (reports) {
     else if (def2fleet < 2) def2fleetClass = 'color-blue'
     const html = `<tr id="row-${e.planetId}">
     <td>   
-    <a href="game.php?page=galaxy&galaxy=${e.galaxy}&system=${e.system}" title="Goto System">[${e.galaxy}:${e.system}:${e.position}]</a>
+    <a href="game.php?page=galaxy&galaxy=${e.galaxy}&system=${e.system}" title="Goto System">[${e.galaxy}:${e.system}:${e.position}]${e.isMoon ? 'M' : ''}</a>
     </td>
     <td>
       <a href="#" title="Open Playercard" onclick="return Dialog.Playercard(${e.player?.playerId});" style="${!e.player?.playerId ? 'display: none;' : ''}">${e.player?.playerName || '-'}${e.player ? ' ' + playerStatus2Indicator(e.player) : ''}</a>
       <span style="${e.player?.playerId ? 'display: none;' : ''}">${e.player?.playerName || '-'}${e.player ? ' ' + playerStatus2Indicator(e.player) : ''}</span>
         <span style="font-size: 80%; color: yellow;"> (${e.player?.rank})</span>
     </td>
-    <td><span>${e.planetName || ''}</span></td>
+    <td><span>${e.planetName || ''} ${e.isMoon ? '🌝' : ''}</span></td>
     <td><span title="Metal Standard Units using 4:1:1" class="${res2class(res2mse(e.resources), quantiles.mse)}">${res2str(res2mse(e.resources))}</span></td>
     <td><span class="${res2class(e.resources.metal, quantiles.metal)}">${res2str(e.resources.metal)}</span></td>
     <td><span class="${res2class(e.resources.crystal, quantiles.crystal)}">${res2str(e.resources.crystal)}</span></td>
