@@ -15,10 +15,12 @@ class SpioParser {
       const id = parseInt(m.id.split('_')[1])
       const header = m.innerText.trim()
       const body = document.getElementsByClassName(`message_${id} messages_body`)[0].innerText.trim()
+      const attackLink = document.querySelectorAll(`.message_${id}.messages_body .spyRaportFooter a`)[0].getAttribute('href')
       messages.push({
         id,
         header,
-        body
+        body,
+        attackLink
       })
     }
     return messages
@@ -27,7 +29,8 @@ class SpioParser {
   parse_text ({
     id,
     header,
-    body
+    body,
+    attackLink
   }) {
     function parseDate (dateRaw) {
       const monthMapping = languageMap.months
@@ -62,26 +65,26 @@ class SpioParser {
         if (matchKey) {
           const [group, item] = map[matchKey].split('_')
           const value = parseInt(line.replace(/\./g, '').replace(/,/g, ''))
-          if (value !== 0) { // skip 0s
-            switch (group) {
-              case 'b':
-                json.buildings[item] = value
-                break
-              case 'def':
-                json.defense[item] = value
-                break
-              case 'res':
-                json.resources[item] = value
-                break
-              case 'sh':
-                json.ships[item] = value
-                break
-              case 'r':
-                json.research[item] = value
-                break
-              default:
-                console.error('Unknown spy repeart group:', group)
-            }
+          // if (value !== 0) { // skip 0s
+          switch (group) {
+            case 'b':
+              json.buildings[item] = value
+              break
+            case 'def':
+              json.defense[item] = value
+              break
+            case 'res':
+              json.resources[item] = value
+              break
+            case 'sh':
+              json.ships[item] = value
+              break
+            case 'r':
+              json.research[item] = value
+              break
+            default:
+              console.error('Unknown spy repeart group:', group)
+            // }
           }
           matchKey = null
         } else {
@@ -103,9 +106,7 @@ class SpioParser {
     const jsons = parseData(content)
     let isMoon = false
     if (reportType === 'espionage') {
-      if (jsons.buildings?.moonBase || jsons.buildings?.phalanxSensor || !jsons.resources?.energy) {
-        isMoon = true
-      }
+      if (attackLink.includes('planettype=3')) isMoon = true
     }
     const data = {
       id,
@@ -306,6 +307,7 @@ function uploadReports () {
         position: parseInt(r.planet.split(':')[2]),
         date: r.date,
         resources: r.resources,
+        isMoon: r.isMoon,
         buildings: r.buildings,
         ships: r.ships,
         research: r.research,
