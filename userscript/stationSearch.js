@@ -100,7 +100,7 @@ function insertResults (planets) {
     <a href="#" title="Open Playercard" onclick="return Dialog.Playercard(${p.player.playerId});">${p.player.playerName}${p.player ? ' ' + playerStatus2Indicator(p.player) : ''} <span style="font-size: 80%; color: yellow;"> (${p.player.rank})</span></a>
     </td>
     <td>${p.planetName}</td>
-    <td>${p.moonId ? '🌝' : ''}</td>
+    <td>${p.moonId && p.moonId > 0 ? '🌝' : ''}</td>
     <td>${p.player.alliance || ''}</td>
     <td>
       <a href="#" class="tooltip_sticky" data-tooltip-content="${report2html(p.report)}" style="${!p.report ? 'display: none;' : ''}font-size: 130%; position: relative; top: 2px;">${p.report ? ' 📃 ' : ''}<span style="font-size: 60%;">${calcTimeDeltaString(p.report?.date)}</span></a>

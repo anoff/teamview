@@ -135,6 +135,7 @@ async function tableReports (knex, forceDrop = false) {
         table.json('research')
         table.json('defense')
         table.integer('planet_id').unsigned()
+        table.integer('moon_id').unsigned()
         table.timestamps(false, true)
       }).raw(`
           CREATE OR REPLACE TRIGGER update_reports_updated_at BEFORE UPDATE
