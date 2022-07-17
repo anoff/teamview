@@ -65,26 +65,26 @@ class SpioParser {
         if (matchKey) {
           const [group, item] = map[matchKey].split('_')
           const value = parseInt(line.replace(/\./g, '').replace(/,/g, ''))
-          if (value !== 0) { // skip 0s
-            switch (group) {
-              case 'b':
-                json.buildings[item] = value
-                break
-              case 'def':
-                json.defense[item] = value
-                break
-              case 'res':
-                json.resources[item] = value
-                break
-              case 'sh':
-                json.ships[item] = value
-                break
-              case 'r':
-                json.research[item] = value
-                break
-              default:
-                console.error('Unknown spy repeart group:', group)
-            }
+          // if (value !== 0) { // skip 0s
+          switch (group) {
+            case 'b':
+              json.buildings[item] = value
+              break
+            case 'def':
+              json.defense[item] = value
+              break
+            case 'res':
+              json.resources[item] = value
+              break
+            case 'sh':
+              json.ships[item] = value
+              break
+            case 'r':
+              json.research[item] = value
+              break
+            default:
+              console.error('Unknown spy repeart group:', group)
+            // }
           }
           matchKey = null
         } else {
