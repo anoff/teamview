@@ -391,7 +391,7 @@ function fetchUploadedReports () {
         uploadedReports.push(id)
       }
     }
-    TM_setValue('reports_uploaded', uploadedReports.slice(-50)) // limit to last 50 items
+    TM_setValue('reports_uploaded', uploadedReports.slice(-200)) // limit to last 200 items
   }).catch(e => {
     setStatus('status-error', 'Error, see console')
     console.error('Error while fetching uploaded reports', e)
