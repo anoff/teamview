@@ -128,6 +128,7 @@ async function tableReports (knex, forceDrop = false) {
         table.integer('galaxy').unsigned().index()
         table.integer('system').unsigned().index()
         table.integer('position').unsigned().index()
+        table.boolean('is_moon')
         table.json('resources')
         table.json('buildings')
         table.json('ships')
