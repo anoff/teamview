@@ -181,7 +181,6 @@ function insertResults (reports) {
   }
 
   for (const e of reports) {
-    console.log(e)
     const requiredCargo = 0.5 * Math.max(e.resources.metal + e.resources.crystal + e.resources.deuterium, Math.min(0.75 * (2 * e.resources.metal + e.resources.crystal + e.resources.deuterium), 2 * e.resources.metal + e.resources.deuterium))
 
     let fleetSp = 0

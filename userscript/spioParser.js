@@ -116,7 +116,6 @@ class SpioParser {
       ...jsons,
       isMoon
     }
-    console.log(data)
     return data
   }
 }
