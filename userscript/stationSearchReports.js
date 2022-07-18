@@ -1,7 +1,7 @@
 const { report2html } = require('./spioHtml')
 const req = require('./requests')
 const searchHtml = require('./stationSearchReports.html').default
-const { getCurrentPosition, quantile, saveSearchSettings, loadSearchSettings } = require('./utils')
+const { getCurrentPosition, quantile, saveSearchSettings, loadSearchSettings, teamviewDebugMode } = require('./utils')
 const { res2str, obj2str, shipStructurePoints, defenseStructurePoints, itemIds } = require('./gameUtils')
 
 const PAGE_ID = '#search-reports' // top level div id to identify this page
@@ -180,6 +180,7 @@ function insertResults (reports) {
     return 'color-white'
   }
 
+  if (teamviewDebugMode) console.log({ receivedData: reports })
   for (const e of reports) {
     const requiredCargo = 0.5 * Math.max(e.resources.metal + e.resources.crystal + e.resources.deuterium, Math.min(0.75 * (2 * e.resources.metal + e.resources.crystal + e.resources.deuterium), 2 * e.resources.metal + e.resources.deuterium))
 

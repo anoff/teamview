@@ -2,7 +2,7 @@
 const { report2html } = require('./spioHtml')
 const req = require('./requests')
 const searchHtml = require('./stationSearch.html').default
-const { getCurrentPosition, saveSearchSettings, loadSearchSettings } = require('./utils')
+const { getCurrentPosition, saveSearchSettings, loadSearchSettings, teamviewDebugMode } = require('./utils')
 
 const PAGE_ID = '#search-planets' // top level div id to identify this page
 const SETTINGS_NAME = 'search_settings_planets'
@@ -91,6 +91,7 @@ function insertResults (planets) {
     return `(${text})`
   }
 
+  if (teamviewDebugMode) console.log({ receivedData: planets })
   for (const p of planets) {
     const html = `<tr id="row-${p.planetId}">
     <td>

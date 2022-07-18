@@ -63,5 +63,6 @@ module.exports = {
   GM_addStyle, // eslint-disable-line camelcase
   quantile,
   loadSearchSettings,
-  saveSearchSettings
+  saveSearchSettings,
+  teamviewDebugMode: TM_getValue('debug_mode') === 1
 }

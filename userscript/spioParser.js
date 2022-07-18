@@ -1,6 +1,7 @@
 /* global TM_getValue, TM_setValue */
 const { setStatus } = require('./teamviewSection')
 const req = require('./requests')
+const { teamviewDebugMode } = require('./utils')
 
 class SpioParser {
   isSpioPage () {
@@ -314,6 +315,7 @@ function uploadReports () {
         defense: r.defense
       }
     })
+  if (teamviewDebugMode) console.log({ uploadedData: data })
   const uploadedReports = TM_getValue('reports_uploaded')
   uploadedReports.push(...data.map(e => e.reportId))
   TM_setValue('reports_uploaded', uploadedReports)
