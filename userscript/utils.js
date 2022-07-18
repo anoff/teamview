@@ -52,9 +52,7 @@ function loadSearchSettings (TMvarName, settingsMap) {
   const settings = TM_getValue(TMvarName) || {}
   for (const [name, [selector]] of Object.entries(settingsMap)) {
     const value = settings[name]
-    if (value) {
-      document.querySelector(selector).value = settings[name]
-    }
+    document.querySelector(selector).value = value
   }
 }
 
