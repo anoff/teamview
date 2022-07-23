@@ -16,7 +16,7 @@ class SpioParser {
       const id = parseInt(m.id.split('_')[1])
       const header = m.innerText.trim()
       const body = document.getElementsByClassName(`message_${id} messages_body`)[0].innerText.trim()
-      const attackLink = document.querySelectorAll(`.message_${id}.messages_body .spyRaportFooter a`)[0].getAttribute('href')
+      const attackLink = document.querySelector(`.message_${id}.messages_body .spyRaportFooter a`)?.getAttribute('href')
       messages.push({
         id,
         header,
