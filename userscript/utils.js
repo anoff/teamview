@@ -56,10 +56,36 @@ function loadSearchSettings (TMvarName, settingsMap) {
   }
 }
 
+/**
+ * Add click events to table headers to make them sortable.
+ * Table structure needs to consist of <table><thead><th to click/></thead><tbody><tr to sort/>
+ * @param {string} thSelector querySelector() string to select all table headers that should be sortable
+ */
+function makeTableSortable (thSelector) {
+  const getCellValue = (tr, idx) => {
+    const c = tr.children[idx]
+    const val = c.innerText || c.textContent
+    const data = c.getAttribute('data-value')
+    if (data) return data
+    else return val
+  }
+  const comparer = (idx, asc) => (a, b) => ((v1, v2) =>
+    v1 !== '' && v2 !== '' && !isNaN(v1) && !isNaN(v2) ? v1 - v2 : v1.toString().localeCompare(v2)
+  )(getCellValue(asc ? a : b, idx), getCellValue(asc ? b : a, idx))
+
+  document.querySelectorAll(thSelector).forEach(th => th.addEventListener('click', () => {
+    const tbody = th.closest('table').querySelector('tbody')
+    Array.from(tbody.querySelectorAll('tr'))
+      .sort(comparer(Array.from(th.parentNode.children).indexOf(th), this.asc = !this.asc))
+      .forEach(tr => tbody.appendChild(tr))
+  }))
+}
+
 module.exports = {
   getCurrentPosition,
   GM_addStyle, // eslint-disable-line camelcase
   quantile,
+  makeTableSortable,
   loadSearchSettings,
   saveSearchSettings,
   teamviewDebugMode: TM_getValue('debug_mode') === 1

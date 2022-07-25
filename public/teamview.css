@@ -146,3 +146,31 @@
 .report-details {
   font-size: 85%;
 }
+
+th.sortable {
+  padding-right: 18px;
+  position: relative;
+  cursor: pointer;
+}
+
+th.sortable:before,
+th.sortable:after {
+  border: 4px solid transparent;
+  content: "";
+  display: block;
+  height: 0;
+  right: 5px;
+  top: 50%;
+  position: absolute;
+  width: 0;
+}
+
+th.sortable:before {
+  border-bottom-color: #eee;
+  margin-top: -9px;
+}
+
+th.sortable:after {
+  border-top-color: #eee;
+  margin-top: 1px;
+}

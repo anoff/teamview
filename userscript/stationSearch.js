@@ -2,7 +2,7 @@
 const { report2html } = require('./spioHtml')
 const req = require('./requests')
 const searchHtml = require('./stationSearch.html').default
-const { getCurrentPosition, saveSearchSettings, loadSearchSettings, teamviewDebugMode } = require('./utils')
+const { getCurrentPosition, saveSearchSettings, loadSearchSettings, teamviewDebugMode, makeTableSortable } = require('./utils')
 
 const PAGE_ID = '#search-planets' // top level div id to identify this page
 const SETTINGS_NAME = 'search_settings_planets'
@@ -73,7 +73,6 @@ function calcTimeDeltaString (date) {
 }
 
 function insertResults (planets) {
-  const ROWS_HEADER = 2
   // const COL_POS = 0
   // const COL_PLANETNAME = 1
   // const COL_PLAYERNAME = 2
@@ -81,7 +80,7 @@ function insertResults (planets) {
   // const COL_DEBRIS = 4
   // const COL_PLAYER = 5
   // const COL_ALLIANCE = 6
-  let anchor = document.querySelector(`${PAGE_ID} table#search-results`).querySelectorAll('tr')[ROWS_HEADER - 1]
+  const anchor = document.querySelector(`${PAGE_ID} table#search-results tbody`)
   const playerStatus2Indicator = (player) => {
     const text = ['isInactive', 'isBanned', 'isVacation']
       .filter(k => player[k])
@@ -94,8 +93,8 @@ function insertResults (planets) {
   if (teamviewDebugMode) console.log({ receivedData: planets })
   for (const p of planets) {
     const html = `<tr id="row-${p.planetId}">
-    <td>
-    <a href="game.php?page=galaxy&galaxy=${p.galaxy}&system=${p.system}" title="Goto System">[${p.galaxy}:${p.system}:${p.position}]</a>
+    <td data-value="${p.galaxy * 10e5 + p.system * 10e2 + p.position}">
+     <a href="game.php?page=galaxy&galaxy=${p.galaxy}&system=${p.system}" title="Goto System">[${p.galaxy}:${p.system}:${p.position}]</a>
     </td>
     <td>
     <a href="#" title="Open Playercard" onclick="return Dialog.Playercard(${p.player.playerId});">${p.player.playerName}${p.player ? ' ' + playerStatus2Indicator(p.player) : ''} <span style="font-size: 80%; color: yellow;"> (${p.player.rank})</span></a>
@@ -110,11 +109,7 @@ function insertResults (planets) {
       <a id="scan-${p.planetId}" title="Spy on planet" href="javascript:doit(6,${p.planetId},{'210':'2'});" style="font-size: 130%; position: relative; top: 2px;">${p.planetId ? ' 🛰 ' : ''}</a>
     </td>
     </tr>`
-    anchor.insertAdjacentHTML('afterend', html)
-
-    const newRow = Array.from(document.querySelector(`${PAGE_ID} table#search-results`).querySelectorAll('tr')).slice(-1)[0]
-    // update anchor row so rows get inserted always after newly added row
-    anchor = newRow
+    anchor.insertAdjacentHTML('beforeend', html)
   }
 }
 
@@ -164,6 +159,9 @@ function insertHtml (anchorElement) {
   document.querySelector(`${PAGE_ID} #system_max`).value = system + SYSTEM_OFFSET
   // set based on previously saved values
   loadSearchSettings(SETTINGS_NAME, SETTINGS_MAP)
+
+  // make table sortable
+  makeTableSortable(`${PAGE_ID} th.sortable`)
 }
 module.exports = {
   search,
