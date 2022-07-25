@@ -1,7 +1,7 @@
 const { report2html } = require('./spioHtml')
 const req = require('./requests')
 const searchHtml = require('./stationSearchReports.html').default
-const { getCurrentPosition, quantile, saveSearchSettings, loadSearchSettings, teamviewDebugMode } = require('./utils')
+const { getCurrentPosition, quantile, saveSearchSettings, loadSearchSettings, teamviewDebugMode, makeTableSortable } = require('./utils')
 const { res2str, obj2str, shipStructurePoints, defenseStructurePoints, itemIds } = require('./gameUtils')
 
 const PAGE_ID = '#search-reports' // top level div id to identify this page
@@ -129,8 +129,7 @@ function simLink (resources, defenses, ships, research) {
  * @param {Array[Object]} reports List of planet espionage reports
  */
 function insertResults (reports) {
-  const ROWS_HEADER = 2
-  let anchor = document.querySelector(`${PAGE_ID} table#search-results`).querySelectorAll('tr')[ROWS_HEADER - 1]
+  const anchor = document.querySelector(`${PAGE_ID} table#search-results tbody`)
 
   const playerStatus2Indicator = (player) => {
     const text = ['isInactive', 'isBanned', 'isVacation']
@@ -204,8 +203,8 @@ function insertResults (reports) {
     if (def2fleet < 1) def2fleetClass = 'color-green'
     else if (def2fleet < 2) def2fleetClass = 'color-blue'
     const html = `<tr id="row-${e.planetId}">
-    <td>   
-    <a href="game.php?page=galaxy&galaxy=${e.galaxy}&system=${e.system}" title="Goto System">[${e.galaxy}:${e.system}:${e.position}]${e.isMoon ? 'M' : ''}</a>
+    <td data-value="${e.galaxy * 10e5 + e.system * 10e2 + e.position}">   
+      <a href="game.php?page=galaxy&galaxy=${e.galaxy}&system=${e.system}" title="Goto System">[${e.galaxy}:${e.system}:${e.position}]${e.isMoon ? 'M' : ''}</a>
     </td>
     <td>
       <a href="#" title="Open Playercard" onclick="return Dialog.Playercard(${e.player?.playerId});" style="${!e.player?.playerId ? 'display: none;' : ''}">${e.player?.playerName || '-'}${e.player ? ' ' + playerStatus2Indicator(e.player) : ''}</a>
@@ -213,11 +212,11 @@ function insertResults (reports) {
         <span style="font-size: 80%; color: yellow;"> (${e.player?.rank})</span>
     </td>
     <td><span>${e.planetName || ''} ${e.isMoon ? '🌝' : ''}</span></td>
-    <td><span title="Metal Standard Units using 4:1:1" class="${res2class(res2mse(e.resources), quantiles.mse)}">${res2str(res2mse(e.resources))}</span></td>
-    <td><span class="${res2class(e.resources.metal, quantiles.metal)}">${res2str(e.resources.metal)}</span></td>
-    <td><span class="${res2class(e.resources.crystal, quantiles.crystal)}">${res2str(e.resources.crystal)}</span></td>
-    <td><span class="${res2class(e.resources.deuterium, quantiles.deuterium)}">${res2str(e.resources.deuterium)}</span></td>
-    <td>
+    <td data-value="${res2mse(e.resources)}"><span title="Metal Standard Units using 4:1:1" class="${res2class(res2mse(e.resources), quantiles.mse)}">${res2str(res2mse(e.resources))}</span></td>
+    <td data-value="${e.resources.metal}"><span class="${res2class(e.resources.metal, quantiles.metal)}">${res2str(e.resources.metal)}</span></td>
+    <td data-value="${e.resources.crystal}"><span class="${res2class(e.resources.crystal, quantiles.crystal)}">${res2str(e.resources.crystal)}</span></td>
+    <td data-value="${e.resources.deuterium}"><span class="${res2class(e.resources.deuterium, quantiles.deuterium)}">${res2str(e.resources.deuterium)}</span></td>
+    <td data-value="${fleetSp}">
       <span style="${fleetSp === 0 ? 'display: none;' : ''}" class="${fleetSpClass}">
         <img src="./styles/theme/nova/planeten/debris.jpg" alt="TF for entire fleet" width="16" height="16">
         ${Math.round(fleetSp * 0.3 / 1e5) / 10}M<br>
@@ -226,8 +225,8 @@ function insertResults (reports) {
         ${obj2str(e.ships)}
       </span>
     </td>
-    <td><span style="${Math.min(defSp, fleetSp) === 0 ? 'display: none;' : ''}" class="${def2fleetClass}">Def/Fleet: ${Math.round(def2fleet * 10) / 10}<br></span><span class="report-details">${obj2str(e.defense)}</span></td>
-    <td>
+    <td data-value="${defSp}"><span style="${Math.min(defSp, fleetSp) === 0 ? 'display: none;' : ''}" class="${def2fleetClass}">Def/Fleet: ${Math.round(def2fleet * 10) / 10}<br></span><span class="report-details">${obj2str(e.defense)}</span></td>
+    <td data-value="${(new Date() - new Date(e.date))}">
       <a href="#" class="tooltip_sticky" data-tooltip-content="${report2html(e)}" font-size: 130%; position: relative; top: 2px;">${calcTimeDeltaString(e.date)}</a>
     </td>
     <td>
@@ -242,12 +241,7 @@ function insertResults (reports) {
       <a id="sim-${e.planetId}" title="Simulate" href="${simLink(e.resources, e.defense, e.ships, e.research)}" style="font-size: 130%; position: relative; top: 2px;" target="_blank">${e.planetId ? ' 🔮 ' : ''}</a>
     </td>
     </tr>`
-    anchor.insertAdjacentHTML('afterend', html)
-
-    const newRow = Array.from(document.querySelector(`${PAGE_ID} table#search-results`).querySelectorAll('tr')).slice(-1)[0]
-
-    // update anchor row so rows get inserted always after newly added row
-    anchor = newRow
+    anchor.insertAdjacentHTML('beforeend', html)
   }
 }
 
@@ -265,6 +259,9 @@ function insertHtml (anchorElement) {
   document.querySelector(`${PAGE_ID} #galaxy_max`).value = galaxy
   // set based on previously saved values
   loadSearchSettings(SETTINGS_NAME, SETTINGS_MAP)
+
+  // make table sortable
+  makeTableSortable(`${PAGE_ID} th.sortable`)
 }
 module.exports = {
   search,
