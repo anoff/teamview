@@ -106,27 +106,27 @@
 }
 
 .text-black {
-  color: #000;
+  color: #000 !important;
 }
 
 .color-green {
-  color: #3e6;
+  color: #3e6 !important;
 }
 
 .color-blue {
-  color: #4bf;
+  color: #4bf !important;
 }
 
 .color-gray {
-  color: #666;
+  color: #666 !important;
 }
 
 .color-white {
-  color: #fafafa;
+  color: #fafafa !important;
 }
 
 .color-orange {
-  color: #e93;
+  color: #e93 !important;
 }
 
 @keyframes status-animation {
