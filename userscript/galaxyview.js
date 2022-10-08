@@ -1,6 +1,8 @@
 /* globals location */
 const req = require('./requests')
-const { report2html } = require('./spioHtml')
+const {
+  report2html
+} = require('./spioHtml')
 
 const MAX_AGE_PLANET_H = 72 // number of hours when a planet info is considered outdated
 
@@ -9,14 +11,27 @@ let startedNavigation = false // global var to dected if navigation was started
 
 /**
  * Parse planet information out of current visible system in the galaxy view table
- * @returns Array[{ name, playerName, galaxy, system, position, hasMoon, debrisMetal, debrisCrystal }]
+ * @returns Array[{
+   planetId,
+   planetName,
+   playerStatus,
+   playerId,
+   playerName,
+   galaxy,
+   system,
+   position,
+   moonId,
+   debrisMetal,
+   debrisCrystal
+ }]
  */
-function getVisibleSystem () {
-  function cleanName (name) {
+function getVisibleSystem() {
+  function cleanName(name) {
     return name.split('(')[0].trim()
   }
-  function getStatus (cell) {
-    const classes = cell.querySelector('a span.galaxy-username')?.classList
+
+  function getStatus(cell) {
+    const classes = cell.querySelector('a span.galaxy-username') ? .classList
     if (classes && classes.length > 0) {
       return Array.from(classes).map(e => e.replace('galaxy-username', '')).filter(e => e.length).map(e => e.slice(1))
     } else {
@@ -89,7 +104,19 @@ function getVisibleSystem () {
           }
         }
       }
-      entries.push({ planetId, planetName, playerStatus, playerId, playerName, galaxy, system, position: i + 1, moonId, debrisMetal, debrisCrystal })
+      entries.push({
+        planetId,
+        planetName,
+        playerStatus,
+        playerId,
+        playerName,
+        galaxy,
+        system,
+        position: i + 1,
+        moonId,
+        debrisMetal,
+        debrisCrystal
+      })
     }
   }
   systemData = entries
@@ -100,8 +127,8 @@ function getVisibleSystem () {
  * Check on the server which planets are already known and set teamview status accordingly.
  * @param {Array[Object]} data response object of getVisibleSystem()
  */
-function checkPlanetStatus (systemData) {
-  function arrayEquals (a, b) {
+function checkPlanetStatus(systemData) {
+  function arrayEquals(a, b) {
     return a.length === b.length && a.every((v, i) => v === b[i])
   }
   const systemCoords = Array.from(document.querySelector('content table.table569').querySelectorAll('tr'))[0].innerText
@@ -149,7 +176,7 @@ function checkPlanetStatus (systemData) {
     })
 }
 
-function addColumn (addCount = 1, titles = []) {
+function addColumn(addCount = 1, titles = []) {
   const rows = document.querySelector('content table.table569 tbody').children
   for (let rowIx = 0; rowIx < rows.length; rowIx++) {
     const tr = rows[rowIx]
@@ -191,10 +218,10 @@ function addColumn (addCount = 1, titles = []) {
   }
 }
 
-function modifyAddPlanetReports (data, cells, rowIx) {
+function modifyAddPlanetReports(data, cells, rowIx) {
   const COLUMN_REPORT = 9
   const planet = data.find(e => e.position === rowIx + 1)
-  if (planet?.report) {
+  if (planet ? .report) {
     let timeSinceScan = '-'
     const seconds = Math.round((new Date() - new Date(planet.report.date)) / 1000)
     let hours = 0
@@ -208,8 +235,9 @@ function modifyAddPlanetReports (data, cells, rowIx) {
     cells[COLUMN_REPORT].insertAdjacentHTML('afterbegin', `<a href="#" class="tooltip_sticky" data-tooltip-content="${report2html(planet.report)}">🛰 <span style="font-size: 85%;">${timeSinceScan}</span></a>`)
   }
 }
-function modifyAddRankFromPopup (data, cells, rowIx) {
-  function cleanName (name) {
+
+function modifyAddRankFromPopup(data, cells, rowIx) {
+  function cleanName(name) {
     return name.split('(')[0].trim()
   }
   const COLUMN_PLAYER = 5
@@ -225,8 +253,9 @@ function modifyAddRankFromPopup (data, cells, rowIx) {
     cells[COLUMN_PLAYER].querySelector('a').appendChild(s)
   }
 }
-function modifyAddPlayerStats (data, cells, rowIx) {
-  function cleanName (name) {
+
+function modifyAddPlayerStats(data, cells, rowIx) {
+  function cleanName(name) {
     return name.split('(')[0].trim()
   }
   const COLUMN_STATS = 8
@@ -254,12 +283,15 @@ function modifyAddPlayerStats (data, cells, rowIx) {
   }
 }
 
-function doUploadPlanets () {
+function doUploadPlanets() {
   const data = getVisibleSystem()
   setStatus('status-working', `Uploading ${data.length} planets`)
   const p = req.uploadPlanets(data)
   p.then(res => {
-    const { totalCount, successCount } = res
+    const {
+      totalCount,
+      successCount
+    } = res
     setStatus('status-ok', `Updated ${successCount}/${totalCount}`)
   }).catch(e => {
     setStatus('status-error', 'Failed, see console')
@@ -277,7 +309,8 @@ function doUploadPlanets () {
     }
   }
 }
-function addUploadSection () {
+
+function addUploadSection() {
   const sectionHTML = `
   <tr>
     <td class="transparent" id="teamview-section" colspan="2">
@@ -334,14 +367,14 @@ function addUploadSection () {
   })
 }
 
-function setStatus (cssClass, text) {
+function setStatus(cssClass, text) {
   const iconElm = document.getElementById('teamview-status-icon')
   const textElm = document.getElementById('teamview-status-text')
   iconElm.classList = `dot ${cssClass}`
   textElm.innerText = text
 }
 
-function modifyTable (data, modfiyFn) {
+function modifyTable(data, modfiyFn) {
   // all indexes 0-based
   // const ROW_SYSTEM = 0
   const ROWS_HEADER = 2
@@ -353,7 +386,7 @@ function modifyTable (data, modfiyFn) {
   }
 }
 
-function init () {
+function init() {
   addColumn(2, ['Player Stats', 'Spio Info'])
   addUploadSection()
   modifyTable({}, modifyAddRankFromPopup)
