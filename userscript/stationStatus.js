@@ -4,20 +4,20 @@ const {
   getCurrentPosition
 } = require('./utils')
 
-function fetchAndDisplay(galaxy) {
+function fetchAndDisplay (galaxy) {
   return req.searchPlanets({
-      galaxy_min: galaxy,
-      galaxy_max: galaxy,
-      type: 'exists',
-      limit: 1000
-    })
+    galaxy_min: galaxy,
+    galaxy_max: galaxy,
+    type: 'exists',
+    limit: 1000
+  })
     .then(res => {
       removeRows()
       addRows(res)
     })
 }
 
-function insertHtml(anchor) {
+function insertHtml (anchor) {
   anchor.insertAdjacentHTML('beforeend', statusHtml)
 
   document.querySelector('select#galaxy').addEventListener('change', e => {
@@ -30,7 +30,7 @@ function insertHtml(anchor) {
   fetchAndDisplay(galaxy)
 }
 
-function removeRows() {
+function removeRows () {
   // all indexes 0-based
   // const ROW_SYSTEM = 0
   const ROWS_HEADER = 1
@@ -42,7 +42,7 @@ function removeRows() {
   }
 }
 
-function addRows(planets) {
+function addRows (planets) {
   const galaxy = document.querySelector('select#galaxy').value
   const ROWS_HEADER = 1
   let anchor = document.querySelector('table#galaxy-status').querySelectorAll('tr')[ROWS_HEADER - 1]
