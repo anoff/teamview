@@ -7,9 +7,9 @@ const sp = require('./spioParser')
 const fm = require('./fleetmenu')
 const { capitalCase } = require('change-case')
 
-const stationSearch = require('./stationSearch')
-const stationStatus = require('./stationStatus')
-const stationSearchReports = require('./stationSearchReports')
+const tabSearchPlanets = require('./ui/tabSearchPlanets')
+const tabSearchReports = require('./ui/tabSearchReports')
+const tabStatus = require('./ui/tabStatus')
 
 function addTokenOption () {
   if (window.location.search.includes('page=settings')) {
@@ -35,9 +35,9 @@ function showStation () {
 
   const anchor = document.querySelector('content')
   insertSelectorHtml(anchor)
-  stationSearch.insertHtml(anchor)
-  stationSearchReports.insertHtml(anchor)
-  stationStatus.insertHtml(anchor)
+  tabSearchPlanets.insertHtml(anchor)
+  tabSearchReports.insertHtml(anchor)
+  tabStatus.insertHtml(anchor)
   insertFleetStatusHtml(anchor)
 
   activatePage('search-planets')

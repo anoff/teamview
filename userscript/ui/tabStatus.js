@@ -1,8 +1,8 @@
-const statusHtml = require('./stationStatus.html').default
-const req = require('./requests')
+const statusHtml = require('./tabStatus.html').default
+const req = require('../requests')
 const {
   getCurrentPosition
-} = require('./utils')
+} = require('../utils')
 
 function fetchAndDisplay (galaxy) {
   return req.searchPlanets({

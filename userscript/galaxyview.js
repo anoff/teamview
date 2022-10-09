@@ -2,7 +2,8 @@
 const req = require('./requests')
 const {
   report2html
-} = require('./spioHtml')
+} = require('./ui/spioHtml')
+const { setTeamviewStatus } = require('./utils')
 
 const MAX_AGE_PLANET_H = 72 // number of hours when a planet info is considered outdated
 
@@ -162,7 +163,7 @@ function checkPlanetStatus (systemData) {
           statusClass = 'status-outdated'
         }
       }
-      setStatus(statusClass, status)
+      setTeamviewStatus(statusClass, status)
 
       modifyTable(serverData, modifyAddPlanetReports)
     }).catch(e => {
@@ -171,7 +172,7 @@ function checkPlanetStatus (systemData) {
         errMessage += ` [${e.status}]`
       }
       errMessage += ', see console'
-      setStatus('status-error', errMessage)
+      setTeamviewStatus('status-error', errMessage)
       console.error('Error while checking current system upload status', e)
     })
 }
@@ -285,16 +286,16 @@ function modifyAddPlayerStats (data, cells, rowIx) {
 
 function doUploadPlanets () {
   const data = getVisibleSystem()
-  setStatus('status-working', `Uploading ${data.length} planets`)
+  setTeamviewStatus('status-working', `Uploading ${data.length} planets`)
   const p = req.uploadPlanets(data)
   p.then(res => {
     const {
       totalCount,
       successCount
     } = res
-    setStatus('status-ok', `Updated ${successCount}/${totalCount}`)
+    setTeamviewStatus('status-ok', `Updated ${successCount}/${totalCount}`)
   }).catch(e => {
-    setStatus('status-error', 'Failed, see console')
+    setTeamviewStatus('status-error', 'Failed, see console')
     console.error(e)
   })
 
@@ -367,13 +368,6 @@ function addUploadSection () {
   })
 }
 
-function setStatus (cssClass, text) {
-  const iconElm = document.getElementById('teamview-status-icon')
-  const textElm = document.getElementById('teamview-status-text')
-  iconElm.classList = `dot ${cssClass}`
-  textElm.innerText = text
-}
-
 function modifyTable (data, modfiyFn) {
   // all indexes 0-based
   // const ROW_SYSTEM = 0
@@ -411,6 +405,5 @@ module.exports = {
   init,
   modifyAddRankFromPopup,
   modifyAddPlayerStats,
-  modifyTable,
-  setStatus
+  modifyTable
 }

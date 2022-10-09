@@ -1,7 +1,6 @@
 /* global TM_getValue, TM_setValue */
-const { setStatus } = require('./teamviewSection')
 const req = require('./requests')
-const { teamviewDebugMode } = require('./utils')
+const { teamviewDebugMode, setTeamviewStatus } = require('./utils')
 
 class SpioParser {
   isSpioPage () {
@@ -322,7 +321,7 @@ function uploadReports () {
   const p = req.uploadReports(data)
   p.then(res => {
     const { totalCount, successCount } = res
-    setStatus('status-ok', `Submitted ${successCount}/${totalCount}`)
+    setTeamviewStatus('status-ok', `Submitted ${successCount}/${totalCount}`)
     colorReports()
   }).catch(e => {
     let errMessage = 'Error'
@@ -330,7 +329,7 @@ function uploadReports () {
       errMessage += ` [${e.status}]`
     }
     errMessage += ', see console'
-    setStatus('status-error', errMessage)
+    setTeamviewStatus('status-error', errMessage)
     console.error(e)
   })
 }
@@ -354,7 +353,7 @@ function addUploadSection () {
   document.querySelector('#messagestable').insertAdjacentHTML('afterend', sectionHTML)
   document.getElementById('teamview-upload').addEventListener('click', uploadReports)
 
-  setStatus('status-outdated', 'ready to upload')
+  setTeamviewStatus('status-outdated', 'ready to upload')
 
   document.onkeydown = function (e) {
     e = e || window.event
@@ -397,7 +396,7 @@ function fetchUploadedReports () {
     }
     TM_setValue('reports_uploaded', uploadedReports.slice(-200)) // limit to last 200 items
   }).catch(e => {
-    setStatus('status-error', 'Error, see console')
+    setTeamviewStatus('status-error', 'Error, see console')
     console.error('Error while fetching uploaded reports', e)
   })
 }
