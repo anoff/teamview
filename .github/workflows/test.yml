@@ -7,12 +7,18 @@ jobs:
   test:
     name: Run Tests
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [16.x, 18.x]
     permissions:
       contents: read
       security-events: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-
-      - name: Run ESLint
-        run: npx standard .
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+      - run: npm run test
