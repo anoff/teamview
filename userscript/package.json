@@ -9,6 +9,6 @@
   "scripts": {
     "dev": "webpack build --watch --node-env development",
     "build": "webpack build",
-    "test": "standard ."
+    "test": "npx standard ."
   }
 }
