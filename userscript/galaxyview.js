@@ -1,6 +1,8 @@
 /* globals location */
 const req = require('./requests')
-const { report2html } = require('./spioHtml')
+const {
+  report2html
+} = require('./spioHtml')
 
 const MAX_AGE_PLANET_H = 72 // number of hours when a planet info is considered outdated
 
@@ -9,12 +11,25 @@ let startedNavigation = false // global var to dected if navigation was started
 
 /**
  * Parse planet information out of current visible system in the galaxy view table
- * @returns Array[{ name, playerName, galaxy, system, position, hasMoon, debrisMetal, debrisCrystal }]
+ * @returns Array[{
+   planetId,
+   planetName,
+   playerStatus,
+   playerId,
+   playerName,
+   galaxy,
+   system,
+   position,
+   moonId,
+   debrisMetal,
+   debrisCrystal
+ }]
  */
 function getVisibleSystem () {
   function cleanName (name) {
     return name.split('(')[0].trim()
   }
+
   function getStatus (cell) {
     const classes = cell.querySelector('a span.galaxy-username')?.classList
     if (classes && classes.length > 0) {
@@ -89,7 +104,19 @@ function getVisibleSystem () {
           }
         }
       }
-      entries.push({ planetId, planetName, playerStatus, playerId, playerName, galaxy, system, position: i + 1, moonId, debrisMetal, debrisCrystal })
+      entries.push({
+        planetId,
+        planetName,
+        playerStatus,
+        playerId,
+        playerName,
+        galaxy,
+        system,
+        position: i + 1,
+        moonId,
+        debrisMetal,
+        debrisCrystal
+      })
     }
   }
   systemData = entries
@@ -208,6 +235,7 @@ function modifyAddPlanetReports (data, cells, rowIx) {
     cells[COLUMN_REPORT].insertAdjacentHTML('afterbegin', `<a href="#" class="tooltip_sticky" data-tooltip-content="${report2html(planet.report)}">🛰 <span style="font-size: 85%;">${timeSinceScan}</span></a>`)
   }
 }
+
 function modifyAddRankFromPopup (data, cells, rowIx) {
   function cleanName (name) {
     return name.split('(')[0].trim()
@@ -225,6 +253,7 @@ function modifyAddRankFromPopup (data, cells, rowIx) {
     cells[COLUMN_PLAYER].querySelector('a').appendChild(s)
   }
 }
+
 function modifyAddPlayerStats (data, cells, rowIx) {
   function cleanName (name) {
     return name.split('(')[0].trim()
@@ -259,7 +288,10 @@ function doUploadPlanets () {
   setStatus('status-working', `Uploading ${data.length} planets`)
   const p = req.uploadPlanets(data)
   p.then(res => {
-    const { totalCount, successCount } = res
+    const {
+      totalCount,
+      successCount
+    } = res
     setStatus('status-ok', `Updated ${successCount}/${totalCount}`)
   }).catch(e => {
     setStatus('status-error', 'Failed, see console')
@@ -277,6 +309,7 @@ function doUploadPlanets () {
     }
   }
 }
+
 function addUploadSection () {
   const sectionHTML = `
   <tr>

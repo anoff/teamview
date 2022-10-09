@@ -1,9 +1,16 @@
 const statusHtml = require('./stationStatus.html').default
 const req = require('./requests')
-const { getCurrentPosition } = require('./utils')
+const {
+  getCurrentPosition
+} = require('./utils')
 
 function fetchAndDisplay (galaxy) {
-  return req.searchPlanets({ galaxy_min: galaxy, galaxy_max: galaxy, type: 'exists', limit: 1000 })
+  return req.searchPlanets({
+    galaxy_min: galaxy,
+    galaxy_max: galaxy,
+    type: 'exists',
+    limit: 1000
+  })
     .then(res => {
       removeRows()
       addRows(res)
@@ -36,7 +43,7 @@ function removeRows () {
 }
 
 function addRows (planets) {
-  const [galaxy] = getCurrentPosition()
+  const galaxy = document.querySelector('select#galaxy').value
   const ROWS_HEADER = 1
   let anchor = document.querySelector('table#galaxy-status').querySelectorAll('tr')[ROWS_HEADER - 1]
   for (let rowIx = 0; rowIx <= 20; rowIx++) {
