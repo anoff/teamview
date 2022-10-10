@@ -1,8 +1,8 @@
 const { report2html } = require('./spioHtml')
-const req = require('./requests')
-const searchHtml = require('./stationSearchReports.html').default
-const { getCurrentPosition, quantile, saveSearchSettings, loadSearchSettings, teamviewDebugMode, makeTableSortable } = require('./utils')
-const { res2str, obj2str, shipStructurePoints, defenseStructurePoints, itemIds } = require('./gameUtils')
+const req = require('../requests')
+const searchHtml = require('./tabSearchReports.html').default
+const { getCurrentPosition, quantile, saveSearchSettings, loadSearchSettings, teamviewDebugMode, makeTableSortable } = require('../utils')
+const { res2str, obj2str, shipStructurePoints, defenseStructurePoints, itemIds } = require('../gameUtils')
 
 const PAGE_ID = '#search-reports' // top level div id to identify this page
 const SETTINGS_NAME = 'search_settings_reports'

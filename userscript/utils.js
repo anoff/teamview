@@ -81,6 +81,18 @@ function makeTableSortable (thSelector) {
   }))
 }
 
+/**
+ * Set color/text of the teamview status indicator (dot on top).
+ * @param {string}  cssClass  which color to use (status-ok, status-working, status-error, status-outdated)
+ * @param {string}  text      a text string that is displayed next to the status indicator
+ */
+function setTeamviewStatus (cssClass, text) {
+  const iconElm = document.getElementById('teamview-status-icon')
+  const textElm = document.getElementById('teamview-status-text')
+  iconElm.classList = `dot ${cssClass}`
+  textElm.innerText = text
+}
+
 module.exports = {
   getCurrentPosition,
   GM_addStyle, // eslint-disable-line camelcase
@@ -88,5 +100,6 @@ module.exports = {
   makeTableSortable,
   loadSearchSettings,
   saveSearchSettings,
-  teamviewDebugMode: TM_getValue('debug_mode') === 1
+  teamviewDebugMode: TM_getValue('debug_mode') === 1,
+  setTeamviewStatus
 }

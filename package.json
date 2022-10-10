@@ -9,7 +9,7 @@
   ],
   "main": "index.js",
   "scripts": {
-    "lint": "standard",
+    "lint": "npx standard",
     "dev": "NODE_ENV=development nodemon",
     "test": "npm run lint",
     "start": "NODE_ENV=production node index.js",

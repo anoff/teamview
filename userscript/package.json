@@ -8,6 +8,7 @@
   },
   "scripts": {
     "dev": "webpack build --watch --node-env development",
-    "build": "webpack build"
+    "build": "webpack build",
+    "test": "npx standard ."
   }
 }
