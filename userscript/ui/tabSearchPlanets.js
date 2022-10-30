@@ -16,7 +16,9 @@ const SETTINGS_MAP = {
 function search () {
   function getQuery () {
     const fields = ['player_name', 'rank_min', 'rank_max', 'alliance_name', 'galaxy_min', 'galaxy_max', 'system_min', 'system_max', 'inactive', 'vacation', 'banned', 'require_report', 'report_maxage', 'has_moon', 'fleetpoints_min', 'defensepoints_max']
-    const query = {}
+    const query = {
+      limit: 300
+    }
     for (const f of fields) {
       const elm = document.querySelector(`${PAGE_ID} #${f}`)
       switch (elm.type.toLowerCase()) {
