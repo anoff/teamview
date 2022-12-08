@@ -96,7 +96,7 @@ function insertResults (planets) {
   for (const p of planets) {
     const html = `<tr id="row-${p.planetId}">
     <td data-value="${p.galaxy * 10e5 + p.system * 10e2 + p.position}">
-     <a href="game.php?page=galaxy&galaxy=${p.galaxy}&system=${p.system}" title="Goto System">[${p.galaxy}:${p.system}:${p.position}]</a>
+     <a href="${window.location.pathname}?page=galaxy&galaxy=${p.galaxy}&system=${p.system}" title="Goto System">[${p.galaxy}:${p.system}:${p.position}]</a>
     </td>
     <td>
     <a href="#" title="Open Playercard" onclick="return Dialog.Playercard(${p.player.playerId});">${p.player.playerName}${p.player ? ' ' + playerStatus2Indicator(p.player) : ''} <span style="font-size: 80%; color: yellow;"> (${p.player.rank})</span></a>

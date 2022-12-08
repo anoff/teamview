@@ -204,7 +204,7 @@ function insertResults (reports) {
     else if (def2fleet < 2) def2fleetClass = 'color-blue'
     const html = `<tr id="row-${e.planetId}">
     <td data-value="${e.galaxy * 10e5 + e.system * 10e2 + e.position}">   
-      <a href="game.php?page=galaxy&galaxy=${e.galaxy}&system=${e.system}" title="Goto System">[${e.galaxy}:${e.system}:${e.position}]${e.isMoon ? 'M' : ''}</a>
+      <a href="${window.location.pathname}?page=galaxy&galaxy=${e.galaxy}&system=${e.system}" title="Goto System">[${e.galaxy}:${e.system}:${e.position}]${e.isMoon ? 'M' : ''}</a>
     </td>
     <td>
       <a href="#" title="Open Playercard" onclick="return Dialog.Playercard(${e.player?.playerId});" style="${!e.player?.playerId ? 'display: none;' : ''}">${e.player?.playerName || '-'}${e.player ? ' ' + playerStatus2Indicator(e.player) : ''}</a>

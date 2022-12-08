@@ -1,11 +1,13 @@
 // ==UserScript==
 // @name         teamview
 // @namespace    http://tampermonkey.net/
-// @version      1.1.0
+// @version      2.0.0
 // @description  augment your view by sharing info with your team
 // @author       joghurtrucksack
 // @match        https://pr0game.com/game.php*
 // @match        https://www.pr0game.com/game.php*
+// @match        https://www.pr0game.com/uni*/game.php*
+// @match        https://pr0game.com/uni*/game.php*
 // @grant        GM_setValue
 // @grant        GM_getValue
 // @grant        GM_xmlhttpRequest

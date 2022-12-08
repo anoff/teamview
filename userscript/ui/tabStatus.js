@@ -58,7 +58,7 @@ function addRows (planets) {
       else if (planetCount === 2) cls = 'color-blue'
       else if (planetCount >= 3) cls = 'color-green'
       if (oldestAge > 24 * 5) cls = 'color-orange'
-      html += `<td><a href="game.php?page=galaxy&galaxy=${galaxy}&system=${system}" class="${cls}">${system}</a></td>`
+      html += `<td><a href="${window.location.pathname}?page=galaxy&galaxy=${galaxy}&system=${system}" class="${cls}">${system}</a></td>`
     }
     html += '</tr>'
     anchor.insertAdjacentHTML('afterend', html)
