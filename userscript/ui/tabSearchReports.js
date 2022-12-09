@@ -96,7 +96,7 @@ function calcTimeDeltaString (date) {
  * @returns {string} relative url for simulator with configured planet info
  */
 function simLink (resources, defenses, ships, research) {
-  let url = 'game.php?page=battleSimulator&'
+  let url = `${window.location.pathname}?page=battleSimulator&`
   for (const r in resources) {
     const id = itemIds[`res_${r}`]
     if (id) {
@@ -230,7 +230,7 @@ function insertResults (reports) {
       <a href="#" class="tooltip_sticky" data-tooltip-content="${report2html(e)}" font-size: 130%; position: relative; top: 2px;">${calcTimeDeltaString(e.date)}</a>
     </td>
     <td>
-      <a id="attack-${e.planetId}" title="Attack" href="https://pr0game.com/game.php?page=fleetTable&galaxy=${e.galaxy}&system=${e.system}&planet=${e.position}&planettype=1&target_mission=1#send_ship[202]=${Math.ceil(requiredCargo / 5000)}" target="_blank"> ⚔️ </a>
+      <a id="attack-${e.planetId}" title="Attack" href="${window.location.pathname}?page=fleetTable&galaxy=${e.galaxy}&system=${e.system}&planet=${e.position}&planettype=1&target_mission=1#send_ship[202]=${Math.ceil(requiredCargo / 5000)}" target="_blank"> ⚔️ </a>
       <br>
       <span>⸺</span>
       <br>
