@@ -4,7 +4,7 @@ const { writeFileSync, readFileSync, existsSync } = require('fs')
 const axios = require('axios').default
 const Player = require('./lib/data/player')
 const logger = require('./lib/logger').child({ module: __filename })
-const STATS_URL = 'https://pr0game.com/stats_Universe_1.json'
+const STATS_URL = 'https://pr0game.com/stats_Universe_2.json'
 
 const HASH_FILE = 'importStats.hash'
 
