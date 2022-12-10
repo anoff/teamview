@@ -4,16 +4,14 @@
 // @version      2.0.0
 // @description  augment your view by sharing info with your team
 // @author       joghurtrucksack
-// @match        https://pr0game.com/game.php*
-// @match        https://www.pr0game.com/game.php*
-// @match        https://www.pr0game.com/uni*/game.php*
-// @match        https://pr0game.com/uni*/game.php*
+// @match        https://www.pr0game.com/uni2/game.php*
+// @match        https://pr0game.com/uni2/game.php*
 // @grant        GM_setValue
 // @grant        GM_getValue
 // @grant        GM_xmlhttpRequest
 // @grant        unsafeWindow
 // @connect      localhost
-// @connect      teamview.mietemieze.de
+// @connect      uni2.teamview.mietemieze.de
 // @run-at       document-start
 // ==/UserScript==
 
@@ -22,7 +20,7 @@
   // const version = GM_getValue('version') || '1.0.0'
   const debugMode = GM_getValue('debug_mode') === 1
   const developerMode = GM_getValue('developer_mode') === 1
-  let apiUrl = developerMode ? 'http://localhost:3000' : 'https://teamview.mietemieze.de'
+  let apiUrl = developerMode ? 'http://localhost:3000' : 'https://uni2.teamview.mietemieze.de'
 
   // remove trailing slashes
   apiUrl = apiUrl.replace(/\/+$/, '')

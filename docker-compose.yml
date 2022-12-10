@@ -7,7 +7,7 @@ services:
     command: npm run start
     depends_on: [db]
     ports:
-      - "8080:3000"
+      - "3002:3000"
     links: [db]
     restart: unless-stopped
 
@@ -21,5 +21,5 @@ services:
       POSTGRES_DB: postgres
       POSTGRES_PASSWORD: postgres
     ports:
-      - "5433:5432"
+      - "5434:5432"
     restart: unless-stopped

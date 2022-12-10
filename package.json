@@ -55,7 +55,7 @@
   },
   "apidoc": {
     "title": "Teamview API spec",
-    "url": "https://teamview.mietemieze.de",
-    "version": "0.5.0"
+    "url": "https://uni2.teamview.mietemieze.de",
+    "version": "0.6.0"
   }
 }
