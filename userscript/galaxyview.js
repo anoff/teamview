@@ -202,12 +202,13 @@ function addColumn (addCount = 1, titles = []) {
       case 17:
       case 18:
       case 19:
-      case 21:
       case 20:
+      case 21:
+      case 22:
         isSpan = parseInt(tr.children[1].getAttribute('colspan'))
         tr.children[1].setAttribute('colspan', isSpan + addCount)
         break
-      case 22:
+      case 23:
         break
       default:
         for (let i = 0; i < addCount; i++) {
