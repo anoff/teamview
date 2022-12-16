@@ -13,7 +13,7 @@ module.exports.report2html = function report2html (report) {
         html += '<div class="spyRaportContainerRow clearfix">\n'
       }
       html += `<div class="spyRaportContainerCell" style="font-size: 70%;">${pascalCase(k)}</div>\n`
-      html += `<div class="spyRaportContainerCell" style="font-size: 70%;">${data[k].toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.')}</div>\n`
+      html += `<div class="spyRaportContainerCell" style="font-size: 70%;">${(data[k] || '').toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.')}</div>\n`
       ix += 1
     }
     html += '</div>\n'
