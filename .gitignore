@@ -10,3 +10,4 @@ importStats.hash
 public/api
 public/teamview.body.bundle.js
 public/teamview.header.bundle.js
+.docker/postgres/
