@@ -45,6 +45,7 @@ teamview/
 ## API Spec
 
 See apidoc or run `npm run apidoc` and browse the `public/api` folder.
+On a running instance the API spec is served on `/api`.
 
 ## DB structure
 
@@ -236,10 +237,6 @@ fuelResearch
 gravitonResearch
 ```
 
-## Todo
-
-- [ ] add team feature
-
 ## Ideas
 
 ### Prevent API spam by implementing rate limit
@@ -254,3 +251,7 @@ Especially for POST/DELETE operations
 1. Add column (and SUM row) for expected incoming res for attacks, based on latest spy report and available cargo space (ignore battle)
 1. Add simulate button to reports view (maybe as popup to spy report?)
 1. Add overlay to galaxy / player card to search for all spy reports abouut this person / search all planets
+
+### Teams feature
+
+Allow to group tokens by teams, where all information is shared within one team but not to other teams.

@@ -3,6 +3,7 @@ version: '3.8'
 services:
   app:
     image: mcr.microsoft.com/vscode/devcontainers/javascript-node:0-16
+    env_file: [../.env]
     volumes:
       - ..:/workspace:cached
     user: node
@@ -19,13 +20,10 @@ services:
 
   db:
     image: postgres:latest
-    restart: unless-stopped
+    env_file: [../.env]
     volumes:
       - postgres-data:/var/lib/postgresql/data
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_DB: postgres
-      POSTGRES_PASSWORD: postgres
+    restart: unless-stopped
 
     # Add "forwardPorts": ["5432"] to **devcontainer.json** to forward PostgreSQL locally.
     # (Adding the "ports" property to this file will not forward from a Codespace.)
