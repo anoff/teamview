@@ -1,3 +1,4 @@
+# make sure .env file exists!
 version: '3.8'
 
 services:
@@ -6,8 +7,8 @@ services:
     build: .
     command: npm run start
     depends_on: [db]
-    ports:
-      - "3002:3000"
+    ports: # HOST:INTERNAL
+      - "3002:$PORT"
     links: [db]
     restart: unless-stopped
 
@@ -17,9 +18,9 @@ services:
     volumes:
       - .docker/postgres:/var/lib/postgresql/data
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_DB: postgres
-      POSTGRES_PASSWORD: postgres
-    ports:
-      - "5434:5432"
+      POSTGRES_DB: $POSTGRES_DB
+      POSTGRES_USER: $POSTGRES_USER
+      POSTGRES_PASSWORD: $POSTGRES_PASSWORD
+    ports: # HOST:INTERNAL
+      - "5434:$POSTGRES_PORT"
     restart: unless-stopped
