@@ -11,3 +11,5 @@ public/api
 public/teamview.body.bundle.js
 public/teamview.header.bundle.js
 .docker/postgres/
+monitoring-infra/influxdb/data/
+monitoring-infra/grafana/data/
