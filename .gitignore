@@ -10,4 +10,4 @@ public/teamview.header.bundle.js
 .docker/postgres/
 monitoring-infra/influxdb/data/
 monitoring-infra/grafana/data/
-logs/*.log
+logs/
