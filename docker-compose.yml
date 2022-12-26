@@ -11,6 +11,8 @@ services:
       - "3002:$PORT"
     links: [db]
     restart: unless-stopped
+    volumes:
+      - ./logs/app:/app/logs
 
   db:
     container_name: teamview-db
