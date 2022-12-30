@@ -1,11 +1,19 @@
 # make sure .env file exists!
 version: '3.8'
 
+networks:
+  backend:
+    external: false
+  metrics:
+    external: true
+
 services:
   app:
     container_name: teamview-app
     build: .
     command: npm run start
+    networks:
+      - backend
     depends_on: [db]
     ports: # HOST:INTERNAL
       - "3002:$APP_PORT"
@@ -17,12 +25,14 @@ services:
   db:
     container_name: teamview-db
     image: postgres:latest
-    volumes:
-      - .docker/postgres:/var/lib/postgresql/data
     environment:
       POSTGRES_DB: $POSTGRES_DB
       POSTGRES_USER: $POSTGRES_USER
       POSTGRES_PASSWORD: $POSTGRES_PASSWORD
+    networks:
+      - backend
     ports: # HOST:INTERNAL
       - "5434:$POSTGRES_PORT"
     restart: unless-stopped
+    volumes:
+      - .docker/postgres:/var/lib/postgresql/data
