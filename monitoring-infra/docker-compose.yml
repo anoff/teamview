@@ -5,7 +5,7 @@ networks:
     name: "tv-metrics"
     external: false
   backend:
-  name: "tv-backend"
+    name: "tv-backend"
     external: true
 
 services:
