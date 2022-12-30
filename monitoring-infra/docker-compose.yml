@@ -14,7 +14,7 @@ services:
       - "8086:8086"
     volumes:
       - ./influxdb/data:/var/lib/influxdb2
-      - ./influxdb/init:/docker-entrypoint-initdb.d 
+      - ./influxdb/init:/docker-entrypoint-initdb.d
   telegraf:
     image: telegraf:latest
     restart: unless-stopped
