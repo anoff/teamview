@@ -7,7 +7,6 @@ networks:
 services:
   influxdb:
     image: influxdb:2.6-alpine
-    # image: quay.io/influxdb/influxdb:v2.0.3
     container_name: tv-influxdb
     env_file: [./.env]
     restart: unless-stopped
@@ -15,7 +14,6 @@ services:
       - "8086:8086"
     volumes:
       - ./influxdb/data:/var/lib/influxdb2
-      # - ./influxdb/influx.config.yml:/etc/influxdb2/config.yml
       - ./influxdb/init:/docker-entrypoint-initdb.d 
   telegraf:
     image: telegraf:latest
