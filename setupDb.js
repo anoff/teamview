@@ -144,6 +144,36 @@ async function tableReports (knex, forceDrop = false) {
   }
 }
 
+async function tableFlights (knex, forceDrop = false) {
+  if (forceDrop) await knex.schema.dropTableIfExists('flights')
+  const tableExists = await knex.schema.hasTable('flights')
+  if (!tableExists) {
+    console.log('recreate flights')
+    // Create a table
+    await knex.schema
+      .createTable('flights', table => {
+        table.increments('id')
+        table.integer('submitted_by').references('tokens.id')
+        table.datetime('date')
+        table.string('mission')
+        table.integer('from_galaxy').unsigned().index()
+        table.integer('from_system').unsigned().index()
+        table.integer('from_position').unsigned().index()
+        table.boolean('from_is_moon')
+        table.string('from_location')
+        table.integer('to_galaxy').unsigned().index()
+        table.integer('to_system').unsigned().index()
+        table.integer('to_position').unsigned().index()
+        table.boolean('to_is_moon')
+        table.string('to_location')
+        table.timestamps(false, true)
+      }).raw(`
+          CREATE OR REPLACE TRIGGER update_flights_updated_at BEFORE UPDATE
+          ON flights FOR EACH ROW EXECUTE PROCEDURE 
+          update_updated_at_column();`)
+  }
+}
+
 async function initDb () {
   const knex = knexDriver({
     client: 'pg',
@@ -174,6 +204,7 @@ async function initDb () {
     await tablePlayersHistory(knex, forceDrop)
     await tablePlanets(knex, forceDrop)
     await tableReports(knex, forceDrop)
+    await tableFlights(knex, forceDrop)
   } catch (e) {
     console.error(e)
   }
