@@ -66,6 +66,10 @@ function uploadReports (data) {
   return genericRequest('/v1/reports/', 'POST', JSON.stringify({ reports: data }))
 }
 
+function uploadFlight (data) {
+  return genericRequest('/v1/flights', 'POST', JSON.stringify(data))
+}
+
 /**
  * Get the latest report ids that were submitted by a token
  * @returns {Array[int]} list of report ids
@@ -113,6 +117,7 @@ module.exports = {
   deletePlanet,
   uploadPlanets,
   uploadReports,
+  uploadFlight,
   getUploadedReports,
   getPlanetInfo,
   getPlayerData,
