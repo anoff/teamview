@@ -2,8 +2,10 @@ version: "3.3"
 
 networks:
   metrics:
+    name: "tv-metrics"
     external: false
   backend:
+  name: "tv-backend"
     external: true
 
 services:
