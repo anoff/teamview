@@ -21,3 +21,4 @@ influx auth create \
   --org-id ${DOCKER_INFLUXDB_INIT_ORG_ID} \
   --write-bucket ${NEW_BUCKET_ID} \
   --user ${INFLUXDB_TELEGRAF_USER}
+  --description "${INFLUXDB_TELEGRAF_USER}'s token"
