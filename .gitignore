@@ -1,8 +1,5 @@
 node_modules/
-data.db
 .env
-*.session.sql
-secrets
 dist/
 public/teamview.js
 importStats.hash
@@ -11,3 +8,6 @@ public/api
 public/teamview.body.bundle.js
 public/teamview.header.bundle.js
 .docker/postgres/
+monitoring-infra/influxdb/data/
+monitoring-infra/grafana/data/
+logs/

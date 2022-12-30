@@ -8,9 +8,11 @@ services:
     command: npm run start
     depends_on: [db]
     ports: # HOST:INTERNAL
-      - "3002:$PORT"
+      - "3002:$APP_PORT"
     links: [db]
     restart: unless-stopped
+    volumes:
+      - ./logs/app:/app/logs
 
   db:
     container_name: teamview-db

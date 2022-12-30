@@ -237,6 +237,10 @@ fuelResearch
 gravitonResearch
 ```
 
+## Production
+
+It is recommended to use `logrotation` to swap the logs in the `./logs` folder on a regular basis.
+
 ## Ideas
 
 ### Prevent API spam by implementing rate limit
