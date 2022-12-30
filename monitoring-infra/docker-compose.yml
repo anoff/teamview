@@ -2,7 +2,11 @@ version: "3.3"
 
 networks:
   metrics:
+    name: "tv-metrics"
     external: false
+  backend:
+    name: "tv-backend"
+    external: true
 
 services:
   influxdb:
@@ -10,15 +14,23 @@ services:
     container_name: tv-influxdb
     env_file: [./.env]
     restart: unless-stopped
+    networks: ["metrics"]
     ports:
       - "8086:8086"
     volumes:
       - ./influxdb/data:/var/lib/influxdb2
       - ./influxdb/init:/docker-entrypoint-initdb.d
+
   telegraf:
     image: telegraf:latest
-    restart: unless-stopped
     container_name: tv-telegraf
+    environment:
+      - HOST_PROC=/host/proc
+      - HOST_SYS=/host/sys
+      - HOST_ETC=/host/etc
+    restart: unless-stopped
+    networks: ["metrics"]
+    user: "${GRAFANA_UNIX_USER}"
     volumes:
       - ./telegraf.conf:/etc/telegraf/telegraf.conf:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
@@ -26,19 +38,16 @@ services:
       - /proc:/host/proc:ro
       - /etc:/host/etc:ro
       - ${PWD}/../logs/app:/logs/app:ro
-    environment:
-      - HOST_PROC=/host/proc
-      - HOST_SYS=/host/sys
-      - HOST_ETC=/host/etc
+  
   grafana:
     image: grafana/grafana-oss:9.3.2
-    env_file: [./.env]
     container_name: tv-grafana
+    env_file: [./.env]
     restart: unless-stopped
-    depends_on:
-      - influxdb
-    ports:
-      - "3030:3000"
+    networks: ["metrics", "backend"]
+    depends_on: ["influxdb"]
+    ports: ["3030:3000"]
+    user: "${GRAFANA_UNIX_USER}"
     volumes:
       - ./grafana/grafana.ini:/etc/grafana/grafana.ini
       - ./grafana/data:/var/lib/grafana

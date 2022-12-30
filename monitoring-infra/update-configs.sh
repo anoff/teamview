@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 set -e
 
 
@@ -11,6 +11,16 @@ sed -e 's/%%INFLUXDB_INIT_ORG%%/'${DOCKER_INFLUXDB_INIT_ORG}'/g' \
     -e 's/%%INFLUXDB_INIT_ADMIN_TOKEN%%/'${DOCKER_INFLUXDB_INIT_ADMIN_TOKEN}'/g' \
     grafana/provisioning/datasources/influx.yml.template \
   > grafana/provisioning/datasources/influx.yml
+
+# load postgres secrets
+source ../.env
+
+sed -e 's/%%POSTGRES_DB%%/'${POSTGRES_DB}'/g' \
+    -e 's/%%POSTGRES_PORT%%/'${POSTGRES_PORT}'/g' \
+    -e 's/%%POSTGRES_USER%%/'${POSTGRES_USER}'/g' \
+    -e 's/%%POSTGRES_PASSWORD%%/'${POSTGRES_PASSWORD}'/g' \
+    grafana/provisioning/datasources/postgres.yml.template \
+  > grafana/provisioning/datasources/postgres.yml
 
 echo "Preparing telegraf config.."
 sed -e 's/%%INFLUXDB_INIT_ORG%%/'${DOCKER_INFLUXDB_INIT_ORG}'/g' \
