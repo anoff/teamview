@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         teamview
 // @namespace    http://tampermonkey.net/
-// @version      2.0.0
+// @version      2.0.1
 // @description  augment your view by sharing info with your team
 // @author       joghurtrucksack
 // @match        https://www.pr0game.com/uni2/game.php*
@@ -54,5 +54,13 @@
 
     unsafeWindow.debugMode = debugMode
     unsafeWindow.apiUrl = apiUrl
+    
+    // New Spio Style with a <br>
+    // OMFG WHAT DID THIS SITTY DEV DO
+    $(document).ready(function() {
+      $('.spyRaport').find('br:first').remove();
+    })
+
+
   })
 })()
