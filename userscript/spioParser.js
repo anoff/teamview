@@ -64,7 +64,7 @@ class SpioParser {
       for (const line of content) {
         if (matchKey) {
           const [group, item] = map[matchKey].split('_')
-          const value = parseInt(line.replace(/\./g, '').replace(/,/g, ''))
+          const value = parseInt(line.replace(/\./g, '').replace(/,/g, '') || '0')
           // if (value !== 0) { // skip 0s
           switch (group) {
             case 'b':
@@ -99,8 +99,7 @@ class SpioParser {
     if ([languageMap.messageType_en.enemySpy, languageMap.messageType_de.enemySpy].includes(subject)) {
       reportType = 'enemySpy'
     }
-    const [report] = body.split(/\n\n/)
-    const [title, ...content] = report.split(/\n/)
+    const [title, ...content] = body.split(/\n/)
     const date = parseDate(dateRaw).toISOString()
     const planet = parsePlanet(title)
     const jsons = parseData(content)
