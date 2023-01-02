@@ -16,7 +16,7 @@
 // ==/UserScript==
 
 /* globals unsafeWindow, GM_getValue, GM_setValue, GM_xmlhttpRequest */
-(function teamviewInit () {
+(function teamviewInit() {
   // const version = GM_getValue('version') || '1.0.0'
   const debugMode = GM_getValue('debug_mode') === 1
   const developerMode = GM_getValue('developer_mode') === 1
@@ -54,11 +54,14 @@
 
     unsafeWindow.debugMode = debugMode
     unsafeWindow.apiUrl = apiUrl
-    
+
     // New Spio Style with a <br>
     // OMFG WHAT DID THIS SITTY DEV DO
-    $(document).ready(function() {
+    $(document).ready(function () {
       $('.spyRaport').find('br:first').remove();
+      if (window.location.href.indexOf("pr0game.com/uni2/game.php?page=messages&category=0") > -1) {
+        $('.messages_body').find('br:first').remove()
+      }
     })
 
 
