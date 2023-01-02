@@ -99,8 +99,7 @@ class SpioParser {
     if ([languageMap.messageType_en.enemySpy, languageMap.messageType_de.enemySpy].includes(subject)) {
       reportType = 'enemySpy'
     }
-    const [report] = body.split(/\n\n/)
-    const [title, ...content] = report.split(/\n/)
+    const [title, ...content] = body.split(/\n/)
     const date = parseDate(dateRaw).toISOString()
     const planet = parsePlanet(title)
     const jsons = parseData(content)
