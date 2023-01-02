@@ -14,7 +14,7 @@ module.exports = {
     path: pathOut,
     filename: 'teamview.[name].bundle.js'
   },
-  devtool: false,
+  devtool: isDevelopment ? 'source-map' : false,
   module: {
     rules: [
       {
