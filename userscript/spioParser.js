@@ -64,7 +64,7 @@ class SpioParser {
       for (const line of content) {
         if (matchKey) {
           const [group, item] = map[matchKey].split('_')
-          const value = parseInt(line.replace(/\./g, '').replace(/,/g, ''))
+          const value = parseInt(line.replace(/\./g, '').replace(/,/g, '') || '0')
           // if (value !== 0) { // skip 0s
           switch (group) {
             case 'b':
