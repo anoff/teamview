@@ -1,15 +1,16 @@
-/* globals  TM_setValue, TM_getValue, alert */
+/* globals  TM_setValue, TM_getValue */
 
-const { getCurrentPosition } = require('./utils')
+const { getCurrentPosition, teamviewDebugMode } = require('./utils')
 const { missionTypes } = require('./gameUtils')
+const { uploadFlight } = require('./requests')
 
 function storeValuesFleet1 () {
   const [g, s, p] = getCurrentPosition()
   const data = {
-    targetGalaxy: parseInt(document.querySelector('content #galaxy').value),
-    targetSystem: parseInt(document.querySelector('content #system').value),
-    targetPosition: parseInt(document.querySelector('content #planet').value),
-    targetIsMoon: document.querySelector('content #type').value === '3',
+    toGalaxy: parseInt(document.querySelector('content #galaxy').value),
+    toSystem: parseInt(document.querySelector('content #system').value),
+    toPosition: parseInt(document.querySelector('content #planet').value),
+    toIsMoon: document.querySelector('content #type').value === '3',
     fromGalaxy: g,
     fromSystem: s,
     fromPosition: p,
@@ -18,13 +19,16 @@ function storeValuesFleet1 () {
   TM_setValue('_fleet_tmp', data)
 }
 
-function submitFlight () {
+function submitFlight (event) {
+  event.preventDefault()
   const missionIx = parseInt(Array.from(document.querySelectorAll('content input')).find(e => e.type === 'radio' && e.checked === true).value)
   const data = TM_getValue('_fleet_tmp')
   data.mission = missionTypes[missionIx]
-  console.log(data)
-  alert('see console')
+  data.date = new Date().toISOString()
+  if (teamviewDebugMode) console.log({ submitFlight: data })
+  uploadFlight(data)
   TM_setValue('_fleet_tmp', null)
+  event.target.form.submit()
 }
 
 function init () {
@@ -38,10 +42,12 @@ function init () {
     })
   }
 
+  // save temporary data from second fleetscreen (target and start location)
   if (document.location.href.match(/page=fleetStep1/)) {
     const elm = Array.from(document.querySelectorAll('content input')).find(e => e.type === 'submit')
     elm.addEventListener('click', storeValuesFleet1)
   }
+  // submit when hitting send on third screen (get mission type)
   if (document.location.href.match(/page=fleetStep2/)) {
     const elm = Array.from(document.querySelectorAll('content input')).find(e => e.type === 'submit')
     elm.addEventListener('click', submitFlight)

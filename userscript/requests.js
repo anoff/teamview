@@ -40,7 +40,7 @@ function genericRequest (urlPath, method = 'GET', data = null) {
         const err = new ApiError(`Failed to ${method} ${urlPath}: Request Timeout`, { status: 408, statusText: 'Request Timeout' })
         reject(err)
       },
-      onerror: e => reject(e)
+      onerror: e => reject(JSON.stringify(e))
     }
     if (!data) delete options.data
     return TM_xmlhttpRequest(options)
