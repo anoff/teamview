@@ -21,6 +21,17 @@ function getCurrentPosition () {
 }
 
 /**
+ * Convert galaxy, system, planet information into a single integer
+ * @param {int} galaxy planet galaxy
+ * @param {int} system
+ * @param {int} position
+ * @returns int calculated as galaxy * 1000000 + system * 1000 + position
+ */
+function pos2location (galaxy, system, position) {
+  return galaxy * 1000000 + system * 1000 + position
+}
+
+/**
  * Calculate the n-th quantile for the given values.
  * @param {Array[Number]} arr Input array containing all values
  * @param {Number} q Quantile 0..1
@@ -101,5 +112,6 @@ module.exports = {
   loadSearchSettings,
   saveSearchSettings,
   teamviewDebugMode: TM_getValue('debug_mode') === 1,
-  setTeamviewStatus
+  setTeamviewStatus,
+  pos2location
 }
