@@ -162,12 +162,10 @@ async function tableFlights (knex, forceDrop = false) {
         table.integer('from_system').unsigned().index()
         table.integer('from_position').unsigned().index()
         table.boolean('from_is_moon')
-        table.integer('from_location').unsigned().index()
         table.integer('to_galaxy').unsigned().index()
         table.integer('to_system').unsigned().index()
         table.integer('to_position').unsigned().index()
         table.boolean('to_is_moon')
-        table.integer('to_location').unsigned().index()
         table.timestamps(false, true)
       }).raw(`
           CREATE OR REPLACE TRIGGER update_flights_updated_at BEFORE UPDATE

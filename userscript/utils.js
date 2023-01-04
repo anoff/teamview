@@ -32,6 +32,18 @@ function pos2location (galaxy, system, position) {
 }
 
 /**
+ * Convert single integer location to galaxy, system, position
+ * @param {int} location galaxy * 1000000 + system * 1000 + position
+ * @returns Array [galaxy, system, position]
+ */
+function location2pos (location) {
+  const position = location % 1000
+  const system = Math.floor(location / 1000) % 1000
+  const galaxy = Math.floor(location / 1000000)
+  return [galaxy, system, position]
+}
+
+/**
  * Calculate the n-th quantile for the given values.
  * @param {Array[Number]} arr Input array containing all values
  * @param {Number} q Quantile 0..1
@@ -113,5 +125,6 @@ module.exports = {
   saveSearchSettings,
   teamviewDebugMode: TM_getValue('debug_mode') === 1,
   setTeamviewStatus,
-  pos2location
+  pos2location,
+  location2pos
 }
