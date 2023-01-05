@@ -203,11 +203,11 @@ function insertResults (reports) {
     if (def2fleet < 1) def2fleetClass = 'color-green'
     else if (def2fleet < 2) def2fleetClass = 'color-blue'
 
-    let lastAttack; let attackFromLocation = null
+    // include last attack if it was less than x hours ago
     const ATTACK_MAX_AGE_H = 3
+    let lastAttack = null
     if ((new Date() - new Date(e.lastAttack)) <= ATTACK_MAX_AGE_H * 1e3 * 60 * 60) {
       lastAttack = e.lastAttack
-      attackFromLocation = e.attackFromLocation
     }
     const html = `<tr id="row-${e.planetId}">
     <td data-value="${e.galaxy * 10e5 + e.system * 10e2 + e.position}">   
@@ -234,7 +234,7 @@ function insertResults (reports) {
     </td>
     <td data-value="${defSp}"><span style="${Math.min(defSp, fleetSp) === 0 ? 'display: none;' : ''}" class="${def2fleetClass}">Def/Fleet: ${Math.round(def2fleet * 10) / 10}<br></span><span class="report-details">${obj2str(e.defense)}</span></td>
     <td data-value="${(new Date() - new Date(e.date))}">
-      <a href="#" class="tooltip_sticky" data-tooltip-content="Last attack started ${calcTimeDeltaString(lastAttack)} ago from [${location2pos(attackFromLocation).join(':')}]" style="${!lastAttack ? 'display: none;' : ''}">
+      <a href="#" class="tooltip_sticky" data-tooltip-content="Last attack started ${calcTimeDeltaString(lastAttack)} ago from [${location2pos(e.attackFromLocation).join(':')}]" style="${!lastAttack ? 'display: none;' : ''}">
         <span style="font-size: 130%; position: relative; top: 2px;">${lastAttack ? ' 🚀 ' : ''}</span>
       </a>
       <a style="${!lastAttack ? 'display: none;' : ''}">

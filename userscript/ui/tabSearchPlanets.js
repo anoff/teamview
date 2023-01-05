@@ -97,8 +97,13 @@ function insertResults (planets) {
     const player = p.extras.player
     const report = p.extras.report
     const flight = p.extras.flight
-    const lastAttack = p.extras.lastAttack
-    console.log(lastAttack)
+
+    // include last attack if it was less than x hours ago
+    const ATTACK_MAX_AGE_H = 3
+    let lastAttack = null
+    if ((new Date() - new Date(p.extras.lastAttack)) <= ATTACK_MAX_AGE_H * 1e3 * 60 * 60) {
+      lastAttack = p.extras.lastAttack
+    }
     const html = `<tr id="row-${p.planetId}">
     <td data-value="${p.galaxy * 10e5 + p.system * 10e2 + p.position}">
      <a href="${window.location.pathname}?page=galaxy&galaxy=${p.galaxy}&system=${p.system}" title="Goto System">[${p.galaxy}:${p.system}:${p.position}]</a>
