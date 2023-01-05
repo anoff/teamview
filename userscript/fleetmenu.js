@@ -20,6 +20,9 @@ function storeValuesFleet1 () {
 }
 
 function submitFlight (event) {
+  const chk = document.querySelector('#submit_flight')
+  TM_setValue('submit_flight', chk.checked)
+  if (chk.checked === false) return
   event.preventDefault()
   const missionIx = parseInt(Array.from(document.querySelectorAll('content input')).find(e => e.type === 'radio' && e.checked === true).value)
   const data = TM_getValue('_fleet_tmp')
@@ -29,6 +32,16 @@ function submitFlight (event) {
   uploadFlight(data)
   TM_setValue('_fleet_tmp', null)
   event.target.form.submit()
+}
+
+function injectSubmitFleetCheckbox () {
+  if (!document.location.href.match(/page=fleetStep2/)) return
+  let isChecked = TM_getValue('submit_flight')
+  if (isChecked === undefined) isChecked = true
+  const row = Array.from(document.querySelectorAll('content form table tr')).slice(-1)[0]
+  row.insertAdjacentHTML('afterend', '<tr><td colspan="2"><input type="checkbox" id="submit_flight" unchecked=""><label for="submit_flight">Submit Flight</label></td></tr>')
+  const chk = document.querySelector('#submit_flight')
+  chk.checked = isChecked
 }
 
 function init () {
@@ -49,6 +62,7 @@ function init () {
   }
   // submit when hitting send on third screen (get mission type)
   if (document.location.href.match(/page=fleetStep2/)) {
+    injectSubmitFleetCheckbox()
     const elm = Array.from(document.querySelectorAll('content input')).find(e => e.type === 'submit')
     elm.addEventListener('click', submitFlight)
   }
