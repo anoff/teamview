@@ -206,7 +206,7 @@ async function initDb () {
     await tablePlayersHistory(knex, forceDrop)
     await tablePlanets(knex, forceDrop)
     await tableReports(knex, forceDrop)
-    await tableFlights(knex, true)
+    await tableFlights(knex, forceDrop)
   } catch (e) {
     console.error(e)
   }

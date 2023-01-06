@@ -49,6 +49,9 @@ On a running instance the API spec is served on `/api`.
 
 ## DB structure
 
+Each table with planet coordinates also has an auto-generated `location` column that can be used to easily compare planets exact locations.
+`location` is calculated as `galaxy * 1000000 + system * 1000 + position`.
+
 ```mermaid
 classDiagram
   planets ..> players: soft ref
@@ -71,6 +74,7 @@ classDiagram
     galaxy: int
     system: int
     position: int
+    location: int
     debris_metal: int
     debris_crystal: int
     player_id: int [soft ref]
@@ -85,6 +89,7 @@ classDiagram
     galaxy: int
     system: int
     position: int
+    location: int
     resources: json
     buildings: json
     ships: json
@@ -145,12 +150,12 @@ classDiagram
     from_system: int
     from_position: int
     from_is_moon: bool
-    from_location: string
+    from_location: int
     to_galaxy: int
     to_system: int
     to_position: int
     to_is_moon: int
-    to_location: string
+    to_location: int
     created_at: date
     updated_at: date
   }
