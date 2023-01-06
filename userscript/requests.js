@@ -40,7 +40,7 @@ function genericRequest (urlPath, method = 'GET', data = null) {
         const err = new ApiError(`Failed to ${method} ${urlPath}: Request Timeout`, { status: 408, statusText: 'Request Timeout' })
         reject(err)
       },
-      onerror: e => reject(e)
+      onerror: e => reject(JSON.stringify(e))
     }
     if (!data) delete options.data
     return TM_xmlhttpRequest(options)
@@ -64,6 +64,10 @@ function uploadPlanets (data) {
 
 function uploadReports (data) {
   return genericRequest('/v1/reports/', 'POST', JSON.stringify({ reports: data }))
+}
+
+function uploadFlight (data) {
+  return genericRequest('/v1/flights', 'POST', JSON.stringify(data))
 }
 
 /**
@@ -113,6 +117,7 @@ module.exports = {
   deletePlanet,
   uploadPlanets,
   uploadReports,
+  uploadFlight,
   getUploadedReports,
   getPlanetInfo,
   getPlayerData,

@@ -83,7 +83,7 @@ class SpioParser {
               json.research[item] = value
               break
             default:
-              console.error('Unknown spy repeart group:', group)
+              console.error('Unknown spy report group:', group)
             // }
           }
           matchKey = null

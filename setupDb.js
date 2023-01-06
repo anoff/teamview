@@ -109,6 +109,7 @@ async function tablePlanets (knex, forceDrop = false) {
         CREATE OR REPLACE TRIGGER update_planets_updated_at BEFORE UPDATE
         ON planets FOR EACH ROW EXECUTE PROCEDURE 
         update_updated_at_column();`)
+      .raw('ALTER TABLE planets ADD location int GENERATED ALWAYS AS (galaxy * 1000000 + system * 1000 + position) STORED')
   }
 }
 
@@ -141,6 +142,37 @@ async function tableReports (knex, forceDrop = false) {
           CREATE OR REPLACE TRIGGER update_reports_updated_at BEFORE UPDATE
           ON reports FOR EACH ROW EXECUTE PROCEDURE 
           update_updated_at_column();`)
+      .raw('ALTER TABLE reports ADD location int GENERATED ALWAYS AS (galaxy * 1000000 + system * 1000 + position) STORED')
+  }
+}
+
+async function tableFlights (knex, forceDrop = false) {
+  if (forceDrop) await knex.schema.dropTableIfExists('flights')
+  const tableExists = await knex.schema.hasTable('flights')
+  if (!tableExists) {
+    console.log('recreate flights')
+    // Create a table
+    await knex.schema
+      .createTable('flights', table => {
+        table.increments('id')
+        table.integer('submitted_by').references('tokens.id')
+        table.datetime('date')
+        table.string('mission')
+        table.integer('from_galaxy').unsigned().index()
+        table.integer('from_system').unsigned().index()
+        table.integer('from_position').unsigned().index()
+        table.boolean('from_is_moon')
+        table.integer('to_galaxy').unsigned().index()
+        table.integer('to_system').unsigned().index()
+        table.integer('to_position').unsigned().index()
+        table.boolean('to_is_moon')
+        table.timestamps(false, true)
+      }).raw(`
+          CREATE OR REPLACE TRIGGER update_flights_updated_at BEFORE UPDATE
+          ON flights FOR EACH ROW EXECUTE PROCEDURE 
+          update_updated_at_column();`)
+      .raw('ALTER TABLE flights ADD to_location int GENERATED ALWAYS AS (to_galaxy * 1000000 + to_system * 1000 + to_position) STORED')
+      .raw('ALTER TABLE flights ADD from_location int GENERATED ALWAYS AS (from_galaxy * 1000000 + from_system * 1000 + from_position) STORED')
   }
 }
 
@@ -174,6 +206,7 @@ async function initDb () {
     await tablePlayersHistory(knex, forceDrop)
     await tablePlanets(knex, forceDrop)
     await tableReports(knex, forceDrop)
+    await tableFlights(knex, true)
   } catch (e) {
     console.error(e)
   }

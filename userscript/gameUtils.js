@@ -336,6 +336,23 @@ function getAverageMaxTemperature (position) {
   return AverageMaxTemperature
 }
 
+const missionTypes = {
+  // see https://codeberg.org/pr0game/pr0game/src/branch/development/includes/constants.php#L260
+  1: 'attack',
+  2: 'acs',
+  3: 'transport',
+  4: 'deploy',
+  5: 'hold',
+  6: 'spy',
+  7: 'colonize',
+  8: 'recycle',
+  9: 'destroy',
+  10: 'missile_attack',
+  15: 'expo',
+  16: 'trade',
+  17: 'transfer'
+}
+
 // FORMATTING
 function res2str (value) {
   return `${Math.floor(value / 100) / 10}k`
@@ -354,5 +371,6 @@ module.exports = {
   calculateHourlyMineProduction,
   shipStructurePoints,
   defenseStructurePoints,
-  itemIds
+  itemIds,
+  missionTypes
 }
