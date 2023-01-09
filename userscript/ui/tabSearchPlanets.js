@@ -116,8 +116,8 @@ function insertResults (planets) {
     <td>${player.alliance || ''}</td>
     <td>
       <a href="#" class="tooltip_sticky" data-tooltip-content="${report2html(report)}" style="${!report ? 'display: none;' : ''}font-size: 130%; position: relative; top: 2px;">${report ? ' 📃 ' : ''}<span style="font-size: 60%;">${calcTimeDeltaString(report?.date)}</span></a>
-      <span style="${report && flight ? '' : 'display: none;'}"> | </span>
-      <a href="#" class="tooltip_sticky" data-tooltip-content="Last attack started ${calcTimeDeltaString(lastAttack)} ago from [${location2pos(flight?.fromLocation).join(':')}]" style="${!flight ? 'display: none;' : ''}font-size: 130%; position: relative; top: 2px;">${lastAttack ? ' 🚀 ' : ''}<span style="font-size: 60%;">${calcTimeDeltaString(lastAttack)}</span></a>
+      <span style="${report && lastAttack ? '' : 'display: none;'}"> | </span>
+      <a href="#" class="tooltip_sticky" data-tooltip-content="Last attack started ${calcTimeDeltaString(lastAttack)} ago from [${location2pos(flight?.fromLocation).join(':')}]" style="${!lastAttack ? 'display: none;' : ''}font-size: 130%; position: relative; top: 2px;">${lastAttack ? ' 🚀 ' : ''}<span style="font-size: 60%;">${calcTimeDeltaString(lastAttack)}</span></a>
     </td>
     <td>
       <a id="scan-${p.planetId}" title="Spy on planet" href="javascript:doit(6,${p.planetId},{'210':'2'});" style="font-size: 130%; position: relative; top: 2px;">${p.planetId ? ' 🛰 ' : ''}</a>
