@@ -1,4 +1,4 @@
-/* globals location */
+/* globals */
 const req = require('./requests')
 const {
   report2html
@@ -8,7 +8,6 @@ const { setTeamviewStatus } = require('./utils')
 const MAX_AGE_PLANET_H = 72 // number of hours when a planet info is considered outdated
 
 let serverData, systemData
-let startedNavigation = false // global var to dected if navigation was started
 
 /**
  * Parse planet information out of current visible system in the galaxy view table
@@ -334,39 +333,13 @@ function addUploadSection () {
 
   document.onkeydown = function (e) {
     e = e || window.event
-    if (!startedNavigation) {
-      switch (e.key || e.keyCode) {
-        case 'Enter':
-        case ' ':
-          doUploadPlanets()
-          break
-        case 'a':
-        case 'ArrowLeft':
-          doUploadPlanets()
-          location.assign("javascript:galaxy_submit('systemLeft')")
-          startedNavigation = true
-          break
-        case 'd':
-        case 'ArrowRight':
-          doUploadPlanets()
-          location.assign("javascript:galaxy_submit('systemRight')")
-          startedNavigation = true
-          break
-      }
+    switch (e.key || e.keyCode) {
+      case 'Enter':
+      case ' ':
+        doUploadPlanets()
+        break
     }
   }
-
-  // make sure that clicking the default navigation buttons also uploads data
-  const dirs = ['systemRight', 'systemLeft', 'galaxyRight', 'galaxyLeft']
-  dirs.forEach(dir => {
-    const elm = Array.from(document.querySelectorAll('input')).find(e => e.type === 'button' && e.name === dir)
-    if (elm) {
-      elm.onclick = () => {
-        doUploadPlanets()
-        location.assign(`javascript:galaxy_submit('${dir}')`)
-      }
-    }
-  })
 }
 
 function modifyTable (data, modfiyFn) {
