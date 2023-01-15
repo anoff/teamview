@@ -16,6 +16,14 @@ class ApiError extends Error {
   }
 }
 
+/**
+ * Generic API call against the configured API.
+ * Authentication token and base url are already provided.
+ * @param {string} urlPath url that should be called
+ * @param {string} method HTTP method, defaults to GET
+ * @param {string} data payload to send (if JSON, stringify it first)
+ * @returns Promise
+ */
 function genericRequest (urlPath, method = 'GET', data = null) {
   return new Promise((resolve, reject) => {
     const options = {
