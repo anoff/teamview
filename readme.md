@@ -14,6 +14,8 @@ cd userscript
 npm run dev # autobuilds userscript in case of changes
 ```
 
+Switch to your browser with the userscript already installed and run `TM_setValue('developer_mode', 1)` (or change the `developer_mode` variable in the tampermonkey storage of the teamview script).
+
 ### Recommended tools
 
 Use vscode for devcontainer with port forwarding to host
@@ -263,22 +265,3 @@ gravitonResearch
 ## Production
 
 It is recommended to use `logrotation` to swap the logs in the `./logs` folder on a regular basis.
-
-## Ideas
-
-### Prevent API spam by implementing rate limit
-
-Especially for POST/DELETE operations
-
-- either via proxy https://faun.pub/prevent-ddos-attacks-with-traefik-2-44fb32eeac4f
-- or in app https://www.npmjs.com/package/express-slow-down
-
-### Fleet Menu
-
-1. Add column (and SUM row) for expected incoming res for attacks, based on latest spy report and available cargo space (ignore battle)
-1. Add simulate button to reports view (maybe as popup to spy report?)
-1. Add overlay to galaxy / player card to search for all spy reports abouut this person / search all planets
-
-### Teams feature
-
-Allow to group tokens by teams, where all information is shared within one team but not to other teams.

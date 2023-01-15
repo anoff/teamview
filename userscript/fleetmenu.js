@@ -1,6 +1,6 @@
 /* globals  TM_setValue, TM_getValue */
 
-const { getCurrentPosition, teamviewDebugMode } = require('./utils')
+const { getCurrentPosition, teamviewDebugMode, setTeamviewStatus } = require('./utils')
 const { missionTypes } = require('./gameUtils')
 const { uploadFlight } = require('./requests')
 
@@ -19,29 +19,57 @@ function storeValuesFleet1 () {
   TM_setValue('_fleet_tmp', data)
 }
 
-function submitFlight (event) {
-  const chk = document.querySelector('#submit_flight')
-  TM_setValue('submit_flight', chk.checked)
-  if (chk.checked === false) return
-  event.preventDefault()
+async function submitFlight (event) {
   const missionIx = parseInt(Array.from(document.querySelectorAll('content input')).find(e => e.type === 'radio' && e.checked === true).value)
   const data = TM_getValue('_fleet_tmp')
   data.mission = missionTypes[missionIx]
   data.date = new Date().toISOString()
   if (teamviewDebugMode) console.log({ submitFlight: data })
-  uploadFlight(data)
+
+  setTeamviewStatus('status-working', 'Uploading flight data')
+  try {
+    await uploadFlight(data)
+    setTeamviewStatus('status-ok', 'Success')
+  } catch (e) {
+    setTeamviewStatus('status-error', 'Failed, see console')
+    console.error(e)
+  }
+
   TM_setValue('_fleet_tmp', null)
-  event.target.form.submit()
 }
 
-function injectSubmitFleetCheckbox () {
+function addUploadSection () {
   if (!document.location.href.match(/page=fleetStep2/)) return
-  let isChecked = TM_getValue('submit_flight')
-  if (isChecked === undefined) isChecked = true
+  const sectionHTML = `
+  <tr>
+    <td class="transparent" id="teamview-section" colspan="2">
+      <table>
+        <tbody>
+          <tr>
+            <th>Teamview</th>
+            <td><button type="button" id="teamview-upload">Upload</button></td>
+            <td><span style="font-weight: bold;">Status</span></div></td>
+            <td><span id="teamview-status-icon" class="dot status-unknown"></td>
+            <td><span id="teamview-status-text" style="font-size: 85%;"></span></td>
+        </tr>
+      </tbody></table>
+    </td>
+  </tr>
+  `
   const row = Array.from(document.querySelectorAll('content form table tr')).slice(-1)[0]
-  row.insertAdjacentHTML('afterend', '<tr><td colspan="2"><input type="checkbox" id="submit_flight" unchecked=""><label for="submit_flight">Submit Flight</label></td></tr>')
-  const chk = document.querySelector('#submit_flight')
-  chk.checked = isChecked
+
+  row.insertAdjacentHTML('afterend', sectionHTML)
+  document.getElementById('teamview-upload').addEventListener('click', submitFlight)
+
+  document.onkeydown = function (e) {
+    e = e || window.event
+    switch (e.key || e.keyCode) {
+      case 'Enter':
+      case ' ':
+        submitFlight()
+        break
+    }
+  }
 }
 
 function init () {
@@ -60,11 +88,9 @@ function init () {
     const elm = Array.from(document.querySelectorAll('content input')).find(e => e.type === 'submit')
     elm.addEventListener('click', storeValuesFleet1)
   }
-  // submit when hitting send on third screen (get mission type)
+  // submit when hitting upload button on third screen (get mission type)
   if (document.location.href.match(/page=fleetStep2/)) {
-    injectSubmitFleetCheckbox()
-    const elm = Array.from(document.querySelectorAll('content input')).find(e => e.type === 'submit')
-    elm.addEventListener('click', submitFlight)
+    addUploadSection()
   }
 }
 
