@@ -1,5 +1,5 @@
 const { report2html } = require('./spioHtml')
-const req = require('../requests')
+const { genericRequest } = require('../requests')
 const searchHtml = require('./tabSearchReports.html').default
 const { getCurrentPosition, quantile, saveSearchSettings, loadSearchSettings, teamviewDebugMode, makeTableSortable, location2pos } = require('../utils')
 const { res2str, obj2str, shipStructurePoints, defenseStructurePoints, itemIds } = require('../gameUtils')
@@ -15,6 +15,19 @@ const SETTINGS_MAP = {
   reportMaxAge: [`${PAGE_ID} #report_maxage`],
   fleetpointsMin: [`${PAGE_ID} #fleetpoints_min`],
   defensepointsMax: [`${PAGE_ID} #defensepoints_max`]
+}
+
+/**
+ * Search the database for specific reports.
+ * @param {Object} query query parameters in object notation
+ * @returns {Array[Object]} list of results
+ */
+function searchReportsRequest (query) {
+  let q = ''
+  for (const [k, v] of Object.entries(query)) {
+    q += `${k}=${v}&`
+  }
+  return genericRequest(`/v1/reports?${q}&type=search`, 'GET')
 }
 
 /**
@@ -53,7 +66,7 @@ function search () {
 
   saveSearchSettings(SETTINGS_NAME, SETTINGS_MAP)
   const query = getQuery()
-  req.searchReports(query)
+  searchReportsRequest(query)
     .then(res => {
       removeRows()
       insertResults(res)

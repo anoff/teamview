@@ -1,8 +1,8 @@
 /* globals TM_xmlhttpRequest, TM_getValue */
 
 const TIMEOUT_S = 3 // timeout for request
-const APIKEY = TM_getValue('api_key')
-const APIURL = window.apiUrl
+const API_KEY = TM_getValue('api_key')
+const API_URL = window.apiUrl
 
 /**
  * Custom error in case API returns something other than 200
@@ -20,10 +20,10 @@ function genericRequest (urlPath, method = 'GET', data = null) {
   return new Promise((resolve, reject) => {
     const options = {
       method,
-      url: `${APIURL}${urlPath}`,
+      url: `${API_URL}${urlPath}`,
       data,
       headers: {
-        token: APIKEY,
+        token: API_KEY,
         'content-type': 'application/json; charset=utf-8'
       },
       timeout: TIMEOUT_S * 1000,
@@ -47,47 +47,6 @@ function genericRequest (urlPath, method = 'GET', data = null) {
   })
 }
 
-function getPlayerData (names) {
-  const namesArray = names.join(',')
-  // console.log('sending request', namesArray)
-  return genericRequest(`/v1/players/${namesArray}`, 'GET')
-}
-
-function deletePlanet (planet) {
-  const location = `${planet.galaxy}:${planet.system}:${planet.position}`
-  return genericRequest(`/v1/planets/${location}`, 'DELETE')
-}
-
-function uploadPlanets (data) {
-  return genericRequest('/v1/planets/', 'POST', JSON.stringify({ planets: data }))
-}
-
-function uploadReports (data) {
-  return genericRequest('/v1/reports/', 'POST', JSON.stringify({ reports: data }))
-}
-
-function uploadFlight (data) {
-  return genericRequest('/v1/flights', 'POST', JSON.stringify(data))
-}
-
-/**
- * Get the latest report ids that were submitted by a token
- * @returns {Array[int]} list of report ids
- */
-function getUploadedReports () {
-  return genericRequest('/v1/reports?type=mine', 'GET')
-}
-
-/**
- * Get information about uploaded planets incl spy reports
- * @param {Array[string]} locations a list of locations in format <SYSTEM>:<GALAXY>:[POSITION]
- * @returns {Array[string]} list of redacted planet info only containing location info, updated_at time and latest report
- */
-function getPlanetInfo (locations) {
-  const locationsConc = locations.join(',')
-  return genericRequest(`/v1/planets/${locationsConc}?type=report`, 'GET')
-}
-
 /**
  * Search the database for planets and reports.
  * @param {Object} query query parameters in object notation
@@ -101,26 +60,7 @@ function searchPlanets (query) {
   return genericRequest(`/v1/planets?${q}`, 'GET')
 }
 
-/**
- * Search the database for specific reports.
- * @param {Object} query query parameters in object notation
- * @returns {Array[Object]} list of results
- */
-function searchReports (query) {
-  let q = ''
-  for (const [k, v] of Object.entries(query)) {
-    q += `${k}=${v}&`
-  }
-  return genericRequest(`/v1/reports?${q}&type=search`, 'GET')
-}
 module.exports = {
-  deletePlanet,
-  uploadPlanets,
-  uploadReports,
-  uploadFlight,
-  getUploadedReports,
-  getPlanetInfo,
-  getPlayerData,
   searchPlanets,
-  searchReports
+  genericRequest
 }

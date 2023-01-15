@@ -1,5 +1,6 @@
 'use strict'
-const { showStation, init: initMain } = require('./teamview')
+const { showStation } = require('./features/teamview')
+const { init: initMain } = require('./tv.main')
 
 function addMenuButton () {
   // add button to menu
