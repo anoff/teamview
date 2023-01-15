@@ -1,6 +1,6 @@
 /* global TM_getValue, TM_setValue */
-const req = require('./requests')
-const { teamviewDebugMode, setTeamviewStatus } = require('./utils')
+const req = require('../requests')
+const { teamviewDebugMode, setTeamviewStatus } = require('../utils')
 
 class SpioParser {
   isSpioPage () {

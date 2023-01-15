@@ -1,8 +1,8 @@
 /* globals  TM_setValue, TM_getValue */
 
-const { getCurrentPosition, teamviewDebugMode, setTeamviewStatus } = require('./utils')
-const { missionTypes } = require('./gameUtils')
-const { uploadFlight } = require('./requests')
+const { getCurrentPosition, teamviewDebugMode, setTeamviewStatus } = require('../utils')
+const { missionTypes } = require('../gameUtils')
+const { uploadFlight } = require('../requests')
 
 function storeValuesFleet1 () {
   const [g, s, p] = getCurrentPosition()

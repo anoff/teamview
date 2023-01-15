@@ -1,9 +1,9 @@
 /* globals */
-const req = require('./requests')
+const req = require('../requests')
 const {
   report2html
-} = require('./ui/spioHtml')
-const { setTeamviewStatus } = require('./utils')
+} = require('../ui/spioHtml')
+const { setTeamviewStatus } = require('../utils')
 
 const MAX_AGE_PLANET_H = 72 // number of hours when a planet info is considered outdated
 
@@ -355,6 +355,7 @@ function modifyTable (data, modfiyFn) {
 }
 
 function init () {
+  if (!(window.location.search.includes('page=galaxy') && window.location.hash !== '#teamview-station')) return
   addColumn(2, ['Player Stats', 'Spio Info'])
   addUploadSection()
   modifyTable({}, modifyAddRankFromPopup)

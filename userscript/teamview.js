@@ -1,12 +1,10 @@
 'use strict'
 /* globals  TM_setValue, TM_getValue */
 
-const gv = require('./galaxyview')
-const pb = require('./planetBookmark')
-const sp = require('./spioParser')
-const fm = require('./fleetmenu')
 const { capitalCase } = require('change-case')
 
+const features = require('./features')
+const { teamviewDebugMode } = require('./utils')
 const tabSearchPlanets = require('./ui/tabSearchPlanets')
 const tabSearchReports = require('./ui/tabSearchReports')
 const tabStatus = require('./ui/tabStatus')
@@ -88,14 +86,13 @@ function removeFleetStatus () {
 }
 
 function init () {
-  if (window.location.search.includes('page=galaxy') && window.location.hash !== '#teamview-station') {
-    gv.init()
-    pb.init()
+  features.init()
+  for (const name in features.list) {
+    const obj = features.list[name]
+    if (teamviewDebugMode) console.log(`Initializing feature: ${name}`)
+    obj.init()
   }
-
   addTokenOption()
-  sp.init()
-  fm.init()
 }
 
 module.exports = {
