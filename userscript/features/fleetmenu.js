@@ -1,8 +1,8 @@
 /* globals  TM_setValue, TM_getValue */
 
-const { getCurrentPosition, teamviewDebugMode, setTeamviewStatus } = require('./utils')
-const { missionTypes } = require('./gameUtils')
-const { uploadFlight } = require('./requests')
+const { getCurrentPosition, teamviewDebugMode, setTeamviewStatus } = require('../utils')
+const { missionTypes } = require('../gameUtils')
+const { genericRequest } = require('../requests')
 
 function storeValuesFleet1 () {
   const [g, s, p] = getCurrentPosition()
@@ -28,7 +28,7 @@ async function submitFlight (event) {
 
   setTeamviewStatus('status-working', 'Uploading flight data')
   try {
-    await uploadFlight(data)
+    await genericRequest('/v1/flights', 'POST', JSON.stringify(data))
     setTeamviewStatus('status-ok', 'Success')
   } catch (e) {
     setTeamviewStatus('status-error', 'Failed, see console')

@@ -7,8 +7,8 @@ const pathOut = path.resolve(__dirname, '..', 'public')
 module.exports = {
   mode: isDevelopment ? 'development' : 'production',
   entry: {
-    header: './teamviewHeader.js',
-    body: './teamview.js'
+    header: './tv.header.js',
+    body: './tv.main.js'
   },
   output: {
     path: pathOut,

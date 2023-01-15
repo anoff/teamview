@@ -1,6 +1,6 @@
 /* global TM_getValue, TM_setValue */
-const req = require('./requests')
-const { teamviewDebugMode, setTeamviewStatus } = require('./utils')
+const { genericRequest } = require('../requests')
+const { teamviewDebugMode, setTeamviewStatus } = require('../utils')
 
 class SpioParser {
   isSpioPage () {
@@ -317,7 +317,7 @@ function uploadReports () {
   const uploadedReports = TM_getValue('reports_uploaded')
   uploadedReports.push(...data.map(e => e.reportId))
   TM_setValue('reports_uploaded', uploadedReports)
-  const p = req.uploadReports(data)
+  const p = genericRequest('/v1/reports/', 'POST', JSON.stringify({ reports: data }))
   p.then(res => {
     const { totalCount, successCount } = res
     setTeamviewStatus('status-ok', `Submitted ${successCount}/${totalCount}`)
@@ -385,7 +385,7 @@ function colorReports () {
 }
 
 function fetchUploadedReports () {
-  return req.getUploadedReports().then(res => {
+  return genericRequest('/v1/reports?type=mine', 'GET').then(res => {
     const uploadedReports = TM_getValue('reports_uploaded')
     const data = res
     for (const id of data) {

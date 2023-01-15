@@ -1,9 +1,9 @@
 /* globals */
-const req = require('./requests')
+const { genericRequest } = require('../requests')
 const {
   report2html
-} = require('./ui/spioHtml')
-const { setTeamviewStatus } = require('./utils')
+} = require('../ui/spioHtml')
+const { setTeamviewStatus } = require('../utils')
 
 const MAX_AGE_PLANET_H = 72 // number of hours when a planet info is considered outdated
 
@@ -133,8 +133,7 @@ function checkPlanetStatus (systemData) {
   }
   const systemCoords = Array.from(document.querySelector('content table.table569').querySelectorAll('tr'))[0].innerText
   const [galaxy, system] = systemCoords.split(' ')[1].split(':').map(e => parseInt(e))
-
-  req.getPlanetInfo([`${galaxy}:${system}`])
+  return genericRequest(`/v1/planets/${galaxy}:${system}?type=report`, 'GET')
     .then(res => {
       serverData = res
       // console.log({ serverData, systemData })
@@ -287,7 +286,7 @@ function modifyAddPlayerStats (data, cells, rowIx) {
 function doUploadPlanets () {
   const data = getVisibleSystem()
   setTeamviewStatus('status-working', `Uploading ${data.length} planets`)
-  const p = req.uploadPlanets(data)
+  const p = genericRequest('/v1/planets/', 'POST', JSON.stringify({ planets: data }))
   p.then(res => {
     const {
       totalCount,
@@ -305,7 +304,8 @@ function doUploadPlanets () {
       const pos = p.position
       const match = data.find(e => e.position === pos)
       if (!match) {
-        req.deletePlanet(p)
+        const location = `${p.galaxy}:${p.system}:${p.position}`
+        genericRequest(`/v1/planets/${location}`, 'DELETE')
       }
     }
   }
@@ -355,6 +355,7 @@ function modifyTable (data, modfiyFn) {
 }
 
 function init () {
+  if (!(window.location.search.includes('page=galaxy') && window.location.hash !== '#teamview-station')) return
   addColumn(2, ['Player Stats', 'Spio Info'])
   addUploadSection()
   modifyTable({}, modifyAddRankFromPopup)
@@ -364,7 +365,8 @@ function init () {
   const players = data.map(e => e.playerName)
   const uniquePlayers = Array.from(new Set(players))
   if (uniquePlayers.length) {
-    req.getPlayerData(uniquePlayers)
+    const namesArray = uniquePlayers.join(',')
+    genericRequest(`/v1/players/${namesArray}`, 'GET')
       .then(playerData => {
         return modifyTable(playerData, modifyAddPlayerStats)
       })
