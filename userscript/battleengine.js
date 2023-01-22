@@ -51,13 +51,11 @@ function shoot (unit, enemies, shooterStats) {
   // select target unit
   let unitCount = 0
   let victimUnit = 0
-  let initialArmor = 0
   for (const fleet of enemies) {
     unitCount += fleet.unitCount
     if (randomEnemyUnitIx < unitCount) {
       const victimUnitIx = Math.round(Math.random() * (fleet.unitCount - 1))
       victimUnit = fleet.units[victimUnitIx]
-      initialArmor = 123 // TODO: set armor for unit
     }
   }
 
@@ -84,9 +82,10 @@ function shoot (unit, enemies, shooterStats) {
         }
       }
     }
-  }
+  } // else bounce off of shields
 
-
+  // check for rapidfire
+  // TODO: check for rapidfire (add to stats)
 }
 
 function destroy (fleet) {
@@ -162,17 +161,26 @@ class Unit {
     return this.type >= 200 && this.type < 300
   }
 
-
   static unitByType (unitType) {
-
+    const name = Object.keys(gameUtils.itemIds)
+      .find(k => gameUtils.itemIds[k] === unitType)
+    const prefix = name.split('_')[0]
+    const nameClean = name.split('_').slice(1).join('_')
+    let stats = null
+    if (prefix === 'sh') {
+      stats = gameUtils.shipValues[nameClean]
+    } else {
+      stats = gameUtils.defenseValues[nameClean]
+    }
+    return new Unit(unitType, stats.shield, stats.armour, stats.attack)
   }
-
 }
 
 class Fleet {
   unitsByType = new Map()
-  units: Array<Unit> = []
+  units = []
   unitCount = 0
+  referenceUnits = new Map() // one reference unit of each used type to copy initial armor/shield values from
 
   constructor (player, startLocation, targetLocation) {
     this.player = player
@@ -185,7 +193,7 @@ class Fleet {
    * @param {int} unitType The unit type to add e.g. 204 for small cargos
    * @param {int} count number of units of this type in the fleet
    */
-  addunitType (unitType, count) {
+  addUnitType (unitType, count) {
     if (this.unitsByType.has(unitType)) {
       this.unitsByType[unitType] += count
     } else {

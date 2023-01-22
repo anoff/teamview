@@ -226,6 +226,24 @@ const obj2StructurePoints = obj => Object.keys(obj).map(k => {
 const shipStructurePoints = obj2StructurePoints(shipValues)
 const defenseStructurePoints = obj2StructurePoints(defenseValues)
 
+/**
+ * Convert itemIds, shipValues and defenseValues into a Map(id -> values)
+ */
+function getStatsByItemId () {
+  const stats = new Map()
+  for (const [k, v] of Object.entries(itemIds)) {
+    const name = k.split('_').slice(1).join('_')
+    if (v >= 200 && v < 300) {
+      stats.set(v, shipValues(name))
+    } else if (v >= 400 && v < 500) {
+      stats.set(v, defenseValues(name))
+    }
+  }
+  return stats
+}
+/** Costs & battle stats of each ship/defense unit, by id. */
+const unitStatsById = getStatsByItemId()
+
 // RESOURCES
 /**
  * Calculate the resources created per hour, assuming 100% production and energy.
@@ -257,6 +275,10 @@ function calculateHourlyMineProduction (mineType, mineLevel, planetPosition) {
 }
 
 // ITEM TO ID
+/**
+ * Object containing all items with name as key and ingame item id as value.
+ * Prefixes: b = building, r = research, res = resources, r = research, sh = ship, def = defense
+ */
 const itemIds = {
   b_metalMine: 1,
   b_crystalMine: 2,
@@ -330,12 +352,18 @@ const itemIds = {
   def_interplanetaryMissiles: 503
 }
 
+/**
+ * Get the average maximum temperature for a given planet position.
+ * @param {int} position Planet position in the system
+ * @returns int average of maximum temperature
+ */
 function getAverageMaxTemperature (position) {
   const listAverageMaxTemperature = [240, 190, 140, 90, 80, 70, 60, 50, 40, 30, 20, 10, -30, -70, -110]
   const AverageMaxTemperature = listAverageMaxTemperature[position - 1]
   return AverageMaxTemperature
 }
 
+/** Object of mission types with key being the ingame id and name being the english mission name. */
 const missionTypes = {
   // see https://codeberg.org/pr0game/pr0game/src/branch/development/includes/constants.php#L260
   1: 'attack',
@@ -354,9 +382,19 @@ const missionTypes = {
 }
 
 // FORMATTING
+/**
+ * Format number of resources to thousands.
+ * @param {int} value resource amount
+ * @returns string formatted as '23.1k'
+ */
 function res2str (value) {
   return `${Math.floor(value / 100) / 10}k`
 }
+/**
+ * Concatenate all items in an object with <br> for simple HTML print.
+ * @param {Object} obj any object
+ * @returns string containing all key: value items
+ */
 function obj2str (obj) {
   let str = ''
   for (const key in obj) {
@@ -372,5 +410,8 @@ module.exports = {
   shipStructurePoints,
   defenseStructurePoints,
   itemIds,
-  missionTypes
+  missionTypes,
+  shipValues,
+  defenseValues,
+  unitStatsById
 }
