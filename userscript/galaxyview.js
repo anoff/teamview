@@ -332,29 +332,29 @@ function addUploadSection () {
   document.querySelectorAll('#galaxy_form table tr')[0].insertAdjacentHTML('afterend', sectionHTML)
   document.getElementById('teamview-upload').addEventListener('click', doUploadPlanets)
 
-  document.onkeydown = function (e) {
-    e = e || window.event
-    if (!startedNavigation) {
-      switch (e.key || e.keyCode) {
-        case 'Enter':
-        case ' ':
-          doUploadPlanets()
-          break
-        case 'a':
-        case 'ArrowLeft':
-          doUploadPlanets()
-          location.assign("javascript:galaxy_submit('systemLeft')")
-          startedNavigation = true
-          break
-        case 'd':
-        case 'ArrowRight':
-          doUploadPlanets()
-          location.assign("javascript:galaxy_submit('systemRight')")
-          startedNavigation = true
-          break
-      }
-    }
-  }
+  // document.onkeydown = function (e) {
+  //   e = e || window.event
+  //   if (!startedNavigation) {
+  //     switch (e.key || e.keyCode) {
+  //       case 'Enter':
+  //       case ' ':
+  //         doUploadPlanets()
+  //         break
+  //       case 'a':
+  //       case 'ArrowLeft':
+  //         doUploadPlanets()
+  //         location.assign("javascript:galaxy_submit('systemLeft')")
+  //         startedNavigation = true
+  //         break
+  //       case 'd':
+  //       case 'ArrowRight':
+  //         doUploadPlanets()
+  //         location.assign("javascript:galaxy_submit('systemRight')")
+  //         startedNavigation = true
+  //         break
+  //     }
+  //   }
+  // }
 
   // make sure that clicking the default navigation buttons also uploads data
   const dirs = ['systemRight', 'systemLeft', 'galaxyRight', 'galaxyLeft']

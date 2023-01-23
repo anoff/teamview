@@ -4,6 +4,8 @@ const TIMEOUT_S = 3 // timeout for request
 const APIKEY = TM_getValue('api_key')
 const APIURL = window.apiUrl
 
+
+
 /**
  * Custom error in case API returns something other than 200
  */

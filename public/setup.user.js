@@ -11,7 +11,7 @@
 // @grant        GM_xmlhttpRequest
 // @grant        unsafeWindow
 // @connect      localhost
-// @connect      uni2.teamview.mietemieze.de
+// @connect      teamview.kejith.de
 // @run-at       document-start
 // ==/UserScript==
 
@@ -20,7 +20,7 @@
   // const version = GM_getValue('version') || '1.0.0'
   const debugMode = GM_getValue('debug_mode') === 1
   const developerMode = GM_getValue('developer_mode') === 1
-  let apiUrl = developerMode ? 'http://localhost:3000' : 'https://uni2.teamview.mietemieze.de'
+  let apiUrl = developerMode ? 'http://localhost:3000' : 'https://teamview.kejith.de'
 
   // remove trailing slashes
   apiUrl = apiUrl.replace(/\/+$/, '')
