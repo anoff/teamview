@@ -2,6 +2,7 @@
   "name": "teamview-userscript",
   "private": true,
   "devDependencies": {
+    "ava": "^5.1.1",
     "http-server": "^14.1.0",
     "webpack": "^5.72.0",
     "webpack-cli": "^4.9.2"
@@ -9,6 +10,6 @@
   "scripts": {
     "dev": "webpack build --watch --node-env development",
     "build": "webpack build",
-    "test": "npx standard ."
+    "test": "standard && ava"
   }
 }

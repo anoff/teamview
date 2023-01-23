@@ -3,6 +3,83 @@
  */
 const { capitalCase } = require('change-case')
 
+/**
+ * Object containing all items with name as key and ingame item id as value.
+ * Prefixes: b = building, r = research, res = resources, r = research, sh = ship, def = defense
+ */
+const itemIds = {
+  b_metalMine: 1,
+  b_crystalMine: 2,
+  b_deuteriumRefinery: 3,
+  b_solarPowerPlant: 4,
+  b_university: 6,
+  b_deuteriumPowerPlant: 12,
+  b_robotFactory: 14,
+  b_naniteFactory: 15,
+  b_shipyard: 21,
+  b_metalStorage: 22,
+  b_crystalStorage: 23,
+  b_deuteriumStorage: 24,
+  b_researchLab: 31,
+  b_terraformer: 33,
+  b_allianceDepot: 34,
+  b_moonBase: 41,
+  b_phalanxSensor: 42,
+  b_jumpgate: 43,
+  b_missileSilo: 44,
+  // research
+  r_spyTechnology: 106,
+  r_computerTechnology: 108,
+  r_weaponsTechnology: 109,
+  r_shieldTechnology: 110,
+  r_armourTechnology: 111,
+  r_energyTechnology: 113,
+  r_hyperspaceTechnology: 114,
+  r_combustionEngine: 115,
+  r_impulseEngine: 117,
+  r_hyperspaceEngine: 118,
+  r_laserTechnology: 120,
+  r_ionTechnology: 121,
+  r_plasmaTechnology: 122,
+  r_intergalacticResearchNetwork: 123,
+  r_expeditionResearch: 124,
+  r_mineralResearch: 131,
+  r_semiCrystalsResearch: 132,
+  r_fuelResearch: 133,
+  r_gravitonResearch: 199,
+  // resources
+  res_metal: 901,
+  res_crystal: 902,
+  res_deuterium: 903,
+  res_energy: 911,
+  // ships
+  sh_lightCargo: 202,
+  sh_heavyCargo: 203,
+  sh_lightFighter: 204,
+  sh_heavyFighter: 205,
+  sh_cruiser: 206,
+  sh_battleship: 207,
+  sh_colonyShip: 208,
+  sh_recycler: 209,
+  sh_spyProbe: 210,
+  sh_planetBomber: 211,
+  sh_solarSatellite: 212,
+  sh_starFighter: 213,
+  sh_battleFortress: 214,
+  sh_battleCruiser: 215,
+  // defenses
+  def_missileLauncher: 401,
+  def_lightLaserTurret: 402,
+  def_heavyLaserTurret: 403,
+  def_gaussCannon: 404,
+  def_ionCannon: 405,
+  def_plasmaCannon: 406,
+  def_smallShieldDome: 407,
+  def_largeShieldDome: 408,
+  def_interceptor: 502,
+  def_interplanetaryMissiles: 503
+}
+
 // ITEM TO POINTS
 const shipValues = {
   lightCargo: {
@@ -233,16 +310,19 @@ function getStatsByItemId () {
   const stats = new Map()
   for (const [k, v] of Object.entries(itemIds)) {
     const name = k.split('_').slice(1).join('_')
+    const data = {}
     if (v >= 200 && v < 300) {
-      stats.set(v, shipValues(name))
+      Object.assign(data, shipValues[name])
     } else if (v >= 400 && v < 500) {
-      stats.set(v, defenseValues(name))
+      Object.assign(data, defenseValues[name])
     }
+    data.name = name
+    stats.set(v, data)
   }
-  return stats
+  return id => stats.get(id)
 }
 /** Costs & battle stats of each ship/defense unit, by id. */
-const unitStatsById = getStatsByItemId()
+const getUnitStatsById = getStatsByItemId()
 
 // RESOURCES
 /**
@@ -272,84 +352,6 @@ function calculateHourlyMineProduction (mineType, mineLevel, planetPosition) {
   }
 
   return result
-}
-
-// ITEM TO ID
-/**
- * Object containing all items with name as key and ingame item id as value.
- * Prefixes: b = building, r = research, res = resources, r = research, sh = ship, def = defense
- */
-const itemIds = {
-  b_metalMine: 1,
-  b_crystalMine: 2,
-  b_deuteriumRefinery: 3,
-  b_solarPowerPlant: 4,
-  b_university: 6,
-  b_deuteriumPowerPlant: 12,
-  b_robotFactory: 14,
-  b_naniteFactory: 15,
-  b_shipyard: 21,
-  b_metalStorage: 22,
-  b_crystalStorage: 23,
-  b_deuteriumStorage: 24,
-  b_researchLab: 31,
-  b_terraformer: 33,
-  b_allianceDepot: 34,
-  b_moonBase: 41,
-  b_phalanxSensor: 42,
-  b_jumpgate: 43,
-  b_missileSilo: 44,
-  // research
-  r_spyTechnology: 106,
-  r_computerTechnology: 108,
-  r_weaponsTechnology: 109,
-  r_shieldTechnology: 110,
-  r_armourTechnology: 111,
-  r_energyTechnology: 113,
-  r_hyperspaceTechnology: 114,
-  r_combustionEngine: 115,
-  r_impulseEngine: 117,
-  r_hyperspaceEngine: 118,
-  r_laserTechnology: 120,
-  r_ionTechnology: 121,
-  r_plasmaTechnology: 122,
-  r_intergalacticResearchNetwork: 123,
-  r_expeditionResearch: 124,
-  r_mineralResearch: 131,
-  r_semiCrystalsResearch: 132,
-  r_fuelResearch: 133,
-  r_gravitonResearch: 199,
-  // resources
-  res_metal: 901,
-  res_crystal: 902,
-  res_deuterium: 903,
-  res_energy: 911,
-  // ships
-  sh_lightCargo: 202,
-  sh_heavyCargo: 203,
-  sh_lightFighter: 204,
-  sh_heavyFighter: 205,
-  sh_cruiser: 206,
-  sh_battleship: 207,
-  sh_colonyShip: 208,
-  sh_recycler: 209,
-  sh_spyProbe: 210,
-  sh_planetBomber: 211,
-  sh_solarSatellite: 212,
-  sh_starFighter: 213,
-  sh_battleFortress: 214,
-  sh_battleCruiser: 215,
-  // defenses
-  def_missileLauncher: 401,
-  def_lightLaserTurret: 402,
-  def_heavyLaserTurret: 403,
-  def_gaussCannon: 404,
-  def_ionCannon: 405,
-  def_plasmaCannon: 406,
-  def_smallShieldDome: 407,
-  def_largeShieldDome: 408,
-  def_interceptor: 502,
-  def_interplanetaryMissiles: 503
 }
 
 /**
@@ -413,5 +415,5 @@ module.exports = {
   missionTypes,
   shipValues,
   defenseValues,
-  unitStatsById
+  getUnitStatsById
 }
