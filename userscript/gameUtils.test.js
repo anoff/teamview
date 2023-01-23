@@ -8,6 +8,13 @@ test('getUnitStatsById.204', t => {
   t.is(stats.attack, 50)
 })
 
+test('getUnitStatsById.204.string', t => {
+  const stats = gameUtils.getUnitStatsById('204')
+  t.is(stats.name, 'lightFighter')
+  t.is(stats.crystal, 1e3)
+  t.is(stats.attack, 50)
+})
+
 test('getUnitStatsById.406', t => {
   const stats = gameUtils.getUnitStatsById(406)
   t.is(stats.name, 'plasmaCannon')

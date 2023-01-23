@@ -89,8 +89,16 @@ function shoot (unit, enemies, shooterStats) {
 }
 
 function destroy (fleet) {
-
+  for (let i = fleet.units.length - 1; i >= 0; i--) {
+    const unit = fleet.units[i]
+    if (unit.armor <= 0 || unit.isExploded) {
+      fleet.units.splice(i, 1)
+      fleet.unitCount -= 1
+      fleet.unitsByType[unit.type] -= 1
+    }
+  }
 }
+module.exports.destroy = destroy
 
 function restoreShields (fleets) {
 
@@ -115,6 +123,7 @@ class BattleTechs {
     }
   }
 }
+module.exports.BattleTechs = BattleTechs
 
 class EngineTechs {
   constructor (combustion, impulse, hyperspace) {
@@ -128,6 +137,7 @@ class EngineTechs {
     }
   }
 }
+module.exports.EngineTechs = EngineTechs
 
 class Player {
   constructor (id, name, battleTechs, engineTechs) {
@@ -137,6 +147,7 @@ class Player {
     this.engineTechs = engineTechs
   }
 }
+module.exports.Player = Player
 
 class Location {
   constructor (galaxy, system, position, isMoon) {
@@ -146,6 +157,7 @@ class Location {
     this.isMoon = isMoon
   }
 }
+module.exports.Location = Location
 
 class Unit {
   isExploded = false
@@ -161,23 +173,15 @@ class Unit {
     return this.type >= 200 && this.type < 300
   }
 
-  static unitByType (unitType) {
-    const name = Object.keys(gameUtils.itemIds)
-      .find(k => gameUtils.itemIds[k] === unitType)
-    const prefix = name.split('_')[0]
-    const nameClean = name.split('_').slice(1).join('_')
-    let stats = null
-    if (prefix === 'sh') {
-      stats = gameUtils.shipValues[nameClean]
-    } else {
-      stats = gameUtils.defenseValues[nameClean]
-    }
+  static createUnit (unitType) {
+    const stats = gameUtils.getUnitStatsById(unitType)
     return new Unit(unitType, stats.shield, stats.armour, stats.attack)
   }
 }
+module.exports.Unit = Unit
 
 class Fleet {
-  unitsByType = new Map()
+  unitsByType = {}
   units = []
   unitCount = 0
   referenceUnits = new Map() // one reference unit of each used type to copy initial armor/shield values from
@@ -190,15 +194,31 @@ class Fleet {
 
   /**
    * Add a number of one specific unit (ship or defense) type to the fleet.
-   * @param {int} unitType The unit type to add e.g. 204 for small cargos
+   * @param {int} unitType The unit type to add e.g. 204 for light fighter
    * @param {int} count number of units of this type in the fleet
    */
   addUnitType (unitType, count) {
-    if (this.unitsByType.has(unitType)) {
+    const types = Object.keys(this.unitsByType)
+    if (types.includes(unitType)) {
       this.unitsByType[unitType] += count
     } else {
       this.unitsByType[unitType] = count
     }
     this.unitCount += count
   }
+
+  /**
+   * Populate the .units property with one unit for each count of .unitsByType.
+   * Does nothing if .units already has elements.
+   */
+  spawnUnits () {
+    if (this.units.length > 0) return
+    for (const [id, count] of Object.entries(this.unitsByType)) {
+      for (let i = count; i > 0; i--) {
+        this.units.push(Unit.createUnit(id))
+      }
+    }
+  }
 }
+
+module.exports.Fleet = Fleet

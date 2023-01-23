@@ -319,7 +319,7 @@ function getStatsByItemId () {
     data.name = name
     stats.set(v, data)
   }
-  return id => stats.get(id)
+  return id => stats.get(parseInt(id))
 }
 /** Costs & battle stats of each ship/defense unit, by id. */
 const getUnitStatsById = getStatsByItemId()
