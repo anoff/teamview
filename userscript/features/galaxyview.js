@@ -1,14 +1,13 @@
-/* globals location */
-const req = require('./requests')
+/* globals */
+const { genericRequest } = require('../requests')
 const {
   report2html
-} = require('./ui/spioHtml')
-const { setTeamviewStatus } = require('./utils')
+} = require('../ui/spioHtml')
+const { setTeamviewStatus } = require('../utils')
 
 const MAX_AGE_PLANET_H = 72 // number of hours when a planet info is considered outdated
 
 let serverData, systemData
-let startedNavigation = false // global var to dected if navigation was started
 
 /**
  * Parse planet information out of current visible system in the galaxy view table
@@ -134,8 +133,7 @@ function checkPlanetStatus (systemData) {
   }
   const systemCoords = Array.from(document.querySelector('content table.table569').querySelectorAll('tr'))[0].innerText
   const [galaxy, system] = systemCoords.split(' ')[1].split(':').map(e => parseInt(e))
-
-  req.getPlanetInfo([`${galaxy}:${system}`])
+  return genericRequest(`/v1/planets/${galaxy}:${system}?type=report`, 'GET')
     .then(res => {
       serverData = res
       // console.log({ serverData, systemData })
@@ -288,7 +286,7 @@ function modifyAddPlayerStats (data, cells, rowIx) {
 function doUploadPlanets () {
   const data = getVisibleSystem()
   setTeamviewStatus('status-working', `Uploading ${data.length} planets`)
-  const p = req.uploadPlanets(data)
+  const p = genericRequest('/v1/planets/', 'POST', JSON.stringify({ planets: data }))
   p.then(res => {
     const {
       totalCount,
@@ -306,7 +304,8 @@ function doUploadPlanets () {
       const pos = p.position
       const match = data.find(e => e.position === pos)
       if (!match) {
-        req.deletePlanet(p)
+        const location = `${p.galaxy}:${p.system}:${p.position}`
+        genericRequest(`/v1/planets/${location}`, 'DELETE')
       }
     }
   }
@@ -332,41 +331,15 @@ function addUploadSection () {
   document.querySelectorAll('#galaxy_form table tr')[0].insertAdjacentHTML('afterend', sectionHTML)
   document.getElementById('teamview-upload').addEventListener('click', doUploadPlanets)
 
-  // document.onkeydown = function (e) {
-  //   e = e || window.event
-  //   if (!startedNavigation) {
-  //     switch (e.key || e.keyCode) {
-  //       case 'Enter':
-  //       case ' ':
-  //         doUploadPlanets()
-  //         break
-  //       case 'a':
-  //       case 'ArrowLeft':
-  //         doUploadPlanets()
-  //         location.assign("javascript:galaxy_submit('systemLeft')")
-  //         startedNavigation = true
-  //         break
-  //       case 'd':
-  //       case 'ArrowRight':
-  //         doUploadPlanets()
-  //         location.assign("javascript:galaxy_submit('systemRight')")
-  //         startedNavigation = true
-  //         break
-  //     }
-  //   }
-  // }
-
-  // make sure that clicking the default navigation buttons also uploads data
-  const dirs = ['systemRight', 'systemLeft', 'galaxyRight', 'galaxyLeft']
-  dirs.forEach(dir => {
-    const elm = Array.from(document.querySelectorAll('input')).find(e => e.type === 'button' && e.name === dir)
-    if (elm) {
-      elm.onclick = () => {
+  document.onkeydown = function (e) {
+    e = e || window.event
+    switch (e.key || e.keyCode) {
+      case 'Enter':
+      case ' ':
         doUploadPlanets()
-        location.assign(`javascript:galaxy_submit('${dir}')`)
-      }
+        break
     }
-  })
+  }
 }
 
 function modifyTable (data, modfiyFn) {
@@ -382,6 +355,7 @@ function modifyTable (data, modfiyFn) {
 }
 
 function init () {
+  if (!(window.location.search.includes('page=galaxy') && window.location.hash !== '#teamview-station')) return
   addColumn(2, ['Player Stats', 'Spio Info'])
   addUploadSection()
   modifyTable({}, modifyAddRankFromPopup)
@@ -391,7 +365,8 @@ function init () {
   const players = data.map(e => e.playerName)
   const uniquePlayers = Array.from(new Set(players))
   if (uniquePlayers.length) {
-    req.getPlayerData(uniquePlayers)
+    const namesArray = uniquePlayers.join(',')
+    genericRequest(`/v1/players/${namesArray}`, 'GET')
       .then(playerData => {
         return modifyTable(playerData, modifyAddPlayerStats)
       })

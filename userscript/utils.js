@@ -1,15 +1,4 @@
 /* globals  TM_setValue, TM_getValue */
-function GM_addStyle (css) { // eslint-disable-line camelcase
-  const style = document.getElementById('GM_addStyleBy8626') || (function () {
-    const style = document.createElement('style')
-    style.type = 'text/css'
-    style.id = 'GM_addStyleBy8626'
-    document.head.appendChild(style)
-    return style
-  })()
-  const sheet = style.sheet
-  sheet.insertRule(css, (sheet.rules || sheet.cssRules || []).length)
-}
 
 /**
  * Read the current active planet position from the planet menu.
@@ -116,15 +105,26 @@ function setTeamviewStatus (cssClass, text) {
   textElm.innerText = text
 }
 
+class Feature {
+  constructor (name, description = '') {
+    this.name = name
+    this.description = description
+  }
+
+  init () {
+    throw Error(`.init() method needs to be implemented by ${this.constructor.name}`)
+  }
+}
+
 module.exports = {
+  Feature,
   getCurrentPosition,
-  GM_addStyle, // eslint-disable-line camelcase
-  quantile,
-  makeTableSortable,
   loadSearchSettings,
-  saveSearchSettings,
-  teamviewDebugMode: TM_getValue('debug_mode') === 1,
-  setTeamviewStatus,
+  location2pos,
+  makeTableSortable,
   pos2location,
-  location2pos
+  quantile,
+  saveSearchSettings,
+  setTeamviewStatus,
+  teamviewDebugMode: TM_getValue('debug_mode') === 1
 }

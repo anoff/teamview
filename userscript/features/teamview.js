@@ -1,15 +1,11 @@
 'use strict'
 /* globals  TM_setValue, TM_getValue */
 
-const gv = require('./galaxyview')
-const pb = require('./planetBookmark')
-const sp = require('./spioParser')
-const fm = require('./fleetmenu')
 const { capitalCase } = require('change-case')
 
-const tabSearchPlanets = require('./ui/tabSearchPlanets')
-const tabSearchReports = require('./ui/tabSearchReports')
-const tabStatus = require('./ui/tabStatus')
+const tabSearchPlanets = require('../ui/tabSearchPlanets')
+const tabSearchReports = require('../ui/tabSearchReports')
+const tabStatus = require('../ui/tabStatus')
 
 function addTokenOption () {
   if (window.location.search.includes('page=settings')) {
@@ -59,6 +55,12 @@ function insertSelectorHtml (anchor) {
   })
 }
 
+/**
+ * Add the HTML code for fleet status at given anchor.
+ * This can be used to show the "fleet sent to xyz" message ususally visible in the galaxyview,
+ * even if teamview overlay is active.
+ * @param {Element} anchor DOM element to inject the fleet status HTML (before)
+ */
 function insertFleetStatusHtml (anchor) {
   const html = `<div>
     <table id="fleet-status" class="">
@@ -88,17 +90,10 @@ function removeFleetStatus () {
 }
 
 function init () {
-  if (window.location.search.includes('page=galaxy') && window.location.hash !== '#teamview-station') {
-    gv.init()
-    pb.init()
-  }
-
   addTokenOption()
-  sp.init()
-  fm.init()
 }
 
 module.exports = {
-  showStation,
-  init
+  init,
+  showStation
 }
