@@ -40,3 +40,11 @@ test('Fleet.restoreShields() does its job', t => {
   t.is(f.units[0].shield, SHIELDEXPECTED)
   t.is(f.units[1].shield, SHIELDEXPECTED)
 })
+
+test('Fleet.attackPower calcualtes sum of all fleet units', t => {
+  const f = new be.Fleet(dummies.player1, dummies.start1, dummies.target1)
+  f.addUnitId(204, 5)
+  f.spawnUnits()
+  const ATTACK_PER_SHIP = 50 * 1.8 // 50 base with battle tech 8
+  t.is(f.attackPower, ATTACK_PER_SHIP * 5)
+})

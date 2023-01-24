@@ -4,6 +4,65 @@ const gameUtils = require('./gameUtils')
 function calculateAttack (attackers, defenders) {
   const FLEET2DF = 0.4
   const DEF2DF = 0
+  const MAX_ROUNDS = 6
+
+  // calculate resources at start of the game
+  const resourcesInFight = {
+    attacker: {
+      total: 0,
+      metal: 0,
+      crystal: 0,
+      deuterium: 0
+    },
+    defender: {
+      total: 0,
+      metal: 0,
+      crystal: 0,
+      deuterium: 0
+    }
+  }
+  for (const fleet of attackers) {
+    for (const [id, count] of Object.entries(fleet.unitsById)) {
+      const stats = gameUtils.getUnitStatsById(id)
+      resourcesInFight.attacker.metal += stats.metal * count
+      resourcesInFight.attacker.crystal += stats.crystal * count
+      resourcesInFight.attacker.deuterium += stats.deuterium * count
+    }
+  }
+
+  let defenseSnapshot = null
+  for (const fleet of defenders) {
+    for (const [id, count] of Object.entries(fleet.unitsById)) {
+      const stats = gameUtils.getUnitStatsById(id)
+      resourcesInFight.attacker.metal += stats.metal * count
+      resourcesInFight.attacker.crystal += stats.crystal * count
+      resourcesInFight.attacker.deuterium += stats.deuterium * count
+      // snapshot of the defenses at start
+      if (id >= 400 && defenseSnapshot === null) {
+        defenseSnapshot = Object.assign({}, fleet.unitsById)
+        for (const key in defenseSnapshot) {
+          if (key < 400) delete defenseSnapshot[key]
+        }
+      }
+    }
+  }
+
+  // initialize fleet units
+  for (const fleet of attackers.concat(defenders)) {
+    fleet.spawnUnits()
+  }
+
+  // TODO: Check if any of the fleets has 0 attack power -> instant win
+  // start fighting
+  const roundStats = []
+  for (let round = 0; round <= MAX_ROUNDS; round++) {
+    const stats = fight(attackers, defenders)
+    roundStats.push(stats)
+    for (const fleet of attackers.concat(defenders)) {
+      fleet.destroy()
+      fleet.restoreShields()
+    }
+  }
 }
 
 /**
@@ -32,6 +91,7 @@ function fight (attackers, defenders) {
     statsDefender
   }
 }
+module.exports.fight = fight
 
 /**
  * Fire shot of a single ship against opposing fleets.
@@ -94,23 +154,9 @@ function shoot (unit, enemies, shooterStats) {
   }
 }
 
-function destroy (fleet) {
-  for (let i = fleet.units.length - 1; i >= 0; i--) {
-    const unit = fleet.units[i]
-    if (unit.armor <= 0 || unit.isExploded) {
-      fleet.units.splice(i, 1)
-      fleet.unitCount -= 1
-      fleet.unitsById[unit.id] -= 1
-    }
-  }
-}
-module.exports.destroy = destroy
+function initCombat (fleet, isFirstInit = false) {
 
-function initCombatValues (fleet, isFirstInit = false) {
-  return {
-    attackAmount: null,
-    attackArray: null
-  }
+  // init single ships
 }
 
 class BattleTechs {
@@ -174,11 +220,6 @@ class Unit {
   isShip () {
     return this.id >= 200 && this.id < 300
   }
-
-  static createUnit (unitId) {
-    const stats = gameUtils.getUnitStatsById(unitId)
-    return new Unit(unitId, stats.shield, stats.armour, stats.attack)
-  }
 }
 module.exports.Unit = Unit
 
@@ -216,7 +257,10 @@ class Fleet {
     if (this.units.length > 0) return
     for (const [id, count] of Object.entries(this.unitsById)) {
       for (let i = count; i > 0; i--) {
-        this.units.push(Unit.createUnit(id))
+        const stats = gameUtils.getUnitStatsById(id)
+        const bonus = this.player.battleTechs.bonus
+        const unit = new Unit(id, stats.shield * bonus.shield, stats.armour * bonus.armor, stats.attack * bonus.attack)
+        this.units.push(unit)
       }
     }
   }
@@ -245,6 +289,16 @@ class Fleet {
         this.unitsById[unit.id] -= 1
       }
     }
+  }
+
+  get attackPower () {
+    let attack = 0
+    for (const [id, count] of Object.entries(this.unitsById)) {
+      const stats = gameUtils.getUnitStatsById(id)
+      const techBoost = this.player.battleTechs.bonus.weapons
+      attack += stats.attack * techBoost * count
+    }
+    return attack
   }
 }
 
