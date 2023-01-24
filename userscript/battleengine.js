@@ -103,6 +103,7 @@ module.exports.destroy = destroy
 function restoreShields (fleets) {
 
 }
+module.exports.restoreShields = restoreShields
 
 function initCombatValues (fleets, isFirstInit = false) {
   return {

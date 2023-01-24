@@ -13,6 +13,7 @@ test('getUnitStatsById.204.string', t => {
   t.is(stats.name, 'lightFighter')
   t.is(stats.crystal, 1e3)
   t.is(stats.attack, 50)
+  t.is(stats.rapid[210], 5)
 })
 
 test('getUnitStatsById.406', t => {

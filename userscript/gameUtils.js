@@ -89,7 +89,11 @@ const shipValues = {
     shield: 10,
     armour: 400,
     attack: 5,
-    cargo: 5000
+    cargo: 5000,
+    rapid: {
+      spyProbe: 5,
+      solarSatellite: 5
+    }
   },
   heavyCargo: {
     metal: 6e3,
@@ -98,7 +102,11 @@ const shipValues = {
     shield: 25,
     armour: 1200,
     attack: 5,
-    cargo: 25e3
+    cargo: 25e3,
+    rapid: {
+      spyProbe: 5,
+      solarSatellite: 5
+    }
   },
   lightFighter: {
     metal: 3e3,
@@ -107,7 +115,11 @@ const shipValues = {
     shield: 10,
     armour: 400,
     attack: 50,
-    cargo: 50
+    cargo: 50,
+    rapid: {
+      spyProbe: 5,
+      solarSatellite: 5
+    }
   },
   heavyFighter: {
     metal: 6e3,
@@ -116,7 +128,12 @@ const shipValues = {
     shield: 25,
     armour: 1000,
     attack: 150,
-    cargo: 100
+    cargo: 100,
+    rapid: {
+      lightCargo: 3,
+      spyProbe: 5,
+      solarSatellite: 5
+    }
   },
   cruiser: {
     metal: 20e3,
@@ -125,7 +142,13 @@ const shipValues = {
     shield: 50,
     armour: 2700,
     attack: 400,
-    cargo: 800
+    cargo: 800,
+    rapid: {
+      lightFighter: 6,
+      spyProbe: 5,
+      solarSatellite: 5,
+      missileLauncher: 10
+    }
   },
   battleship: {
     metal: 45e3,
@@ -134,7 +157,11 @@ const shipValues = {
     shield: 200,
     armour: 6000,
     attack: 1000,
-    cargo: 1500
+    cargo: 1500,
+    rapid: {
+      spyProbe: 5,
+      solarSatellite: 5
+    }
   },
   colonyShip: {
     metal: 10e3,
@@ -143,7 +170,11 @@ const shipValues = {
     shield: 100,
     armour: 3000,
     attack: 50,
-    cargo: 7500
+    cargo: 7500,
+    rapid: {
+      spyProbe: 5,
+      solarSatellite: 5
+    }
   },
   recycler: {
     metal: 10e3,
@@ -152,7 +183,11 @@ const shipValues = {
     shield: 10,
     armour: 1600,
     attack: 1,
-    cargo: 20e3
+    cargo: 20e3,
+    rapid: {
+      spyProbe: 5,
+      solarSatellite: 5
+    }
   },
   spyProbe: {
     metal: 0,
@@ -170,7 +205,15 @@ const shipValues = {
     shield: 500,
     armour: 7500,
     attack: 1000,
-    cargo: 500
+    cargo: 500,
+    rapid: {
+      spyProbe: 5,
+      solarSatellite: 5,
+      missileLauncher: 20,
+      lightLaserTurret: 20,
+      heavyLaserTurret: 10,
+      ionCannon: 10
+    }
   },
   solarSatellite: {
     metal: 0,
@@ -188,7 +231,13 @@ const shipValues = {
     shield: 500,
     armour: 11e3,
     attack: 2e3,
-    cargo: 2e3
+    cargo: 2e3,
+    rapid: {
+      spyProbe: 5,
+      solarSatellite: 5,
+      battleCruiser: 2,
+      lightLaserTurret: 10
+    }
   },
   battleFortress: {
     metal: 5e6,
@@ -197,7 +246,27 @@ const shipValues = {
     shield: 50e3,
     armour: 90e3,
     attack: 200e3,
-    cargo: 1e3
+    cargo: 1e3,
+    rapid: {
+      lightCargo: 250,
+      heavyCargo: 250,
+      lightFighter: 200,
+      heavyFighter: 100,
+      cruiser: 33,
+      battleship: 30,
+      colonyShip: 250,
+      recycler: 250,
+      spyProbe: 1250,
+      planetBomber: 25,
+      solarSatellite: 1250,
+      starFighter: 5,
+      battleCruiser: 15,
+      missileLauncher: 200,
+      lightLaserTurret: 200,
+      heavyLaserTurret: 100,
+      gaussCannon: 50,
+      ionCannon: 100
+    }
   },
   battleCruiser: {
     metal: 30e3,
@@ -206,7 +275,16 @@ const shipValues = {
     shield: 400,
     armour: 7000,
     attack: 700,
-    cargo: 750
+    cargo: 750,
+    rapid: {
+      lightCargo: 3,
+      heavyCargo: 3,
+      heavyFighter: 4,
+      cruiser: 4,
+      battleship: 7,
+      spyProbe: 5,
+      solarSatellite: 5
+    }
   }
 }
 
@@ -313,9 +391,16 @@ function getStatsByItemId () {
     const data = {}
     if (v >= 200 && v < 300) {
       Object.assign(data, shipValues[name])
+      // convert rapidfire names to ship ids
+      for (const [rfN, rfV] of Object.entries(data.rapid || {})) {
+        const rfId = itemIds[`sh_${rfN}`] || itemIds[`def_${rfN}`]
+        data.rapid[rfId] = rfV
+        delete data.rapid[rfN]
+      }
     } else if (v >= 400 && v < 500) {
       Object.assign(data, defenseValues[name])
     }
+
     data.name = name
     stats.set(v, data)
   }
