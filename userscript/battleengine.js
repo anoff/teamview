@@ -85,7 +85,13 @@ function shoot (unit, enemies, shooterStats) {
   } // else bounce off of shields
 
   // check for rapidfire
-  // TODO: check for rapidfire (add to stats)
+  const rapidFire = gameUtils.getUnitStatsById(unit.id)?.rapid[victimUnit.id]
+  if (rapidFire > 0) {
+    const chance = Math.random()
+    if (chance < (rapidFire - 1) / rapidFire) { // TODO: check if this is the same chance as the php implementation of `rand(0, $count) < $count`
+      shoot(unit, enemies, shooterStats)
+    }
+  }
 }
 
 function destroy (fleet) {
@@ -94,18 +100,13 @@ function destroy (fleet) {
     if (unit.armor <= 0 || unit.isExploded) {
       fleet.units.splice(i, 1)
       fleet.unitCount -= 1
-      fleet.unitsByType[unit.type] -= 1
+      fleet.unitsById[unit.id] -= 1
     }
   }
 }
 module.exports.destroy = destroy
 
-function restoreShields (fleets) {
-
-}
-module.exports.restoreShields = restoreShields
-
-function initCombatValues (fleets, isFirstInit = false) {
+function initCombatValues (fleet, isFirstInit = false) {
   return {
     attackAmount: null,
     attackArray: null
@@ -162,8 +163,8 @@ module.exports.Location = Location
 
 class Unit {
   isExploded = false
-  constructor (unitType, shield, armor, attack) {
-    this.type = unitType
+  constructor (unitId, shield, armor, attack) {
+    this.id = unitId
     this.shield = shield
     this.armor = armor
     this.attack = attack
@@ -171,21 +172,20 @@ class Unit {
   }
 
   isShip () {
-    return this.type >= 200 && this.type < 300
+    return this.id >= 200 && this.id < 300
   }
 
-  static createUnit (unitType) {
-    const stats = gameUtils.getUnitStatsById(unitType)
-    return new Unit(unitType, stats.shield, stats.armour, stats.attack)
+  static createUnit (unitId) {
+    const stats = gameUtils.getUnitStatsById(unitId)
+    return new Unit(unitId, stats.shield, stats.armour, stats.attack)
   }
 }
 module.exports.Unit = Unit
 
 class Fleet {
-  unitsByType = {}
+  unitsById = {}
   units = []
   unitCount = 0
-  referenceUnits = new Map() // one reference unit of each used type to copy initial armor/shield values from
 
   constructor (player, startLocation, targetLocation) {
     this.player = player
@@ -194,29 +194,55 @@ class Fleet {
   }
 
   /**
-   * Add a number of one specific unit (ship or defense) type to the fleet.
-   * @param {int} unitType The unit type to add e.g. 204 for light fighter
-   * @param {int} count number of units of this type in the fleet
+   * Add a number of one specific unit (ship or defense) id to the fleet.
+   * @param {int} unitId The unit id to add e.g. 204 for light fighter
+   * @param {int} count number of units of this id in the fleet
    */
-  addUnitType (unitType, count) {
-    const types = Object.keys(this.unitsByType)
-    if (types.includes(unitType)) {
-      this.unitsByType[unitType] += count
+  addUnitId (unitId, count) {
+    const ids = Object.keys(this.unitsById)
+    if (ids.includes(unitId)) {
+      this.unitsById[unitId] += count
     } else {
-      this.unitsByType[unitType] = count
+      this.unitsById[unitId] = count
     }
     this.unitCount += count
   }
 
   /**
-   * Populate the .units property with one unit for each count of .unitsByType.
+   * Populate the .units property with one unit for each count of .unitsById.
    * Does nothing if .units already has elements.
    */
   spawnUnits () {
     if (this.units.length > 0) return
-    for (const [id, count] of Object.entries(this.unitsByType)) {
+    for (const [id, count] of Object.entries(this.unitsById)) {
       for (let i = count; i > 0; i--) {
         this.units.push(Unit.createUnit(id))
+      }
+    }
+  }
+
+  /**
+   * Restore shield of each unit to full power.
+   */
+  restoreShields () {
+    for (let i = this.units.length - 1; i >= 0; i--) {
+      const unit = this.units[i]
+      const shield = gameUtils.getUnitStatsById(unit.id).shield
+      const techBoost = this.player.battleTechs.bonus.shield
+      this.units[i].shield = shield * techBoost
+    }
+  }
+
+  /**
+   * Remove destroyed units.
+   */
+  destroy () {
+    for (let i = this.units.length - 1; i >= 0; i--) {
+      const unit = this.units[i]
+      if (unit.armor <= 0 || unit.isExploded) {
+        this.units.splice(i, 1)
+        this.unitCount -= 1
+        this.unitsById[unit.id] -= 1
       }
     }
   }
