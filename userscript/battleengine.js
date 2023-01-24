@@ -56,6 +56,9 @@ function calculateAttack (attackers, defenders) {
   // start fighting
   const roundStats = []
   for (let round = 0; round <= MAX_ROUNDS; round++) {
+    const attackersPower = attackers.reduce((p, f) => p + f.attackPower, 0)
+    const defendersPower = defenders.reduce((p, f) => p + f.attackPower, 0)
+    if (attackersPower <= 0 || defendersPower <= 0) break
     const stats = fight(attackers, defenders)
     roundStats.push(stats)
     for (const fleet of attackers.concat(defenders)) {
@@ -64,6 +67,7 @@ function calculateAttack (attackers, defenders) {
     }
   }
 }
+module.exports.calculateAttack = calculateAttack
 
 /**
  * Fight one round.
@@ -71,18 +75,18 @@ function calculateAttack (attackers, defenders) {
  * @param {[Fleet]} defenders list of defender Fleets
  */
 function fight (attackers, defenders) {
-  const statsAttacker = new Map({ totalDamage: 0, absorbedByShields: 0 })
-  const statsDefender = new Map({ totalDamage: 0, absorbedByShields: 0 })
+  const statsAttacker = { totalDamage: 0, absorbedByShields: 0 }
+  const statsDefender = { totalDamage: 0, absorbedByShields: 0 }
 
   for (const fleet of attackers) {
     for (const unit of fleet.units) {
-      shoot(fleet.player.id, unit, defenders, statsAttacker)
+      shoot(unit, defenders, statsAttacker)
     }
   }
 
   for (const fleet of defenders) {
     for (const unit of fleet.units) {
-      shoot(fleet.player.id, unit, attackers, statsDefender)
+      shoot(unit, attackers, statsDefender)
     }
   }
 
@@ -100,7 +104,7 @@ module.exports.fight = fight
  * PHP code _attackers_ is not needed for sim-only
  * @param {Unit} unit the firing unit
  * @param {[Fleet]} enemies array containing all target Fleets
- * @param {Map[string,int]} shooterStats stats for totalDamage and absorbedByShield
+ * @param {Object[string,int]} shooterStats stats for totalDamage and absorbedByShield
  */
 function shoot (unit, enemies, shooterStats) {
   const enemyUnitCount = enemies
@@ -152,11 +156,6 @@ function shoot (unit, enemies, shooterStats) {
       shoot(unit, enemies, shooterStats)
     }
   }
-}
-
-function initCombat (fleet, isFirstInit = false) {
-
-  // init single ships
 }
 
 class BattleTechs {
