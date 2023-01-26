@@ -3,12 +3,14 @@ const be = require('./battleengine')
 
 const dummies = {
   player1: new be.Player(1, 'player1', new be.BattleTechs(8, 6, 7), new be.EngineTechs(8, 5, 3)),
+  bt1: new be.BattleTechs(8, 6, 7),
+  bt2: new be.BattleTechs(5, 7, 10),
   player2: new be.Player(1, 'player2', new be.BattleTechs(5, 7, 10), new be.EngineTechs(1, 2, 4)),
   start1: new be.Location(1, 33, 7),
   target1: new be.Location(1, 33, 8)
 }
 test('Fleet creation', t => {
-  const f = new be.Fleet(dummies.player1, dummies.start1, dummies.target1)
+  const f = new be.Fleet(dummies.bt1)
   f.addUnitId(204, 5)
   f.spawnUnits()
   t.is(f.unitCount, 5)
@@ -16,7 +18,7 @@ test('Fleet creation', t => {
 })
 
 test('Fleet.destroy() removes if armor drops', t => {
-  const f = new be.Fleet(dummies.player1, dummies.start1, dummies.target1)
+  const f = new be.Fleet(dummies.bt1)
   f.addUnitId(204, 5)
   f.spawnUnits()
 
@@ -28,7 +30,7 @@ test('Fleet.destroy() removes if armor drops', t => {
 })
 
 test('Fleet.restoreShields() does its job', t => {
-  const f = new be.Fleet(dummies.player1, dummies.start1, dummies.target1)
+  const f = new be.Fleet(dummies.bt1)
   f.addUnitId(204, 5)
   f.spawnUnits()
 
@@ -43,7 +45,7 @@ test('Fleet.restoreShields() does its job', t => {
 })
 
 test('Fleet.attackPower calcualtes sum of all fleet units', t => {
-  const f = new be.Fleet(dummies.player1, dummies.start1, dummies.target1)
+  const f = new be.Fleet(dummies.bt1)
   f.addUnitId(204, 5)
   f.spawnUnits()
   const ATTACK_PER_SHIP = 50 * 1.8 // 50 base with battle tech 8
@@ -51,9 +53,9 @@ test('Fleet.attackPower calcualtes sum of all fleet units', t => {
 })
 
 test.skip('pick a fight', t => {
-  const a1 = new be.Fleet(dummies.player1, dummies.start1, dummies.target1)
-  const a2 = new be.Fleet(dummies.player1, dummies.start1, dummies.target1)
-  const d1 = new be.Fleet(dummies.player2, dummies.target1, dummies.target1)
+  const a1 = new be.Fleet(dummies.bt1)
+  const a2 = new be.Fleet(dummies.bt1, 1)
+  const d1 = new be.Fleet(dummies.bt2)
   a1.addUnitId(204, 20)
   a2.addUnitId(203, 1)
 
@@ -66,9 +68,9 @@ test.skip('pick a fight', t => {
 })
 
 test('pick another fight', t => {
-  const a1 = new be.Fleet(dummies.player1, dummies.start1, dummies.target1)
-  const a2 = new be.Fleet(dummies.player1, dummies.start1, dummies.target1)
-  const d1 = new be.Fleet(dummies.player2, dummies.target1, dummies.target1)
+  const a1 = new be.Fleet(dummies.bt1)
+  const a2 = new be.Fleet(dummies.bt1, 1)
+  const d1 = new be.Fleet(dummies.bt2)
   a1.addUnitId(204, 20)
   a2.addUnitId(203, 1)
   a2.addUnitId(207, 4)

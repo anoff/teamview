@@ -54,9 +54,9 @@ function calculateAttack (attackers, defenders) {
 
   if (DO_LOGS) {
     console.log('Attackers:')
-    attackers.forEach(f => console.log(`${f.player.name}: Weapons=${f.player.battleTechs.weapons}, Shield=${f.player.battleTechs.shield}, Armor=${f.player.battleTechs.armor}`))
+    attackers.forEach(f => console.log(`${f.slot}: Weapons=${f.battleTechs.weapons}, Shield=${f.battleTechs.shield}, Armor=${f.battleTechs.armor}`))
     console.log('Defenders:')
-    defenders.forEach(f => console.log(`${f.player.name}: Weapons=${f.player.battleTechs.weapons}, Shield=${f.player.battleTechs.shield}, Armor=${f.player.battleTechs.armor}`))
+    defenders.forEach(f => console.log(`${f.slot}: Weapons=${f.battleTechs.weapons}, Shield=${f.battleTechs.shield}, Armor=${f.battleTechs.armor}`))
   }
   // start fighting
   const roundStats = []
@@ -128,13 +128,19 @@ function calculateAttack (attackers, defenders) {
     winner = 'attacker'
   }
 
+  const losses = calculateLosses(attackers, defenders)
   if (DO_LOGS) {
-    const losses = calculateLosses(attackers, defenders)
     console.log(`Done fighting ${round}/${MAX_ROUNDS} rounds`)
     console.log(`Winner: ${winner}`)
     console.log(`Attackers lost: ${losses.attackers.lostRes.metal + losses.attackers.lostRes.crystal} units`)
     console.log(`Defenders lost: ${losses.defenders.lostRes.metal + losses.defenders.lostRes.crystal} units`)
     console.log('\n')
+  }
+
+  return {
+    winner,
+    losses,
+    roundStats
   }
 }
 module.exports.calculateAttack = calculateAttack
@@ -300,10 +306,9 @@ class Fleet {
   units = []
   unitCount = 0
 
-  constructor (player, startLocation, targetLocation) {
-    this.player = player
-    this.startLocation = startLocation
-    this.targetLocation = targetLocation
+  constructor (battleTechs, slot = 0) {
+    this.slot = slot
+    this.battleTechs = battleTechs
   }
 
   /**
@@ -312,6 +317,7 @@ class Fleet {
    * @param {int} count number of units of this id in the fleet
    */
   addUnitId (unitId, count) {
+    if (unitId < 200 || unitId >= 500) return
     const ids = Object.keys(this.unitsById)
     if (ids.includes(unitId)) {
       this.unitsById[unitId] += count
@@ -330,7 +336,7 @@ class Fleet {
     for (const [id, count] of Object.entries(this.unitsById)) {
       for (let i = count; i > 0; i--) {
         const stats = gameUtils.getUnitStatsById(id)
-        const bonus = this.player.battleTechs.bonus
+        const bonus = this.battleTechs.bonus
         const unit = new Unit(parseInt(id), stats.shield * bonus.shield, stats.armour * bonus.armor, stats.attack * bonus.weapons)
         this.units.push(unit)
       }
@@ -344,7 +350,7 @@ class Fleet {
     for (let i = this.units.length - 1; i >= 0; i--) {
       const unit = this.units[i]
       const shield = gameUtils.getUnitStatsById(unit.id).shield
-      const techBoost = this.player.battleTechs.bonus.shield
+      const techBoost = this.battleTechs.bonus.shield
       this.units[i].shield = shield * techBoost
     }
   }
@@ -369,7 +375,7 @@ class Fleet {
     let attack = 0
     for (const [id, count] of Object.entries(this.unitsById)) {
       const stats = gameUtils.getUnitStatsById(id)
-      const techBoost = this.player.battleTechs.bonus.weapons
+      const techBoost = this.battleTechs.bonus.weapons
       attack += stats.attack * techBoost * count
     }
     return attack
