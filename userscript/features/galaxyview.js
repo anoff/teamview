@@ -330,6 +330,7 @@ function addUploadSection () {
   `
   document.querySelectorAll('#galaxy_form table tr')[0].insertAdjacentHTML('afterend', sectionHTML)
   document.getElementById('teamview-upload').addEventListener('click', doUploadPlanets)
+  document.getElementById('gala_sync').addEventListener('click', doUploadPlanets)
 
   document.onkeydown = function (e) {
     e = e || window.event
