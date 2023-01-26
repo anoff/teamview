@@ -50,7 +50,7 @@ test('Fleet.attackPower calcualtes sum of all fleet units', t => {
   t.is(f.attackPower, ATTACK_PER_SHIP * 5)
 })
 
-test('pick a fight', t => {
+test.skip('pick a fight', t => {
   const a1 = new be.Fleet(dummies.player1, dummies.start1, dummies.target1)
   const a2 = new be.Fleet(dummies.player1, dummies.start1, dummies.target1)
   const d1 = new be.Fleet(dummies.player2, dummies.target1, dummies.target1)
@@ -62,4 +62,20 @@ test('pick a fight', t => {
   d1.addUnitId(407, 1)
 
   be.calculateAttack([a1, a2], [d1])
+  t.pass()
+})
+
+test('pick another fight', t => {
+  const a1 = new be.Fleet(dummies.player1, dummies.start1, dummies.target1)
+  const a2 = new be.Fleet(dummies.player1, dummies.start1, dummies.target1)
+  const d1 = new be.Fleet(dummies.player2, dummies.target1, dummies.target1)
+  a1.addUnitId(204, 20)
+  a2.addUnitId(203, 1)
+  a2.addUnitId(207, 4)
+
+  d1.addUnitId(401, 5)
+  d1.addUnitId(402, 3)
+
+  be.calculateAttack([a1, a2], [d1])
+  t.pass()
 })

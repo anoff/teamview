@@ -1,5 +1,5 @@
 const gameUtils = require('./gameUtils')
-// { itemIds, defenseValues, shipValues }
+const DO_LOGS = true
 
 function calculateAttack (attackers, defenders) {
   const FLEET2DF = 0.4
@@ -52,19 +52,89 @@ function calculateAttack (attackers, defenders) {
     fleet.spawnUnits()
   }
 
-  // TODO: Check if any of the fleets has 0 attack power -> instant win
+  if (DO_LOGS) {
+    console.log('Attackers:')
+    attackers.forEach(f => console.log(`${f.player.name}: Weapons=${f.player.battleTechs.weapons}, Shield=${f.player.battleTechs.shield}, Armor=${f.player.battleTechs.armor}`))
+    console.log('Defenders:')
+    defenders.forEach(f => console.log(`${f.player.name}: Weapons=${f.player.battleTechs.weapons}, Shield=${f.player.battleTechs.shield}, Armor=${f.player.battleTechs.armor}`))
+  }
   // start fighting
   const roundStats = []
-  for (let round = 0; round <= MAX_ROUNDS; round++) {
+  let round = 0
+  for (round = 1; round <= MAX_ROUNDS; round++) {
     const attackersPower = attackers.reduce((p, f) => p + f.attackPower, 0)
     const defendersPower = defenders.reduce((p, f) => p + f.attackPower, 0)
-    if (attackersPower <= 0 || defendersPower <= 0) break
+    if (attackersPower <= 0 || defendersPower <= 0) {
+      round -= 1
+      break
+    }
     const stats = fight(attackers, defenders)
     roundStats.push(stats)
     for (const fleet of attackers.concat(defenders)) {
       fleet.destroy()
       fleet.restoreShields()
     }
+    const attackersCount = attackers.reduce((p, f) => p + f.unitCount, 0)
+    const defendersCount = defenders.reduce((p, f) => p + f.unitCount, 0)
+    if (DO_LOGS) {
+      console.log(`Round ${round}:`)
+      console.log(`Attackers deals ${stats.statsAttacker.totalDamage} total damage, ${stats.statsAttacker.absorbedByShields} absorbed by enemy shields`)
+      console.log(`Defenders deals ${stats.statsDefender.totalDamage} total damage, ${stats.statsDefender.absorbedByShields} absorbed by enemy shields`)
+      console.log(`Remaining units: Attackers=${attackersCount} Defenders=${defendersCount}`)
+    }
+  }
+
+  function calculateLosses (attackers, defenders) {
+    const stats = {
+      attackers: {
+        lostUnits: {},
+        lostRes: { metal: 0, crystal: 0, deuterium: 0 },
+        debris: { metal: 0, crystal: 0, deuterium: 0 }
+      },
+      defenders: {
+        lostUnits: {},
+        lostRes: { metal: 0, crystal: 0, deuterium: 0 },
+        debris: { metal: 0, crystal: 0, deuterium: 0 }
+      }
+    }
+    // calculate losses & debris field
+    function calcLostUnits (fleets) {
+      return fleets.reduce((p, fleet) => Fleet.sumUnitsById(p, fleet.lostUnitsById), {})
+    }
+    stats.attackers.lostUnits = calcLostUnits(attackers)
+    stats.defenders.lostUnits = calcLostUnits(defenders)
+    function calcLostRes (lostUnits) {
+      return Object.keys(lostUnits)
+        .reduce((p, id) => {
+          const stats = gameUtils.getUnitStatsById(id)
+          p.metal += stats.metal * lostUnits[id]
+          p.crystal += stats.crystal * lostUnits[id]
+          p.deuterium += stats.deuterium * lostUnits[id]
+          return p
+        }, { metal: 0, crystal: 0, deuterium: 0 })
+    }
+    stats.attackers.lostRes = calcLostRes(stats.attackers.lostUnits)
+    stats.defenders.lostRes = calcLostRes(stats.defenders.lostUnits)
+    return stats
+  }
+
+  // define winner
+  const attackersPower = attackers.reduce((p, f) => p + f.attackPower, 0)
+  const defendersPower = defenders.reduce((p, f) => p + f.attackPower, 0)
+  let winner = 'draw'
+  if (attackersPower <= 0 && defendersPower > 0) {
+    winner = 'defender'
+  } else if (attackersPower > 0 && defendersPower <= 0) {
+    winner = 'attacker'
+  }
+
+  if (DO_LOGS) {
+    const losses = calculateLosses(attackers, defenders)
+    console.log(`Done fighting ${round}/${MAX_ROUNDS} rounds`)
+    console.log(`Winner: ${winner}`)
+    console.log(`Attackers lost: ${losses.attackers.lostRes.metal + losses.attackers.lostRes.crystal} units`)
+    console.log(`Defenders lost: ${losses.defenders.lostRes.metal + losses.defenders.lostRes.crystal} units`)
+    console.log('\n')
   }
 }
 module.exports.calculateAttack = calculateAttack
@@ -114,12 +184,13 @@ function shoot (unit, enemies, shooterStats) {
 
   // select target unit
   let unitCount = 0
-  let victimUnit = 0
+  let victimUnit = null
   for (const fleet of enemies) {
     unitCount += fleet.unitCount
     if (randomEnemyUnitIx < unitCount) {
       const victimUnitIx = Math.round(Math.random() * (fleet.unitCount - 1))
       victimUnit = fleet.units[victimUnitIx]
+      break
     }
   }
 
@@ -149,7 +220,7 @@ function shoot (unit, enemies, shooterStats) {
   } // else bounce off of shields
 
   // check for rapidfire
-  const rapidFire = gameUtils.getUnitStatsById(unit.id)?.rapid[victimUnit.id]
+  const rapidFire = gameUtils.getUnitStatsById(unit.id)?.rapid?.[victimUnit.id]
   if (rapidFire > 0) {
     const chance = Math.random()
     if (chance < (rapidFire - 1) / rapidFire) { // TODO: check if this is the same chance as the php implementation of `rand(0, $count) < $count`
@@ -217,13 +288,15 @@ class Unit {
   }
 
   isShip () {
-    return this.id >= 200 && this.id < 300
+    const id = parseInt(this.id)
+    return id >= 200 && id < 300
   }
 }
 module.exports.Unit = Unit
 
 class Fleet {
   unitsById = {}
+  lostUnitsById = {}
   units = []
   unitCount = 0
 
@@ -258,7 +331,7 @@ class Fleet {
       for (let i = count; i > 0; i--) {
         const stats = gameUtils.getUnitStatsById(id)
         const bonus = this.player.battleTechs.bonus
-        const unit = new Unit(id, stats.shield * bonus.shield, stats.armour * bonus.armor, stats.attack * bonus.attack)
+        const unit = new Unit(parseInt(id), stats.shield * bonus.shield, stats.armour * bonus.armor, stats.attack * bonus.weapons)
         this.units.push(unit)
       }
     }
@@ -286,6 +359,8 @@ class Fleet {
         this.units.splice(i, 1)
         this.unitCount -= 1
         this.unitsById[unit.id] -= 1
+        if (this.lostUnitsById[unit.id] === undefined) this.lostUnitsById[unit.id] = 0
+        this.lostUnitsById[unit.id] += 1
       }
     }
   }
@@ -298,6 +373,21 @@ class Fleet {
       attack += stats.attack * techBoost * count
     }
     return attack
+  }
+
+  /**
+   * Sum up two unit count objects.
+   * @param {object} obj1 an object listing fleet unit count by id { '204': 4 }
+   * @param {object} obj2 an object listing fleet unit count by id { '204': 4 }
+   */
+  static sumUnitsById (obj1, obj2) {
+    const result = {}
+    Object.assign(result, obj1)
+    for (const [id, count] of Object.entries(obj2)) {
+      if (result[id] === undefined) result[id] = 0
+      result[id] += count
+    }
+    return result
   }
 }
 
