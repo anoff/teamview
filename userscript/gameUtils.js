@@ -87,7 +87,7 @@ const shipValues = {
     crystal: 2e3,
     deuterium: 0,
     shield: 10,
-    armour: 40,
+    armour: 400,
     attack: 5,
     cargo: 5000,
     rapid: {
@@ -100,7 +100,7 @@ const shipValues = {
     crystal: 6e3,
     deuterium: 0,
     shield: 25,
-    armour: 120,
+    armour: 1200,
     attack: 5,
     cargo: 25e3,
     rapid: {
@@ -113,7 +113,7 @@ const shipValues = {
     crystal: 1e3,
     deuterium: 0,
     shield: 10,
-    armour: 40,
+    armour: 400,
     attack: 50,
     cargo: 50,
     rapid: {
@@ -126,7 +126,7 @@ const shipValues = {
     crystal: 4e3,
     deuterium: 0,
     shield: 25,
-    armour: 100,
+    armour: 1000,
     attack: 150,
     cargo: 100,
     rapid: {
@@ -155,7 +155,7 @@ const shipValues = {
     crystal: 15e3,
     deuterium: 0,
     shield: 200,
-    armour: 600,
+    armour: 6000,
     attack: 1000,
     cargo: 1500,
     rapid: {
@@ -168,7 +168,7 @@ const shipValues = {
     crystal: 20e3,
     deuterium: 10e3,
     shield: 100,
-    armour: 300,
+    armour: 3000,
     attack: 50,
     cargo: 7500,
     rapid: {
@@ -181,7 +181,7 @@ const shipValues = {
     crystal: 6e3,
     deuterium: 2e3,
     shield: 10,
-    armour: 160,
+    armour: 1600,
     attack: 1,
     cargo: 20e3,
     rapid: {
@@ -194,7 +194,7 @@ const shipValues = {
     crystal: 1e3,
     deuterium: 0,
     shield: 0.01,
-    armour: 10,
+    armour: 100,
     attack: 0.01,
     cargo: 5
   },
@@ -203,7 +203,7 @@ const shipValues = {
     crystal: 25e3,
     deuterium: 15e3,
     shield: 500,
-    armour: 750,
+    armour: 7500,
     attack: 1000,
     cargo: 500,
     rapid: {
@@ -220,7 +220,7 @@ const shipValues = {
     crystal: 2e3,
     deuterium: 500,
     shield: 1,
-    armour: 20,
+    armour: 200,
     attack: 1,
     cargo: 0
   },
@@ -229,7 +229,7 @@ const shipValues = {
     crystal: 50e3,
     deuterium: 15e3,
     shield: 500,
-    armour: 11e2,
+    armour: 11e3,
     attack: 2e3,
     cargo: 2e3,
     rapid: {
@@ -244,7 +244,7 @@ const shipValues = {
     crystal: 4e6,
     deuterium: 1e6,
     shield: 50e3,
-    armour: 90e2,
+    armour: 9e5,
     attack: 200e3,
     cargo: 1e3,
     rapid: {
@@ -273,7 +273,7 @@ const shipValues = {
     crystal: 40e3,
     deuterium: 15e3,
     shield: 400,
-    armour: 700,
+    armour: 7000,
     attack: 700,
     cargo: 750,
     rapid: {
