@@ -87,7 +87,7 @@ const shipValues = {
     crystal: 2e3,
     deuterium: 0,
     shield: 10,
-    armour: 400,
+    armour: 40,
     attack: 5,
     cargo: 5000,
     rapid: {
@@ -100,7 +100,7 @@ const shipValues = {
     crystal: 6e3,
     deuterium: 0,
     shield: 25,
-    armour: 1200,
+    armour: 120,
     attack: 5,
     cargo: 25e3,
     rapid: {
@@ -113,7 +113,7 @@ const shipValues = {
     crystal: 1e3,
     deuterium: 0,
     shield: 10,
-    armour: 400,
+    armour: 40,
     attack: 50,
     cargo: 50,
     rapid: {
@@ -126,7 +126,7 @@ const shipValues = {
     crystal: 4e3,
     deuterium: 0,
     shield: 25,
-    armour: 1000,
+    armour: 100,
     attack: 150,
     cargo: 100,
     rapid: {
@@ -140,7 +140,7 @@ const shipValues = {
     crystal: 7e3,
     deuterium: 2e3,
     shield: 50,
-    armour: 2700,
+    armour: 270,
     attack: 400,
     cargo: 800,
     rapid: {
@@ -155,7 +155,7 @@ const shipValues = {
     crystal: 15e3,
     deuterium: 0,
     shield: 200,
-    armour: 6000,
+    armour: 600,
     attack: 1000,
     cargo: 1500,
     rapid: {
@@ -168,7 +168,7 @@ const shipValues = {
     crystal: 20e3,
     deuterium: 10e3,
     shield: 100,
-    armour: 3000,
+    armour: 300,
     attack: 50,
     cargo: 7500,
     rapid: {
@@ -181,7 +181,7 @@ const shipValues = {
     crystal: 6e3,
     deuterium: 2e3,
     shield: 10,
-    armour: 1600,
+    armour: 160,
     attack: 1,
     cargo: 20e3,
     rapid: {
@@ -194,7 +194,7 @@ const shipValues = {
     crystal: 1e3,
     deuterium: 0,
     shield: 0.01,
-    armour: 100,
+    armour: 10,
     attack: 0.01,
     cargo: 5
   },
@@ -203,7 +203,7 @@ const shipValues = {
     crystal: 25e3,
     deuterium: 15e3,
     shield: 500,
-    armour: 7500,
+    armour: 750,
     attack: 1000,
     cargo: 500,
     rapid: {
@@ -220,7 +220,7 @@ const shipValues = {
     crystal: 2e3,
     deuterium: 500,
     shield: 1,
-    armour: 200,
+    armour: 20,
     attack: 1,
     cargo: 0
   },
@@ -229,7 +229,7 @@ const shipValues = {
     crystal: 50e3,
     deuterium: 15e3,
     shield: 500,
-    armour: 11e3,
+    armour: 11e2,
     attack: 2e3,
     cargo: 2e3,
     rapid: {
@@ -244,7 +244,7 @@ const shipValues = {
     crystal: 4e6,
     deuterium: 1e6,
     shield: 50e3,
-    armour: 90e3,
+    armour: 90e2,
     attack: 200e3,
     cargo: 1e3,
     rapid: {
@@ -273,7 +273,7 @@ const shipValues = {
     crystal: 40e3,
     deuterium: 15e3,
     shield: 400,
-    armour: 7000,
+    armour: 700,
     attack: 700,
     cargo: 750,
     rapid: {
@@ -294,7 +294,7 @@ const defenseValues = {
     crystal: 0,
     deuterium: 0,
     shield: 20,
-    armour: 2000,
+    armour: 200,
     attack: 80
   },
   lightLaserTurret: {
@@ -302,7 +302,7 @@ const defenseValues = {
     crystal: 500,
     deuterium: 0,
     shield: 25,
-    armour: 2000,
+    armour: 200,
     attack: 100
   },
   heavyLaserTurret: {
@@ -310,7 +310,7 @@ const defenseValues = {
     crystal: 2000,
     deuterium: 0,
     shield: 100,
-    armour: 8000,
+    armour: 800,
     attack: 250
   },
   gaussCannon: {
@@ -318,7 +318,7 @@ const defenseValues = {
     crystal: 15e3,
     deuterium: 2e3,
     shield: 200,
-    armour: 35e3,
+    armour: 35e2,
     attack: 1100
   },
   ionCannon: {
@@ -326,7 +326,7 @@ const defenseValues = {
     crystal: 3e3,
     deuterium: 0,
     shield: 500,
-    armour: 8000,
+    armour: 800,
     attack: 150
   },
   plasmaCannon: {
@@ -334,7 +334,7 @@ const defenseValues = {
     crystal: 50e3,
     deuterium: 30e3,
     shield: 300,
-    armour: 100e3,
+    armour: 100e2,
     attack: 3e3
   },
   smallShieldDome: {
@@ -342,7 +342,7 @@ const defenseValues = {
     crystal: 10e3,
     deuterium: 0,
     shield: 2000,
-    armour: 20e3,
+    armour: 20e2,
     attack: 0
   },
   largeShieldDome: {
@@ -350,7 +350,7 @@ const defenseValues = {
     crystal: 50e3,
     deuterium: 0,
     shield: 10e3,
-    armour: 100e3,
+    armour: 100e2,
     attack: 0
   },
   interceptor: {
@@ -358,7 +358,7 @@ const defenseValues = {
     crystal: 0,
     deuterium: 2e3,
     shield: 1,
-    armour: 8000,
+    armour: 800,
     attack: 1
   },
   interplanetaryMissiles: {
@@ -366,7 +366,7 @@ const defenseValues = {
     crystal: 2500,
     deuterium: 10e3,
     shield: 1,
-    armour: 15e3,
+    armour: 15e2,
     attack: 12e3
   }
 }
