@@ -1,7 +1,6 @@
 const gameUtils = require('./gameUtils')
-const DO_LOGS = true
 
-function calculateAttack (attackers, defenders) {
+function calculateAttack (attackers, defenders, debugLog = false) {
   const FLEET2DF = 0.4
   const DEF2DF = 0
   const MAX_ROUNDS = 6
@@ -52,7 +51,7 @@ function calculateAttack (attackers, defenders) {
     fleet.spawnUnits()
   }
 
-  if (DO_LOGS) {
+  if (debugLog) {
     console.log('Attackers:')
     attackers.forEach(f => console.log(`${f.slot}: Weapons=${f.battleTechs.weapons}, Shield=${f.battleTechs.shield}, Armor=${f.battleTechs.armor}`))
     console.log('Defenders:')
@@ -61,7 +60,7 @@ function calculateAttack (attackers, defenders) {
   // start fighting
   const roundStats = []
   let round = 0
-  for (round = 1; round <= MAX_ROUNDS; round++) {
+  for (round = 1; round < MAX_ROUNDS; round++) {
     const attackersPower = attackers.reduce((p, f) => p + f.attackPower, 0)
     const defendersPower = defenders.reduce((p, f) => p + f.attackPower, 0)
     if (attackersPower <= 0 || defendersPower <= 0) {
@@ -76,11 +75,21 @@ function calculateAttack (attackers, defenders) {
     }
     const attackersCount = attackers.reduce((p, f) => p + f.unitCount, 0)
     const defendersCount = defenders.reduce((p, f) => p + f.unitCount, 0)
-    if (DO_LOGS) {
+    if (debugLog) {
       console.log(`Round ${round}:`)
       console.log(`Attackers deals ${stats.statsAttacker.totalDamage} total damage, ${stats.statsAttacker.absorbedByShields} absorbed by enemy shields`)
       console.log(`Defenders deals ${stats.statsDefender.totalDamage} total damage, ${stats.statsDefender.absorbedByShields} absorbed by enemy shields`)
       console.log(`Remaining units: Attackers=${attackersCount} Defenders=${defendersCount}`)
+      const attackersLost = attackers.reduce((p, c) => Fleet.sumUnitsById(p, c.lostUnitsById), {})
+      const attackersLostStr = Object.entries(attackersLost)
+        .map(elm => `${gameUtils.getUnitStatsById(elm[0]).name}=${elm[1]}`)
+        .join(', ')
+      const defendersLost = defenders.reduce((p, c) => Fleet.sumUnitsById(p, c.lostUnitsById), {})
+      const defendersLostStr = Object.entries(defendersLost)
+        .map(elm => `${gameUtils.getUnitStatsById(elm[0]).name}=${elm[1]}`)
+        .join(', ')
+      console.log(`Attacker lost: ${attackersLostStr}`)
+      console.log(`Defenders lost: ${defendersLostStr}`)
     }
   }
 
@@ -115,6 +124,23 @@ function calculateAttack (attackers, defenders) {
     }
     stats.attackers.lostRes = calcLostRes(stats.attackers.lostUnits)
     stats.defenders.lostRes = calcLostRes(stats.defenders.lostUnits)
+
+    function calcDebris (lostUnits) {
+      const debris = Object.keys(lostUnits)
+        .reduce((p, id) => {
+          const stats = gameUtils.getUnitStatsById(id)
+          p.metal += stats.metal * lostUnits[id] * (id < 400 ? FLEET2DF : DEF2DF)
+          p.crystal += stats.crystal * lostUnits[id] * (id < 400 ? FLEET2DF : DEF2DF)
+          return p
+        }, { metal: 0, crystal: 0 })
+      return debris
+    }
+    stats.attackers.debris = calcDebris(stats.attackers.lostUnits)
+    stats.defenders.debris = calcDebris(stats.defenders.lostUnits)
+    stats.debris = {
+      metal: stats.attackers.debris.metal + stats.defenders.debris.metal,
+      crystal: stats.attackers.debris.crystal + stats.defenders.debris.crystal
+    }
     return stats
   }
 
@@ -129,7 +155,7 @@ function calculateAttack (attackers, defenders) {
   }
 
   const losses = calculateLosses(attackers, defenders)
-  if (DO_LOGS) {
+  if (debugLog) {
     console.log(`Done fighting ${round}/${MAX_ROUNDS} rounds`)
     console.log(`Winner: ${winner}`)
     console.log(`Attackers lost: ${losses.attackers.lostRes.metal + losses.attackers.lostRes.crystal} units`)
@@ -230,6 +256,7 @@ function shoot (unit, enemies, shooterStats) {
   if (rapidFire > 0) {
     const chance = Math.random()
     if (chance < (rapidFire - 1) / rapidFire) { // TODO: check if this is the same chance as the php implementation of `rand(0, $count) < $count`
+    // if (Math.round(Math.random() * rapidFire) < rapidFire) { // PHP-like implementation
       shoot(unit, enemies, shooterStats)
     }
   }
