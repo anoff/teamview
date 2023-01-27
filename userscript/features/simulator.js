@@ -1,6 +1,12 @@
+const { setTeamviewStatus } = require('../utils')
 const be = require('../battleengine')
+const gameUtils = require('../gameUtils')
 const outHtml = require('./simulator.html').default
 
+/**
+ * Reads simulation input as Fleet instances.
+ * @returns object containing .attackers and .defenders each as Array<Fleet>
+ */
 function readFleets () {
   const fields = document.querySelectorAll('input[name^="battleinput"]')
   const attackers = {}
@@ -46,44 +52,114 @@ function readFleets () {
   return fleets
 }
 
+/**
+ * Start the simulation as many times as requested.
+ * Read fleet info from simulation menu.
+ * Show results when done.
+ */
 function startSim () {
+  const results = []
   const fleets = readFleets()
-  const result = be.calculateAttack(fleets.attackers, fleets.defenders)
-  printResults(fleets, result)
+  const simulations = 200
+  let i = 0
+  function simulate () {
+    // TODO: can probably make this faster if not parsing DOM 200 times
+    const fleets = readFleets()
+    const result = be.calculateAttack(fleets.attackers, fleets.defenders)
+    results.push(result)
+    i += 1
+    setTeamviewStatus('status-working', `${i}/${simulations}`)
+    if (i < simulations) window.requestAnimationFrame(simulate)
+    else done()
+  }
+
+  function done () {
+    setTeamviewStatus('status-ok', 'Done')
+    clearSimResult(document.querySelector('#tv-sim-result'))
+    const averageResult = calculateAverageBattle(results)
+    printResult(document.querySelector('#tv-sim-result'), fleets, averageResult, 'average')
+  }
+  window.requestAnimationFrame(simulate) // use this to update DOM while simulating
 }
 
-function injectNewSimButton () {
-  const anchor = document.querySelector('tr[id="submit"] input[value="Calculate"]')
-  const html = '<input type="button" value="Teamview Sim" id="tv-startsim" class="color-orange">'
-  anchor.insertAdjacentHTML('beforebegin', html)
+/**
+ * Calculate the average battle result.
+ * @param {Array<Object>} results several battleengine.calculateAttack() results
+ * @returns Object similar to battleengine.calculateAttack()
+ */
+function calculateAverageBattle (results) {
+  const average = {
+    losses: {
+      attackers: { lostRes: { metal: 0, crystal: 0, deuterium: 0 } },
+      defenders: { lostRes: { metal: 0, crystal: 0, deuterium: 0 } },
+      debris: { metal: 0, crystal: 0 }
+    },
+    winRatio: 0,
+    rounds: 0
+  }
+  const battleN = results.length
+  for (const battle of results) {
+    average.winRatio += battle.winner === 'attacker' ? 1 / battleN : 0
+    average.losses.debris.metal += battle.losses.debris.metal / battleN
+    average.losses.debris.crystal += battle.losses.debris.crystal / battleN
+    average.losses.attackers.lostRes.metal += battle.losses.attackers.lostRes.metal / battleN
+    average.losses.attackers.lostRes.crystal += battle.losses.attackers.lostRes.crystal / battleN
+    average.losses.attackers.lostRes.deuterium += battle.losses.attackers.lostRes.deuterium / battleN
+    average.losses.defenders.lostRes.metal += battle.losses.defenders.lostRes.metal / battleN
+    average.losses.defenders.lostRes.crystal += battle.losses.defenders.lostRes.crystal / battleN
+    average.losses.defenders.lostRes.deuterium += battle.losses.defenders.lostRes.deuterium / battleN
+    average.rounds += battle.roundStats.length / battleN
+  }
+  return average
+}
+/**
+ * Add the HTML at the bottom of the simulator.
+ */
+function injectHtml () {
+  const anchor = document.querySelector('tr[id="submit"]')
+  anchor.insertAdjacentHTML('afterend', `<tr><td>${outHtml}</td></tr>`)
   const elm = document.getElementById('tv-startsim')
   elm.addEventListener('click', () => startSim())
 }
 
-function injectResultView () {
-  const anchor = document.querySelector('tr[id="submit"]')
-  anchor.insertAdjacentHTML('afterend', outHtml)
+/**
+ * Remove simulation results, removes all <p> elements.
+ * @param {HTMLelement} anchor
+ */
+function clearSimResult (anchor) {
+  anchor.querySelectorAll('p').forEach(e => e.remove())
 }
 
-function printResults (fleets, result) {
+/**
+ * Print battle report into HTML table.
+ * @param {HTMLelement} anchor where text will be inserted as <p> per row
+ * @param {Object} fleets object containing .attackers and .defenders each with an Array<Fleet>
+ * @param {Object} result the fight object returned by battleengine.calculateAttack()
+ */
+function printResult (anchor, fleets, result) {
   function print (text) {
-    document.querySelector('#tv-sim-results').insertAdjacentHTML('beforeend', `<p>${text}</p>`)
+    anchor.insertAdjacentHTML('beforeend', `<p>${text}</p>`)
   }
-  print('Attackers:')
-  fleets.attackers.forEach(f => print(`${f.slot}: Weapons=${f.battleTechs.weapons}, Shield=${f.battleTechs.shield}, Armor=${f.battleTechs.armor}`))
-  print('Defenders:')
-  fleets.defenders.forEach(f => print(`${f.slot}: Weapons=${f.battleTechs.weapons}, Shield=${f.battleTechs.shield}, Armor=${f.battleTechs.armor}`))
+  fleets.attackers.forEach(f => print(`Attacker Slot ${f.slot}: Weapons: ${f.battleTechs.weapons}, Shield: ${f.battleTechs.shield}, Armor: ${f.battleTechs.armor}`))
+  fleets.defenders.forEach(f => print(`Defender Slot ${f.slot}: Weapons: ${f.battleTechs.weapons}, Shield: ${f.battleTechs.shield}, Armor: ${f.battleTechs.armor}`))
+  const RECS_CARGO = gameUtils.shipValues.recycler.cargo
+  const requiredRecs = (result.losses.debris.metal + result.losses.debris.crystal) / RECS_CARGO
 
-  print(`Done fighting after ${result.roundStats.length} rounds`)
-  print(`Winner: ${result.winner}`)
-  print(`Attackers lost: ${result.losses.attackers.lostRes.metal + result.losses.attackers.lostRes.crystal} units`)
-  print(`Defenders lost: ${result.losses.defenders.lostRes.metal + result.losses.defenders.lostRes.crystal} units`)
+  print(`Done fighting after ${result.rounds.toFixed(1)} rounds`)
+  print(`Attacker win chance: <span class="${result.winRatio < 0.6 ? 'color-red' : (result.winRatio > 0.9 ? 'color-green' : 'color-orange')}">${result.winRatio.toFixed(2)}</span>`)
+  print(`Attackers lost: ${(result.losses.attackers.lostRes.metal + result.losses.attackers.lostRes.crystal).toLocaleString()} units`)
+  print(`Defenders lost: ${(result.losses.defenders.lostRes.metal + result.losses.defenders.lostRes.crystal).toLocaleString()} units`)
+  print(`Debris field: ${result.losses.debris.metal.toLocaleString()} metal, ${result.losses.debris.crystal.toLocaleString()} crystal`)
+  print(`Required Recyclers: ${Math.ceil(requiredRecs)}`)
 }
 
+/**
+ * Initialize teamview simulator.
+ */
 function init () {
   if (!window.location.search.includes('page=battleSimulator')) return
-  injectNewSimButton()
-  injectResultView()
+  injectHtml()
+  setTeamviewStatus('status-ok', 'Ready')
 }
 
 module.exports = {
