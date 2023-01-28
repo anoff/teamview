@@ -83,24 +83,15 @@ test.skip('pick another fight', t => {
 })
 
 test('pick a fight that should be won', t => {
-  const a1 = new be.Fleet(new be.BattleTechs(9, 6, 9))
-  const d1 = new be.Fleet(new be.BattleTechs(5, 7, 6))
+  const a1 = new be.Fleet(new be.BattleTechs(0, 0, 0))
+  const d1 = new be.Fleet(new be.BattleTechs(0, 0, 0))
   a1.addUnitId(202, 67)
-  a1.addUnitId(204, 29)
-  a1.addUnitId(205, 43)
   a1.addUnitId(207, 200)
-  a1.addUnitId(208, 1)
-  a1.addUnitId(210, 95)
   a1.addUnitId(215, 2)
 
-  d1.addUnitId(206, 1)
-  d1.addUnitId(212, 62)
   d1.addUnitId(401, 138)
   d1.addUnitId(402, 337)
-  d1.addUnitId(403, 57)
-  d1.addUnitId(404, 25)
-  d1.addUnitId(405, 24)
-  d1.addUnitId(407, 1)
+  d1.addUnitId(402, 337)
   d1.addUnitId(408, 1)
 
   be.calculateAttack([a1], [d1], true)

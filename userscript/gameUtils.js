@@ -140,7 +140,7 @@ const shipValues = {
     crystal: 7e3,
     deuterium: 2e3,
     shield: 50,
-    armour: 270,
+    armour: 2700,
     attack: 400,
     cargo: 800,
     rapid: {
@@ -193,9 +193,9 @@ const shipValues = {
     metal: 0,
     crystal: 1e3,
     deuterium: 0,
-    shield: 0.01,
+    shield: 0,
     armour: 100,
-    attack: 0.01,
+    attack: 0,
     cargo: 5
   },
   planetBomber: {
@@ -219,9 +219,9 @@ const shipValues = {
     metal: 0,
     crystal: 2e3,
     deuterium: 500,
-    shield: 1,
+    shield: 0,
     armour: 200,
-    attack: 1,
+    attack: 0,
     cargo: 0
   },
   starFighter: {
@@ -244,9 +244,9 @@ const shipValues = {
     crystal: 4e6,
     deuterium: 1e6,
     shield: 50e3,
-    armour: 9e5,
+    armour: 900e3,
     attack: 200e3,
-    cargo: 1e3,
+    cargo: 1e6,
     rapid: {
       lightCargo: 250,
       heavyCargo: 250,
@@ -318,7 +318,7 @@ const defenseValues = {
     crystal: 15e3,
     deuterium: 2e3,
     shield: 200,
-    armour: 35e2,
+    armour: 3500,
     attack: 1100
   },
   ionCannon: {
@@ -334,24 +334,24 @@ const defenseValues = {
     crystal: 50e3,
     deuterium: 30e3,
     shield: 300,
-    armour: 100e2,
-    attack: 3e3
+    armour: 10e3,
+    attack: 3000
   },
   smallShieldDome: {
     metal: 10e3,
     crystal: 10e3,
     deuterium: 0,
     shield: 2000,
-    armour: 20e2,
-    attack: 0
+    armour: 2000,
+    attack: 1
   },
   largeShieldDome: {
     metal: 50e3,
     crystal: 50e3,
     deuterium: 0,
     shield: 10e3,
-    armour: 100e2,
-    attack: 0
+    armour: 10e3,
+    attack: 1
   },
   interceptor: {
     metal: 8e3,

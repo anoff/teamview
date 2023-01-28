@@ -312,12 +312,13 @@ module.exports.Location = Location
 
 class Unit {
   isExploded = false
-  constructor (unitId, shield, armor, attack) {
+  constructor (unitId, attack, shield, armor) {
     this.id = unitId
     this.shield = shield
     this.armor = armor
     this.attack = attack
     this.fullArmor = armor
+    this.fullShield = shield
   }
 
   isShip () {
@@ -345,12 +346,8 @@ class Fleet {
    */
   addUnitId (unitId, count) {
     if (unitId < 200 || unitId >= 500) return
-    const ids = Object.keys(this.unitsById)
-    if (ids.includes(unitId)) {
-      this.unitsById[unitId] += count
-    } else {
-      this.unitsById[unitId] = count
-    }
+    if (this.unitsById[unitId] === undefined) this.unitsById[unitId] = 0
+    this.unitsById[unitId] += count
     this.unitCount += count
   }
 
@@ -364,7 +361,7 @@ class Fleet {
       for (let i = count; i > 0; i--) {
         const stats = gameUtils.getUnitStatsById(id)
         const bonus = this.battleTechs.bonus
-        const unit = new Unit(parseInt(id), stats.shield * bonus.shield, stats.armour * bonus.armor, stats.attack * bonus.weapons)
+        const unit = new Unit(parseInt(id), stats.attack * bonus.weapons, stats.shield * bonus.shield, stats.armour * bonus.armor)
         this.units.push(unit)
       }
     }
@@ -376,9 +373,7 @@ class Fleet {
   restoreShields () {
     for (let i = this.units.length - 1; i >= 0; i--) {
       const unit = this.units[i]
-      const shield = gameUtils.getUnitStatsById(unit.id).shield
-      const techBoost = this.battleTechs.bonus.shield
-      this.units[i].shield = shield * techBoost
+      this.units[i].shield = unit.fullShield
     }
   }
 
