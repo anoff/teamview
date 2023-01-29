@@ -1,5 +1,6 @@
 const { setTeamviewStatus } = require('../utils')
 const be = require('../battleengine')
+const gameUtils = require('../gameUtils')
 const outHtml = require('./simulator.html').default
 
 /**
@@ -80,7 +81,8 @@ function startSim () {
   function done () {
     setTeamviewStatus('status-ok', 'Done')
     clearSimResult(document.querySelector('#tv-sim-results'))
-    printAverageResult(document.querySelector('#tv-sim-result-average'), fleets, results)
+    const averageResult = calculateAverageBattle(results)
+    printResult(document.querySelector('#tv-sim-result-average'), fleets, averageResult, 'average')
 
     // display best/worst
     let best = 0 // for the attackers
@@ -96,13 +98,43 @@ function startSim () {
         worst = i
       }
     }
-    printSingleResult(document.querySelector('#tv-sim-result-best'), fleets, results[best])
-    printSingleResult(document.querySelector('#tv-sim-result-worst'), fleets, results[worst])
+    printResult(document.querySelector('#tv-sim-result-best'), fleets, results[best])
+    printResult(document.querySelector('#tv-sim-result-worst'), fleets, results[worst])
   }
 
   window.requestAnimationFrame(simulate) // use this to update DOM while simulating
 }
 
+/**
+ * Calculate the average battle result.
+ * @param {Array<Object>} results several battleengine.calculateAttack() results
+ * @returns Object similar to battleengine.calculateAttack()
+ */
+function calculateAverageBattle (results) {
+  const average = {
+    losses: {
+      attackers: { lostRes: { metal: 0, crystal: 0, deuterium: 0 } },
+      defenders: { lostRes: { metal: 0, crystal: 0, deuterium: 0 } },
+      debris: { metal: 0, crystal: 0 }
+    },
+    winRatio: 0,
+    rounds: 0
+  }
+  const battleN = results.length
+  for (const battle of results) {
+    average.winRatio += battle.winner === 'attacker' ? 1 / battleN : 0
+    average.losses.debris.metal += battle.losses.debris.metal / battleN
+    average.losses.debris.crystal += battle.losses.debris.crystal / battleN
+    average.losses.attackers.lostRes.metal += battle.losses.attackers.lostRes.metal / battleN
+    average.losses.attackers.lostRes.crystal += battle.losses.attackers.lostRes.crystal / battleN
+    average.losses.attackers.lostRes.deuterium += battle.losses.attackers.lostRes.deuterium / battleN
+    average.losses.defenders.lostRes.metal += battle.losses.defenders.lostRes.metal / battleN
+    average.losses.defenders.lostRes.crystal += battle.losses.defenders.lostRes.crystal / battleN
+    average.losses.defenders.lostRes.deuterium += battle.losses.defenders.lostRes.deuterium / battleN
+    average.rounds += battle.roundStats.length / battleN
+  }
+  return average
+}
 /**
  * Add the HTML at the bottom of the simulator.
  */
@@ -132,74 +164,32 @@ function clearSimResult (anchor) {
 }
 
 /**
- * Print battle report for a single battle into HTML.
+ * Print battle report into HTML table.
  * @param {HTMLelement} anchor where text will be inserted as <p> per row
  * @param {Object} fleets object containing .attackers and .defenders each with an Array<Fleet>
  * @param {Object} result the fight object returned by battleengine.calculateAttack()
+ * @param {String} battleType indicate whether this is a single battle or an averaged one
  */
-function printSingleResult (anchor, fleets, result) {
+function printResult (anchor, fleets, result, battleType = 'single') {
   function print (text) {
     anchor.insertAdjacentHTML('beforeend', `<p>${text}</p>`)
   }
   fleets.attackers.forEach(f => print(`Attacker Slot ${f.slot}: Weapons: ${f.battleTechs.weapons}, Shield: ${f.battleTechs.shield}, Armor: ${f.battleTechs.armor}`))
   fleets.defenders.forEach(f => print(`Defender Slot ${f.slot}: Weapons: ${f.battleTechs.weapons}, Shield: ${f.battleTechs.shield}, Armor: ${f.battleTechs.armor}`))
+  const RECS_CARGO = gameUtils.shipValues.recycler.cargo
+  const requiredRecs = (result.losses.debris.metal + result.losses.debris.crystal) / RECS_CARGO
 
-  print(`Done fighting after ${result.roundStats.length} rounds`)
-  print(`Winner: ${result.winner}`)
+  if (battleType === 'average') {
+    print(`Done fighting after ${result.rounds.toFixed(1)} rounds`)
+    print(`Attacker win chance: <span class="${result.winRatio < 0.6 ? 'color-red' : (result.winRatio > 0.9 ? 'color-green' : 'color-orange')}">${result.winRatio.toFixed(2)}</span>`)
+  } else {
+    print(`Done fighting after ${result.roundStats.length.toFixed(1)} rounds`)
+    print(`Winner: ${result.winner}`)
+  }
   print(`Attackers lost: ${(result.losses.attackers.lostRes.metal + result.losses.attackers.lostRes.crystal).toLocaleString()} units`)
   print(`Defenders lost: ${(result.losses.defenders.lostRes.metal + result.losses.defenders.lostRes.crystal).toLocaleString()} units`)
   print(`Debris field: ${result.losses.debris.metal.toLocaleString()} metal, ${result.losses.debris.crystal.toLocaleString()} crystal`)
-}
-
-/**
- * Print battle report as average over all battles into HTML.
- * @param {HTMLelement} anchor where text will be inserted as <p> per row
- * @param {Object} fleets object containing .attackers and .defenders each with an Array<Fleet>
- * @param {Array} results array containing multiple objects returned by battleengine.calculateAttack()
- */
-function printAverageResult (anchor, fleets, results) {
-  function print (text) {
-    anchor.insertAdjacentHTML('beforeend', `<p>${text}</p>`)
-  }
-  fleets.attackers.forEach(f => print(`Attacker Slot ${f.slot}: Weapons: ${f.battleTechs.weapons}, Shield: ${f.battleTechs.shield}, Armor: ${f.battleTechs.armor}`))
-  fleets.defenders.forEach(f => print(`Defender Slot ${f.slot}: Weapons: ${f.battleTechs.weapons}, Shield: ${f.battleTechs.shield}, Armor: ${f.battleTechs.armor}`))
-
-  let best = results[0] // for the attackers
-  let worst = results[0]
-  const average = {
-    losses: {
-      attackers: { metal: 0, crystal: 0, deuterium: 0 },
-      defenders: { metal: 0, crystal: 0, deuterium: 0 }
-    },
-    winRatio: 0,
-    debris: { metal: 0, crystal: 0 },
-    rounds: 0
-  }
-  const battleN = results.length
-  for (const battle of results) {
-    const totalAttackerLosses = battle.losses.attackers.metal + battle.losses.attackers.crystal
-    if (totalAttackerLosses < (best.losses.attackers.metal + best.losses.attackers.crystal)) {
-      best = battle
-    }
-    if (totalAttackerLosses > (worst.losses.attackers.metal + worst.losses.attackers.crystal)) {
-      worst = battle
-    }
-    average.winRatio += battle.winner === 'attacker' ? 1 / battleN : 0
-    average.debris.metal += battle.losses.debris.metal / battleN
-    average.debris.crystal += battle.losses.debris.crystal / battleN
-    average.losses.attackers.metal += battle.losses.attackers.lostRes.metal / battleN
-    average.losses.attackers.crystal += battle.losses.attackers.lostRes.crystal / battleN
-    average.losses.attackers.deuterium += battle.losses.attackers.lostRes.deuterium / battleN
-    average.losses.defenders.metal += battle.losses.defenders.lostRes.metal / battleN
-    average.losses.defenders.crystal += battle.losses.defenders.lostRes.crystal / battleN
-    average.losses.defenders.deuterium += battle.losses.defenders.lostRes.deuterium / battleN
-    average.rounds += battle.roundStats.length / battleN
-  }
-  print(`Done fighting after ${average.rounds.toFixed(1)} rounds`)
-  print(`Attacker win chance: <span class="${average.winRatio < 0.6 ? 'color-red' : (average.winRatio > 0.9 ? 'color-green' : 'color-orange')}">${average.winRatio.toFixed(2)}</span>`)
-  print(`Attackers lost: ${(average.losses.attackers.metal + average.losses.attackers.crystal).toLocaleString()} units`)
-  print(`Defenders lost: ${(average.losses.defenders.metal + average.losses.defenders.crystal).toLocaleString()} units`)
-  print(`Debris field: ${average.debris.metal.toLocaleString()} metal, ${average.debris.crystal.toLocaleString()} crystal`)
+  print(`Required Recyclers: ${Math.ceil(requiredRecs)}`)
 }
 
 /**
