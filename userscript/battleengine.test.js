@@ -52,7 +52,7 @@ test('Fleet.attackPower calcualtes sum of all fleet units', t => {
   t.is(f.attackPower, ATTACK_PER_SHIP * 5)
 })
 
-test.skip('pick a fight', t => {
+test('pick a fight', t => {
   const a1 = new be.Fleet(dummies.bt1)
   const a2 = new be.Fleet(dummies.bt1, 1)
   const d1 = new be.Fleet(dummies.bt2)
@@ -67,7 +67,7 @@ test.skip('pick a fight', t => {
   t.pass()
 })
 
-test.skip('pick another fight', t => {
+test('pick another fight', t => {
   const a1 = new be.Fleet(dummies.bt1)
   const a2 = new be.Fleet(dummies.bt1, 1)
   const d1 = new be.Fleet(dummies.bt2)
