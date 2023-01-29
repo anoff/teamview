@@ -10,6 +10,7 @@
       "name": "Debug AVA test file",
       "program": "${workspaceFolder}/userscript/node_modules/ava/entrypoints/cli.mjs",
       "args": [
+        "--serial",
         "${file}"
       ],
       "outputCapture": "std",

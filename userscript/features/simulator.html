@@ -1,4 +1,37 @@
-<div class="infos">
-  <div class="planeto">Sim Results</div>
-  <div id="tv-sim-results"></div>
+<div class="teamview">
+  <table>
+    <thead>
+      <tr>
+        <th>Teamview Simulator</th>
+        <th>
+          <span id="teamview-status-icon" class="dot status-unknown"></span>
+          <span id="teamview-status-text" style="font-size: 85%;"></span>
+        </th>
+      </tr>
+      <tr>
+        <td>
+          <label for="tv-n_simulations">Simulations: </label>
+          <input type="number" id="tv-n_simulations" value="200" min="1" max="100000">
+        </td>
+        <td>
+          <input type="button" value="Simulate" id="tv-startsim">
+        </td>
+      </tr>
+      <tr>
+        <th>Select Result</th>
+        <td>
+          <input type="button" value="Average" id="tv-sim-show-average" class="tv-show-result color-blue">
+          <input type="button" value="Best" id="tv-sim-show-best" class="tv-show-result">
+          <input type="button" value="Worst" id="tv-sim-show-worst" class="tv-show-result">
+        </td>
+      </tr>
+    </thead>
+    <tbody>
+      <tr id="tv-sim-results">
+        <td colspan="2" id="tv-sim-result-average"></td>
+        <td colspan="2" id="tv-sim-result-best" class="hidden"></td>
+        <td colspan="2" id="tv-sim-result-worst" class="hidden"></td>
+      </tr>
+    </tbody>
+  </table>
 </div>
