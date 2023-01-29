@@ -97,7 +97,7 @@
 }
 
 .status-unknown {
-  background-color: #fff;
+  background-color: #fafafa;
 }
 
 .status-working {
@@ -110,7 +110,7 @@
 }
 
 .color-green {
-  color: #3e6 !important;
+  color: #00ee00 !important;
 }
 
 .color-blue {
@@ -127,6 +127,14 @@
 
 .color-orange {
   color: #e93 !important;
+}
+
+.color-yellow {
+  color: #eeee00 !important;
+}
+
+.color-red {
+  color: #ee0000 !important;
 }
 
 @keyframes status-animation {

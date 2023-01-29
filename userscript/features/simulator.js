@@ -196,7 +196,7 @@ function printAverageResult (anchor, fleets, results) {
     average.rounds += battle.roundStats.length / battleN
   }
   print(`Done fighting after ${average.rounds.toFixed(1)} rounds`)
-  print(`Attacker win chance: ${average.winRatio.toFixed(2)}`)
+  print(`Attacker win chance: <span class="${average.winRatio < 0.6 ? 'color-red' : (average.winRatio > 0.9 ? 'color-green' : 'color-orange')}">${average.winRatio.toFixed(2)}</span>`)
   print(`Attackers lost: ${(average.losses.attackers.metal + average.losses.attackers.crystal).toLocaleString()} units`)
   print(`Defenders lost: ${(average.losses.defenders.metal + average.losses.defenders.crystal).toLocaleString()} units`)
   print(`Debris field: ${average.debris.metal.toLocaleString()} metal, ${average.debris.crystal.toLocaleString()} crystal`)
