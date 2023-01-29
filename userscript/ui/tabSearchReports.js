@@ -35,7 +35,7 @@ function searchReportsRequest (query) {
  */
 function search () {
   function getQuery () {
-    const fields = ['by_me', 'report_maxage', 'player_name', 'alliance_name', 'rank_min', 'rank_max', 'galaxy_min', 'galaxy_max', 'system_min', 'system_max', 'inactive', 'vacation', 'banned', 'min_mse', 'min_crystal', 'min_deuterium', 'min_ships', 'max_def', 'max_tech', 'fleetpoints_min', 'defensepoints_max']
+    const fields = ['by_me', 'report_maxage', 'player_name', 'alliance_name', 'rank_min', 'rank_max', 'galaxy_min', 'galaxy_max', 'system_min', 'system_max', 'inactive', 'vacation', 'banned', 'min_mse', 'min_crystal', 'min_deuterium', 'min_ships', 'max_def', 'max_tech', 'fleetpoints_min', 'defensepoints_max', 'is_moon']
     const query = {}
     for (const f of fields) {
       const elm = document.querySelector(`${PAGE_ID} #${f}`)
