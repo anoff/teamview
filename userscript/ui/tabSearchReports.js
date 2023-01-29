@@ -3,6 +3,7 @@ const { genericRequest } = require('../requests')
 const searchHtml = require('./tabSearchReports.html').default
 const { getCurrentPosition, quantile, saveSearchSettings, loadSearchSettings, teamviewDebugMode, makeTableSortable, location2pos } = require('../utils')
 const { res2str, obj2str, shipStructurePoints, defenseStructurePoints, itemIds } = require('../gameUtils')
+const { TradeRatios } = require('../features/tradeRatios')
 
 const PAGE_ID = '#search-reports' // top level div id to identify this page
 const SETTINGS_NAME = 'search_settings_reports'
@@ -153,10 +154,10 @@ function insertResults (reports) {
     return `(${text})`
   }
 
-  const res2mse = (obj, ratio = [4, 1, 1]) => {
+  const res2mse = (obj, ratio = TradeRatios.get()) => {
     const m = obj.metal
-    const c = obj.crystal * ratio[0] / ratio[1]
-    const d = obj.deuterium * ratio[0] / ratio[2]
+    const c = obj.crystal * ratio.metal / ratio.crystal
+    const d = obj.deuterium * ratio.metal / ratio.deuterium
     return m + c + d
   }
 
@@ -222,6 +223,9 @@ function insertResults (reports) {
     if ((new Date() - new Date(e.lastAttack)) <= ATTACK_MAX_AGE_H * 1e3 * 60 * 60) {
       lastAttack = e.lastAttack
     }
+
+    const tradeRatios = TradeRatios.get()
+
     const html = `<tr id="row-${e.planetId}">
     <td data-value="${e.galaxy * 10e5 + e.system * 10e2 + e.position}">   
       <a href="${window.location.pathname}?page=galaxy&galaxy=${e.galaxy}&system=${e.system}" title="Goto System">[${e.galaxy}:${e.system}:${e.position}]${e.isMoon ? 'M' : ''}</a>
@@ -232,7 +236,7 @@ function insertResults (reports) {
         <span style="font-size: 80%; color: yellow;"> (${e.player?.rank})</span>
     </td>
     <td><span>${e.planetName || ''} ${e.isMoon ? '🌝' : ''}</span></td>
-    <td data-value="${res2mse(e.resources)}"><span title="Metal Standard Units using 4:1:1" class="${res2class(res2mse(e.resources), quantiles.mse)}">${res2str(res2mse(e.resources))}</span></td>
+    <td data-value="${res2mse(e.resources)}"><span title="Metal Standard Units using ${tradeRatios.metal}:${tradeRatios.crystal}:${tradeRatios.deuterium}" class="${res2class(res2mse(e.resources), quantiles.mse)}">${res2str(res2mse(e.resources))}</span></td>
     <td data-value="${e.resources.metal}"><span class="${res2class(e.resources.metal, quantiles.metal)}">${res2str(e.resources.metal)}</span></td>
     <td data-value="${e.resources.crystal}"><span class="${res2class(e.resources.crystal, quantiles.crystal)}">${res2str(e.resources.crystal)}</span></td>
     <td data-value="${e.resources.deuterium}"><span class="${res2class(e.resources.deuterium, quantiles.deuterium)}">${res2str(e.resources.deuterium)}</span></td>
