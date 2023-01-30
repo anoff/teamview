@@ -1,7 +1,7 @@
 const { report2html } = require('./spioHtml')
 const { genericRequest } = require('../requests')
 const searchHtml = require('./tabSearchReports.html').default
-const { getCurrentPosition, quantile, saveSearchSettings, loadSearchSettings, teamviewDebugMode, makeTableSortable, location2pos } = require('../utils')
+const { getCurrentPosition, quantile, saveSearchSettings, loadSearchSettings, teamviewDebugMode, makeTableSortable } = require('../utils')
 const { res2str, obj2str, shipStructurePoints, defenseStructurePoints, itemIds } = require('../gameUtils')
 const { TradeRatios } = require('../features/tradeRatios')
 

@@ -2,7 +2,7 @@
 const { report2html } = require('./spioHtml')
 const req = require('../requests')
 const searchHtml = require('./tabSearchPlanets.html').default
-const { getCurrentPosition, saveSearchSettings, loadSearchSettings, teamviewDebugMode, makeTableSortable, location2pos } = require('../utils')
+const { getCurrentPosition, saveSearchSettings, loadSearchSettings, teamviewDebugMode, makeTableSortable } = require('../utils')
 
 const PAGE_ID = '#search-planets' // top level div id to identify this page
 const SETTINGS_NAME = 'search_settings_planets'
