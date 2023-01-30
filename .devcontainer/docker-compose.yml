@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   app:
-    image: mcr.microsoft.com/vscode/devcontainers/javascript-node:0-16
+    image: mcr.microsoft.com/vscode/devcontainers/javascript-node:16
     env_file: [../.env]
     volumes:
       - ..:/workspace:cached
