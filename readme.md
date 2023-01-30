@@ -143,24 +143,6 @@ classDiagram
     created_at: date
     updated_at: date
   }
-  class flights {
-    id: int
-    submitted_by: int (tokens.id)
-    date: date
-    flight_mission: string
-    from_galaxy: int
-    from_system: int
-    from_position: int
-    from_is_moon: bool
-    from_location: int
-    to_galaxy: int
-    to_system: int
-    to_position: int
-    to_is_moon: int
-    to_location: int
-    created_at: date
-    updated_at: date
-  }
 ```
 
 The respective classes in `lib/data` use camelCase notation instead of snake_case.
