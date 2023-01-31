@@ -247,7 +247,7 @@ function insertResults (reports) {
       <a href="#" class="tooltip_sticky" data-tooltip-content="${report2html(e)}">${calcTimeDeltaString(e.date)}</a>
     </td>
     <td>
-      <a id="attack-${e.planetId}" title="Attack" href="${window.location.pathname}?page=fleetTable&galaxy=${e.galaxy}&system=${e.system}&planet=${e.position}&planettype=1&target_mission=1#send_ship[202]=${Math.ceil(requiredCargo / 5000)}" target="_blank"> ⚔️ </a>
+      <a id="attack-${e.planetId}" title="Attack" href="${window.location.pathname}?page=fleetTable&galaxy=${e.galaxy}&system=${e.system}&planet=${e.position}&planettype=1&target_mission=1#ship_input[202]=${Math.ceil(requiredCargo / 5000)}" target="_blank"> ⚔️ </a>
       <br>
       <span>⸺</span>
       <br>
