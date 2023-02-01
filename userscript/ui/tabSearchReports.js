@@ -56,7 +56,10 @@ function search () {
           }
           break
         case 'number':
-          if (elm.value) query[f] = parseInt(elm.value)
+          if (elm.value) {
+            if (f === 'report_maxage') query[f] = parseFloat(elm.value)
+            else query[f] = parseInt(elm.value)
+          }
           break
         default:
           query[f] = elm.value
