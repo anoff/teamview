@@ -24,7 +24,7 @@ server.start()
 
 // start cronjob to update stats.json
 const updateStats = new CronJob(
-  '*/2 * * * *',
+  '7 * * * *',
   spawnStatsUpdate
 )
 updateStats.start()
