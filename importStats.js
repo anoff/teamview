@@ -55,8 +55,8 @@ async function main () {
 
     logger.info(`Trying to insert ${players.length} Players`)
 
-    const playersHistory = await Player.saveMany(players, 'players_history')
-    players = await Player.upsertMany(playersHistory, 'players')
+    let resultUpsert = await Player.upsertMany(players, 'players')
+    let resultSave = await Player.saveMany(players, 'players_history')
   }
 }
 
