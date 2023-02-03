@@ -14,6 +14,8 @@ function isNewHash (hash) {
     return true
   } else {
     const oldHash = readFileSync(HASH_FILE, 'ascii')
+    logger.info(hash)
+    logger.info(oldHash)
     return oldHash !== hash
   }
 }
@@ -30,6 +32,8 @@ async function main () {
     logger.info('Stats have not changed, not inserting any new data. (Hash is unchanged)')
   } else {
     writeFileSync(HASH_FILE, hash)
+
+    let players = []
     for (const s of stats) {
       const data = {
         playerId: s.playerId,
@@ -47,13 +51,12 @@ async function main () {
         battlesWon: parseInt(s.battlesWon),
         battlesDraw: parseInt(s.battlesDraw)
       }
-      const p1 = new Player(data)
-      await p1.save('players_history')
-      // logger.info(`Processing ${n}/${len}`)
-      const p2 = new Player(data)
-      await p2.sync('players')
-      await p2.save('players')
+      const p = new Player(data)
+      players.push(p)
     }
+
+    const playersHistory = Player.saveMany(players, 'players_history')
+    players = Player.upsertMany(playersHistory, 'players')
   }
 }
 
