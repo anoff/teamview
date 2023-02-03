@@ -14,8 +14,6 @@ function isNewHash (hash) {
     return true
   } else {
     const oldHash = readFileSync(HASH_FILE, 'ascii')
-    logger.info(hash)
-    logger.info(oldHash)
     return oldHash !== hash
   }
 }
@@ -55,8 +53,10 @@ async function main () {
       players.push(p)
     }
 
-    const playersHistory = Player.saveMany(players, 'players_history')
-    players = Player.upsertMany(playersHistory, 'players')
+    logger.info(`Trying to insert ${players.length} Players`)
+
+    const playersHistory = await Player.saveMany(players, 'players_history')
+    players = await Player.upsertMany(playersHistory, 'players')
   }
 }
 
