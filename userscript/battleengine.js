@@ -60,7 +60,7 @@ function calculateAttack (attackers, defenders, debugLog = false) {
   // start fighting
   const roundStats = []
   let round = 0
-  for (round = 1; round < MAX_ROUNDS; round++) {
+  for (round = 1; round <= MAX_ROUNDS; round++) {
     const attackersPower = attackers.reduce((p, f) => p + f.attackPower, 0)
     const defendersPower = defenders.reduce((p, f) => p + f.attackPower, 0)
     if (attackersPower <= 0 || defendersPower <= 0) {
