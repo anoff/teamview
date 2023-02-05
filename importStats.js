@@ -29,14 +29,19 @@ async function main () {
   if (!isNew) {
     logger.info('Stats have not changed, not inserting any new data. (Hash is unchanged)')
   } else {
-    writeFileSync(HASH_FILE, hash)
+    try {
+      logger.info(`New ${HASH_FILE} with the new hash ${hash}.`)
+      writeFileSync(HASH_FILE, hash)
+    } catch (error) {
+      logger.error(`There was a problem creating the ${HASHFILE} file.`, {error})
+    }
 
     let players = []
     for (const s of stats) {
       const data = {
         playerId: s.playerId,
         playerName: s.playerName,
-        alliance: s.allianceName,
+        alliance: s.allianceName || "",
         rank: parseInt(s.rank),
         pointsResearch: parseInt(s.researchScore),
         pointsDefense: parseInt(s.defensiveScore),
