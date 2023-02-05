@@ -60,8 +60,8 @@ async function main () {
 
     logger.info(`Trying to insert ${players.length} Players`)
 
-    let resultUpsert = await Player.upsertMany(players, 'players')
-    let resultSave = await Player.saveMany(players, 'players_history')
+    let resultUpsert = await Player.upsertMany(players, 'players', true)
+    let resultSave = await Player.saveMany(players, 'players_history', true)
   }
 }
 
