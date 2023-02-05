@@ -41,7 +41,7 @@ async function main () {
       const data = {
         playerId: s.playerId,
         playerName: s.playerName,
-        alliance: s.allianceName || "",
+        alliance: s.allianceName,
         rank: parseInt(s.rank),
         pointsResearch: parseInt(s.researchScore),
         pointsDefense: parseInt(s.defensiveScore),
