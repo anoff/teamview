@@ -7,7 +7,6 @@ function addMenuButton () {
   const listEntry = document.createElement('li')
   const listLink = document.createElement('a')
   listLink.href = `${window.location.pathname}?page=galaxy#teamview-station`
-  listLink.onclick = showStation
   listLink.text = 'Teamview'
   listEntry.appendChild(listLink)
   const ref = document.getElementById('menu').children[13]
