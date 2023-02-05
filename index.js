@@ -10,7 +10,7 @@ function spawnStatsUpdate () {
   logger.info('Stats update started!')
   const updateStatsProc = spawn('node', ['importStats.js'])
   
-  const stdOutStream = fs.createWriteStream('logs/stdout_stderr.log', { flags: 'a' });
+  const stdOutStream = fs.createWriteStream('logs/importstats_stdout_stderr.log', { flags: 'a' });
   updateStatsProc.stdout.pipe(stdOutStream);
   updateStatsProc.stderr.pipe(stdOutStream);
 
