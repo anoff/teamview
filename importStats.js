@@ -29,7 +29,14 @@ async function main () {
   if (!isNew) {
     logger.info('Stats have not changed, not inserting any new data. (Hash is unchanged)')
   } else {
-    writeFileSync(HASH_FILE, hash)
+    try {
+      logger.info(`New ${HASH_FILE} with the new hash ${hash}.`)
+      writeFileSync(HASH_FILE, hash)
+    } catch (error) {
+      logger.error(`There was a problem creating the ${HASHFILE} file.`, {error})
+    }
+
+    let players = []
     for (const s of stats) {
       const data = {
         playerId: s.playerId,
@@ -47,13 +54,14 @@ async function main () {
         battlesWon: parseInt(s.battlesWon),
         battlesDraw: parseInt(s.battlesDraw)
       }
-      const p1 = new Player(data)
-      await p1.save('players_history')
-      // logger.info(`Processing ${n}/${len}`)
-      const p2 = new Player(data)
-      await p2.sync('players')
-      await p2.save('players')
+      const p = new Player(data)
+      players.push(p)
     }
+
+    logger.info(`Trying to insert ${players.length} Players`)
+
+    let resultUpsert = await Player.upsertMany(players, 'players', true)
+    let resultSave = await Player.saveMany(players, 'players_history', true)
   }
 }
 

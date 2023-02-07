@@ -30,7 +30,7 @@ async function tablePlayers (knex, forceDrop = false) {
     await knex.schema
       .createTable('players', table => {
         table.increments('id')
-        table.integer('player_id').unsigned()
+        table.integer('player_id').unsigned().unique()
         table.string('player_name').index()
         table.string('alliance')
         table.integer('rank').unsigned()
