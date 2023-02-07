@@ -356,7 +356,7 @@ function modifyTable (data, modfiyFn) {
 }
 
 function init () {
-  if (!(window.location.search.includes('page=galaxy') && window.location.hash !== '#teamview-station')) return
+  if (!(window.location.search.includes('page=galaxy') && !window.location.search.includes('tv=station'))) return
   addColumn(2, ['Player Stats', 'Spio Info'])
   addUploadSection()
   modifyTable({}, modifyAddRankFromPopup)

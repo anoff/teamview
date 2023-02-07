@@ -19,8 +19,8 @@ function addMenuButton (text, href) {
 }
 
 function init () {
-  addMenuButton('Teamview', `${window.location.pathname}?page=galaxy#teamview-station`)
-  if (window.location.hash === '#teamview-station') {
+  addMenuButton('Teamview', `${window.location.pathname}?page=galaxy&tv=station`)
+  if (window.location.search.includes('tv=station')) {
     showStation()
   }
 }

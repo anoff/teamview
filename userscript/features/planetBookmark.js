@@ -148,7 +148,7 @@ function updateTimestamp (planetId) {
 }
 
 function init () {
-  if (!(window.location.search.includes('page=galaxy') && window.location.hash !== '#teamview-station')) return
+  if (!(window.location.search.includes('page=galaxy') && !window.location.search.includes('tv=station'))) return
   if (TM_getValue('bookmarks') === undefined) {
     TM_setValue('bookmarks', [])
   }
