@@ -21,7 +21,7 @@ module.exports.report2html = function report2html (report) {
   }
   return `
   <div class="spyRaport" style="width: 320px;">
-  <div class="spyRaportHead">${new Date(report.date).toLocaleString('sv')}</a></div>
+  <div class="spyRaportHead"><span>${new Date(report.date).toLocaleString('sv')}</span><span style="cursor: pointer;" onclick="navigator.clipboard.writeText(${report.reportId})"> [ ID: ${report.reportId} ]<span></div>
   <div class="spyRaportContainer">
     <div class="spyRaportContainerHead spyRaportContainerHeadClass900">Resources</div>
     ${addSection(report.resources)}
