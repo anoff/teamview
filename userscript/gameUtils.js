@@ -409,6 +409,16 @@ function getStatsByItemId () {
 /** Costs & battle stats of each ship/defense unit, by id. */
 const getUnitStatsById = getStatsByItemId()
 
+/**
+ * Returns common name for given ingame entity id, e.g. 202 => 'lightCargo'
+ * @param {int} id unit, tech, building id
+ */
+function itemId2name (id) {
+  const item = Object.entries(itemIds).find(e => e[1] === id)
+  if (!item) return ''
+  return item[0].split('_').slice(1).join('_')
+}
+
 // RESOURCES
 /**
  * Calculate the resources created per hour, assuming 100% production and energy.
@@ -491,14 +501,15 @@ function obj2str (obj) {
 }
 
 module.exports = {
-  res2str,
-  obj2str,
   calculateHourlyMineProduction,
-  shipStructurePoints,
   defenseStructurePoints,
+  defenseValues,
+  getUnitStatsById,
+  itemId2name,
   itemIds,
   missionTypes,
-  shipValues,
-  defenseValues,
-  getUnitStatsById
+  obj2str,
+  res2str,
+  shipStructurePoints,
+  shipValues
 }

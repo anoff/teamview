@@ -2,19 +2,24 @@
 const { showStation } = require('./features/teamview')
 const { init: initMain } = require('./tv.main')
 
-function addMenuButton () {
+/**
+ * Inject a game-styled button into the left side nav menu.
+ * @param {string} text Some string that should be displayed as button text
+ * @param {string} href where the button should link to
+ */
+function addMenuButton (text, href) {
   // add button to menu
   const listEntry = document.createElement('li')
   const listLink = document.createElement('a')
-  listLink.href = `${window.location.pathname}?page=galaxy#teamview-station`
-  listLink.text = 'Teamview'
+  listLink.href = href
+  listLink.text = text
   listEntry.appendChild(listLink)
   const ref = document.getElementById('menu').children[13]
   ref.insertAdjacentElement('afterend', listEntry)
 }
 
 function init () {
-  addMenuButton()
+  addMenuButton('Teamview', `${window.location.pathname}?page=galaxy#teamview-station`)
   if (window.location.hash === '#teamview-station') {
     showStation()
   }

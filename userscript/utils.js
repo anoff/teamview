@@ -105,6 +105,16 @@ function setTeamviewStatus (cssClass, text) {
   textElm.innerText = text
 }
 
+/**
+ * Convert single integer location to string representation
+ * @param {int} location galaxy * 1000000 + system * 1000 + position
+ * @returns Formatted string [3:23:10]
+ */
+function location2str (location) {
+  const [g, s, p] = location2pos(location)
+  return `[${g}:${s}:${p}]`
+}
+
 class Feature {
   constructor (name, description = '') {
     this.name = name
@@ -116,11 +126,25 @@ class Feature {
   }
 }
 
+/**
+ * Turn camelCase into Camel Case
+ * @param {str} text text to transform
+ * @returns str as Capital Case
+ */
+function camel2capitalCase (text) {
+  return text
+    .replace(/([A-Z]+)/g, ' $1')
+    .replace(/([A-Z][a-z])/g, ' $1')
+    .replace(/^./, e => e.toUpperCase())
+}
+
 module.exports = {
+  camel2capitalCase,
   Feature,
   getCurrentPosition,
   loadSearchSettings,
   location2pos,
+  location2str,
   makeTableSortable,
   pos2location,
   quantile,

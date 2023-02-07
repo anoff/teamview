@@ -5,6 +5,7 @@ async function tableTokens (knex, forceDrop = false) {
   if (forceDrop) await knex.schema.dropTableIfExists('tokens')
   const tableExists = await knex.schema.hasTable('tokens')
   if (!tableExists) {
+    console.log('recreate tokens')
     // Create a table
     await knex.schema
       .createTable('tokens', table => {
