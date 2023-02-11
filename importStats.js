@@ -33,10 +33,10 @@ async function main () {
       logger.info(`New ${HASH_FILE} with the new hash ${hash}.`)
       writeFileSync(HASH_FILE, hash)
     } catch (error) {
-      logger.error(`There was a problem creating the ${HASHFILE} file.`, {error})
+      logger.error(`There was a problem creating the ${HASH_FILE} file.`, { error })
     }
 
-    let players = []
+    const players = []
     for (const s of stats) {
       const data = {
         playerId: s.playerId,
@@ -60,8 +60,8 @@ async function main () {
 
     logger.info(`Trying to insert ${players.length} Players`)
 
-    let resultUpsert = await Player.upsertMany(players, 'players', true)
-    let resultSave = await Player.saveMany(players, 'players_history', true)
+    await Player.upsertMany(players, 'players', true)
+    await Player.saveMany(players, 'players_history', true)
   }
 }
 
