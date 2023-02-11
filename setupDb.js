@@ -29,14 +29,14 @@ async function tablePlayers (knex, forceDrop = false) {
     // Create a table
     await knex.schema
       .createTable('players', table => {
-        table.increments('id').index()
+        table.increments('id')
         table.integer('player_id').unique().index()
         table.string('player_name').index()
-        table.string('alliance')
-        table.integer('rank')
+        table.string('alliance').index()
+        table.integer('rank').index()
         table.integer('points_research')
-        table.integer('points_defense')
-        table.integer('points_fleet')
+        table.integer('points_defense').index()
+        table.integer('points_fleet').index()
         table.integer('points_building')
         table.integer('points')
         table.integer('units_destroyed')
@@ -95,7 +95,7 @@ async function tablePlanets (knex, forceDrop = false) {
     // Create a table
     await knex.schema
       .createTable('planets', table => {
-        table.increments('id').index()
+        table.increments('id')
         table.integer('planet_id').index()
         table.integer('moon_id').index()
         table.string('planet_name')
@@ -122,11 +122,11 @@ async function tableReports (knex, forceDrop = false) {
     // Create a table
     await knex.schema
       .createTable('reports', table => {
-        table.increments('id').index()
+        table.increments('id')
         table.bigint('report_id').index()
         table.string('report_type').index()
         table.integer('submitted_by').references('tokens.id')
-        table.datetime('date')
+        table.datetime('date').index()
         table.integer('galaxy').index()
         table.integer('system').index()
         table.integer('position').index()
