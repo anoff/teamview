@@ -242,10 +242,11 @@ function insertResults (reports) {
       <span>⸺</span>
       <br>
       <a id="scan-${e.planetId}" title="Spy on planet" href="javascript:doit(6,${e.planetId},{'210':'2'});" style="font-size: 130%; position: relative; top: 2px;">${e.planetId ? ' 🛰 ' : ''}</a>
-      <br>
-      <span>⸺</span>
-      <br>
-      <a id="sim-${e.planetId}" title="Simulate" href="${simLink(e.resources, e.defense, e.ships, e.research)}" style="font-size: 130%; position: relative; top: 2px;" target="_blank">${e.planetId ? ' 🔮 ' : ''}</a>
+      <div ${fleetSp + defSp === 0 ? 'class="hidden"' : ''}>
+        <span>⸺</span>
+        <br>
+        <a id="sim-${e.planetId}" title="Simulate" href="${simLink(e.resources, e.defense, e.ships, e.research)}" style="font-size: 130%; position: relative; top: 2px;" target="_blank">${e.planetId ? ' 🔮 ' : ''}</a>
+      </div>
     </td>
     </tr>`
     anchor.insertAdjacentHTML('beforeend', html)

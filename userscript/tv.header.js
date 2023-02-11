@@ -21,6 +21,7 @@ function addMenuButton (text, href) {
 function init () {
   addMenuButton('Teamview', `${window.location.pathname}?page=galaxy&tv=station`)
   if (window.location.search.includes('tv=station')) {
+    document.title = 'Teamview - pr0game'
     showStation()
   }
 }
