@@ -417,6 +417,19 @@ class Fleet {
     }
     return result
   }
+
+  /**
+   * Create a copy of the fleet instance.
+   * @return Fleet
+   */
+  copy () {
+    const bt = new BattleTechs(this.battleTechs.weapons, this.battleTechs.shield, this.battleTechs.armor)
+    const f = new Fleet(bt, this.slot)
+    for (const [id, count] of Object.entries(this.unitsById)) {
+      f.addUnitId(id, count)
+    }
+    return f
+  }
 }
 
 module.exports.Fleet = Fleet

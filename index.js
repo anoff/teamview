@@ -4,15 +4,15 @@ const CronJob = require('cron').CronJob
 const server = new (require('./lib/server'))()
 const logger = require('./lib/logger').child({ module: __filename })
 
-const fs = require('fs');
+const fs = require('fs')
 
 function spawnStatsUpdate () {
   logger.info('Stats update started!')
   const updateStatsProc = spawn('node', ['importStats.js'])
-  
-  const stdOutStream = fs.createWriteStream('logs/importstats_stdout_stderr.log', { flags: 'a' });
-  updateStatsProc.stdout.pipe(stdOutStream);
-  updateStatsProc.stderr.pipe(stdOutStream);
+
+  const stdOutStream = fs.createWriteStream('logs/importstats_stdout_stderr.log', { flags: 'a' })
+  updateStatsProc.stdout.pipe(stdOutStream)
+  updateStatsProc.stderr.pipe(stdOutStream)
 
   updateStatsProc.stderr.on('data', (data) => {
     logger.error('Error occured while running stats update')
