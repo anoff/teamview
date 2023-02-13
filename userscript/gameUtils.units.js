@@ -99,7 +99,7 @@ class Ship extends Unit {
   }
 
   get armor () {
-    return (this.metal + this.crystal) / 10
+    return (this.cost.metal + this.cost.crystal) / 10
   }
 }
 
@@ -132,6 +132,10 @@ class Defense extends Unit {
     super(id, name, cost)
     this.shield = shield
     this.attack = attack
+  }
+
+  get armor () {
+    return (this.cost.metal + this.cost.crystal) / 10
   }
 }
 
