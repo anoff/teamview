@@ -312,6 +312,16 @@ const shipValues = {
   }
 }
 
+/**
+ * Check if a given id is a battleship
+ * @param {int} id ship id e.g. 202
+ * @returns {boolean} true if id is a battleship
+ */
+function isBattleship (id) {
+  id = parseInt(id)
+  return [204, 205, 206, 207, 215, 211, 213, 214].includes(id)
+}
+
 const defenseValues = {
   missileLauncher: {
     metal: 2e3,
@@ -533,6 +543,7 @@ module.exports = {
   getUnitStatsById,
   itemId2name,
   itemIds,
+  isBattleship,
   missionTypes,
   obj2str,
   res2str,

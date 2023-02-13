@@ -75,6 +75,17 @@ class Units {
     id = parseInt(id)
     return this.units.find(u => u.id === id)
   }
+
+  /**
+   * Retrieve single ship by its id
+   * @param {int} id ingame id e.g. 202
+   * @returns {Ship} the unit with the given id
+   */
+  getShipById (id) {
+    id = parseInt(id)
+    const unit = this.units.find(u => u.id === id)
+    if (unit && unit.isShip) return unit
+  }
 }
 
 class Ship extends Unit {
