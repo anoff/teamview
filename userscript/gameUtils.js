@@ -2,6 +2,7 @@
  * Convert various game entities to other units.
  */
 const { capitalCase } = require('change-case')
+const gameUnits = require('./gameUtils.units')
 
 /**
  * Object containing all items with name as key and ingame item id as value.
@@ -93,7 +94,15 @@ const shipValues = {
     rapid: {
       spyProbe: 5,
       solarSatellite: 5
-    }
+    },
+    speed: [
+      { value: 5e3, tech: 115 },
+      {
+        value: 10e3,
+        tech: 117,
+        minLevel: 5
+      }
+    ]
   },
   heavyCargo: {
     metal: 6e3,
@@ -106,7 +115,10 @@ const shipValues = {
     rapid: {
       spyProbe: 5,
       solarSatellite: 5
-    }
+    },
+    speed: [
+      { value: 12e3, tech: 115 }
+    ]
   },
   lightFighter: {
     metal: 3e3,
@@ -119,7 +131,8 @@ const shipValues = {
     rapid: {
       spyProbe: 5,
       solarSatellite: 5
-    }
+    },
+    speed: [{ value: 12500, tech: 115 }]
   },
   heavyFighter: {
     metal: 6e3,
@@ -133,7 +146,8 @@ const shipValues = {
       lightCargo: 3,
       spyProbe: 5,
       solarSatellite: 5
-    }
+    },
+    speed: [{ value: 10e3, tech: 117 }]
   },
   cruiser: {
     metal: 20e3,
@@ -148,7 +162,8 @@ const shipValues = {
       spyProbe: 5,
       solarSatellite: 5,
       missileLauncher: 10
-    }
+    },
+    speed: [{ value: 15e3, tech: 117 }]
   },
   battleship: {
     metal: 45e3,
@@ -161,7 +176,8 @@ const shipValues = {
     rapid: {
       spyProbe: 5,
       solarSatellite: 5
-    }
+    },
+    speed: [{ value: 10e3, tech: 118 }]
   },
   colonyShip: {
     metal: 10e3,
@@ -174,7 +190,8 @@ const shipValues = {
     rapid: {
       spyProbe: 5,
       solarSatellite: 5
-    }
+    },
+    speed: [{ value: 2500, tech: 117 }]
   },
   recycler: {
     metal: 10e3,
@@ -187,7 +204,8 @@ const shipValues = {
     rapid: {
       spyProbe: 5,
       solarSatellite: 5
-    }
+    },
+    speed: [{ value: 2000, tech: 115 }, { value: 4000, tech: 117, minLevel: 17 }, { value: 6000, tech: 118, minLevel: 15 }]
   },
   spyProbe: {
     metal: 0,
@@ -196,7 +214,9 @@ const shipValues = {
     shield: 0,
     armour: 100,
     attack: 0,
-    cargo: 5
+    rapid: {},
+    cargo: 5,
+    speed: [100e6]
   },
   planetBomber: {
     metal: 50e3,
@@ -213,7 +233,8 @@ const shipValues = {
       lightLaserTurret: 20,
       heavyLaserTurret: 10,
       ionCannon: 10
-    }
+    },
+    speed: [{ value: 4000, tech: 117 }, { value: 5000, minLevel: 8, tech: 118 }]
   },
   solarSatellite: {
     metal: 0,
@@ -237,7 +258,8 @@ const shipValues = {
       solarSatellite: 5,
       battleCruiser: 2,
       lightLaserTurret: 10
-    }
+    },
+    speed: [{ value: 5000, tech: 118 }]
   },
   battleFortress: {
     metal: 5e6,
@@ -266,7 +288,8 @@ const shipValues = {
       heavyLaserTurret: 100,
       gaussCannon: 50,
       ionCannon: 100
-    }
+    },
+    speed: [{ level: 100, tech: 118 }]
   },
   battleCruiser: {
     metal: 30e3,
@@ -284,8 +307,19 @@ const shipValues = {
       battleship: 7,
       spyProbe: 5,
       solarSatellite: 5
-    }
+    },
+    speed: [{ value: 10e3, tech: 118 }]
   }
+}
+
+/**
+ * Check if a given id is a battleship
+ * @param {int} id ship id e.g. 202
+ * @returns {boolean} true if id is a battleship
+ */
+function isBattleship (id) {
+  id = parseInt(id)
+  return [204, 205, 206, 207, 215, 211, 213, 214].includes(id)
 }
 
 const defenseValues = {
@@ -414,6 +448,7 @@ const getUnitStatsById = getStatsByItemId()
  * @param {int} id unit, tech, building id
  */
 function itemId2name (id) {
+  id = parseInt(id)
   const item = Object.entries(itemIds).find(e => e[1] === id)
   if (!item) return ''
   return item[0].split('_').slice(1).join('_')
@@ -504,9 +539,11 @@ module.exports = {
   calculateHourlyMineProduction,
   defenseStructurePoints,
   defenseValues,
+  gameUnits,
   getUnitStatsById,
   itemId2name,
   itemIds,
+  isBattleship,
   missionTypes,
   obj2str,
   res2str,
