@@ -144,23 +144,25 @@ async function tableReports (knex, forceDrop = false) {
           update_updated_at_column();`)
       .raw('ALTER TABLE reports ADD location int GENERATED ALWAYS AS (galaxy * 1000000 + system * 1000 + position) STORED')
       .raw(`
-      CREATE OR REPLACE FUNCTION update_phalanxes() RETURNS TRIGGER AS $BODY$
+      CREATE OR REPLACE FUNCTION "public"."update_phalanxes"()
+      RETURNS "pg_catalog"."trigger" AS $BODY$
       BEGIN
         IF NEW.moon_id IS NOT NULL THEN
           IF EXISTS (SELECT * FROM phalanxes WHERE moon_id = NEW.moon_id) THEN
             UPDATE phalanxes
-            SET phalanxsensor = (NEW.buildings ->> 'phalanxSensor')::numeric,
+            SET sensor = (NEW.buildings ->> 'phalanxSensor')::numeric,
                 updated_at = GREATEST(NEW.date, phalanxes.updated_at)
             WHERE moon_id = NEW.moon_id AND (phalanxes.updated_at IS NULL OR NEW.date > phalanxes.updated_at);
           ELSE
-            INSERT INTO phalanxes (phalanxsensor, galaxy, system, position, moon_id, updated_at)
+            INSERT INTO phalanxes (sensor, galaxy, system, position, moon_id, updated_at)
             VALUES ((NEW.buildings ->> 'phalanxSensor')::numeric, NEW.galaxy, NEW.system, NEW.position, NEW.moon_id, NEW.date);
           END IF;
         END IF;
         RETURN NEW;
       END;
       $BODY$
-      LANGUAGE plpgsql VOLATILE;
+        LANGUAGE plpgsql VOLATILE
+      COST 100
 
       CREATE TRIGGER update_phalanx AFTER INSERT OR UPDATE ON reports
       FOR EACH ROW
