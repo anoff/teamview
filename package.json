@@ -10,9 +10,10 @@
   "main": "index.js",
   "scripts": {
     "lint": "npx standard",
-    "dev": "NODE_ENV=development nodemon",
+    "dev": "NODE_ENV=development npx ts-node-dev --poll --respawn --transpile-only index.js",
     "test": "npm run lint",
-    "start": "NODE_ENV=production node index.js | pino-tee info ./logs/info.log | pino-tee error ./logs/error.log",
+    "start": "NODE_ENV=production node ./build/index.js | pino-tee info ./logs/info.log | pino-tee error ./logs/error.log",
+    "build": "tsc",
     "apidoc": "apidoc -i lib/ -o public/api"
   },
   "author": "Andreas Offenhaeuser <https://anoff.io>",
@@ -26,6 +27,7 @@
     "express": "^4.18.1",
     "express-validator": "^6.14.0",
     "knex": "^2.0.0",
+    "morgan": "^1.10.0",
     "pg": "^8.7.3",
     "pino": "^7.11.0",
     "pino-http": "^7.0.0",
@@ -34,11 +36,13 @@
     "sqlite3": "^5.0.8"
   },
   "devDependencies": {
+    "@types/node": "^18.13.0",
     "apidoc": "^0.51.1",
     "html-loader": "^3.1.0",
     "nodemon": "^2.0.16",
     "pino-pretty": "^7.6.1",
-    "standard": "^17.0.0"
+    "standard": "^17.0.0",
+    "typescript": "^4.9.5"
   },
   "nodemonConfig": {
     "ignore": [
@@ -50,8 +54,15 @@
     "exec": "node index.js | pino-pretty"
   },
   "standard": {
+    "plugins": [
+      "typescript"
+    ],
     "ignore": [
       "public/teamview.js"
+    ],
+    "validator": [
+      "js",
+      "typescript"
     ]
   },
   "apidoc": {
