@@ -7,7 +7,7 @@ exports.up = async function (knex) {
   if (exists) return
 
   return knex.schema.createTable('phalanxes', (table) => {
-    table.decimal('phalanxsensor')
+    table.integer('sensor')
     table.integer('galaxy').notNullable()
     table.integer('system').notNullable()
     table.integer('position').notNullable()
@@ -20,12 +20,12 @@ exports.up = async function (knex) {
           IF NEW.moon_id IS NOT NULL THEN
           IF EXISTS (SELECT * FROM phalanxes WHERE moon_id = NEW.moon_id) THEN
               UPDATE phalanxes
-              SET phalanxsensor = (NEW.buildings ->> 'phalanxSensor')::numeric,
+              SET sensor = (NEW.buildings ->> 'phalanxsensor')::numeric,
                   updated_at = GREATEST(NEW.date, phalanxes.updated_at)
               WHERE moon_id = NEW.moon_id AND (phalanxes.updated_at IS NULL OR NEW.date > phalanxes.updated_at);
           ELSE
-              INSERT INTO phalanxes (phalanxsensor, galaxy, system, position, moon_id, updated_at)
-              VALUES ((NEW.buildings ->> 'phalanxSensor')::numeric, NEW.galaxy, NEW.system, NEW.position, NEW.moon_id, NEW.date);
+              INSERT INTO phalanxes (sensor, galaxy, system, position, moon_id, updated_at)
+              VALUES ((NEW.buildings ->> 'phalanxsensor')::numeric, NEW.galaxy, NEW.system, NEW.position, NEW.moon_id, NEW.date);
           END IF;
           END IF;
           RETURN NEW;

@@ -177,7 +177,7 @@ async function tablePhalanxes (knex, forceDrop = false) {
     console.log('recreate phalanxes')
     // Create a table
     await knex.schema.createTable('phalanxes', (table) => {
-      table.decimal('phalanxsensor')
+      table.integer('sensor')
       table.integer('galaxy').notNullable()
       table.integer('system').notNullable()
       table.integer('position').notNullable()
