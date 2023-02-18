@@ -355,14 +355,48 @@ function modifyTable (data, modfiyFn) {
   }
 }
 
+function checkPhalanxesInRange (galaxy, system) {
+  genericRequest(`/v1/phalanxes/in_range/${galaxy}:${system}`, 'GET')
+    .then(phalanxes => {
+      if (phalanxes.length > 0) {
+        const galaxyTable = document.querySelector('content table.table569')
+        galaxyTable.style.border = '2px solid red'
+        const systemHeader = document.querySelector('.table569 tr:first-child th:first-child')
+
+        const phalanxLabel = document.createElement('span')
+        phalanxLabel.textContent = ' - Phalanxes in Range: '
+        phalanxLabel.style.color = 'red'
+        systemHeader.appendChild(phalanxLabel)
+
+        phalanxes.forEach(phalanx => {
+          const span = document.createElement('span')
+          span.innerHTML = `
+          <a style="color: red;"
+            href="https://pr0game.com/uni2/game.php?page=galaxy&amp;galaxy=${phalanx.galaxy}&amp;system=${phalanx.system}">
+            [${phalanx.galaxy}:${phalanx.system}:${phalanx.position}]              
+          </a>
+        `
+          systemHeader.appendChild(span)
+        })
+      }
+    })
+}
+
 function init () {
   if (!(window.location.search.includes('page=galaxy') && !window.location.search.includes('tv=station'))) return
   addColumn(2, ['Player Stats', 'Spio Info'])
   addUploadSection()
   modifyTable({}, modifyAddRankFromPopup)
   const data = getVisibleSystem()
+  console.log({ data })
   systemData = data
   checkPlanetStatus(data)
+
+  const systemCoords = Array.from(document.querySelector('content table.table569').querySelectorAll('tr'))[0].innerText
+  const [galaxy, system] = systemCoords.split(' ')[1].split(':').map(e => parseInt(e))
+
+  checkPhalanxesInRange(galaxy, system)
+
   const players = data.map(e => e.playerName)
   const uniquePlayers = Array.from(new Set(players))
   if (uniquePlayers.length) {
