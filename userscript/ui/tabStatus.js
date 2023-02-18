@@ -42,8 +42,51 @@ function removeRows () {
   }
 }
 
-function addRows (planets) {
+// build and array with systems as indexes and boolean as values
+// if the value is truw the index is in a phalanx
+async function calculateSystemsInPhalanxRange (galaxy) {
+  const phalanxes = await req.getPhalanxes(galaxy)
+  const galaxyData = Array.from(Array(400), () => [])
+
+  phalanxes.forEach(phalanx => {
+    const { from, to } = phalanx.range
+    if (from < to || from === to) {
+      for (let system = from; system <= to; system++) {
+        galaxyData[system - 1].push(phalanx)
+      }
+    } else {
+      for (let system = from; system <= 400; system++) {
+        galaxyData[system - 1].push(phalanx)
+      }
+
+      for (let system = 1; system <= to; system++) {
+        galaxyData[system - 1].push(phalanx)
+      }
+    }
+  })
+
+  return galaxyData
+}
+
+function createDataTooltipContent (galaxyPhalanxData, system) {
+  const systemData = galaxyPhalanxData[system - 1]
+
+  let content = '<ul>'
+  systemData.forEach(phalanx => {
+    content += `<li>[${phalanx.galaxy}:${phalanx.system}:${phalanx.position}]</li>`
+  })
+  content += '</ul>'
+  return content
+}
+
+async function addRows (planets) {
   const galaxy = document.querySelector('select#galaxy').value
+  const galaxyPhalanxData = await calculateSystemsInPhalanxRange(galaxy)
+  const isInPhalanxRange = system => {
+    if (system < 1 || system > 400) return false
+    return galaxyPhalanxData[system - 1].length > 0
+  }
+
   const ROWS_HEADER = 1
   let anchor = document.querySelector('table#galaxy-status').querySelectorAll('tr')[ROWS_HEADER - 1]
   for (let rowIx = 0; rowIx <= 20; rowIx++) {
@@ -58,7 +101,11 @@ function addRows (planets) {
       else if (planetCount === 2) cls = 'color-blue'
       else if (planetCount >= 3) cls = 'color-green'
       if (oldestAge > 24 * 5) cls = 'color-orange'
-      html += `<td><a href="${window.location.pathname}?page=galaxy&galaxy=${galaxy}&system=${system}" class="${cls}">${system}</a></td>`
+
+      const inPhalanxStyle = isInPhalanxRange(system) ? 'style="border: 1px solid red;"' : ''
+      const phalanxTooltipConent = isInPhalanxRange(system) ? `data-tooltip-content="${createDataTooltipContent(galaxyPhalanxData, system)}"` : ''
+
+      html += `<td ${inPhalanxStyle} ><a ${phalanxTooltipConent} href="${window.location.pathname}?page=galaxy&galaxy=${galaxy}&system=${system}" class="${cls}">${system}</a></td>`
     }
     html += '</tr>'
     anchor.insertAdjacentHTML('afterend', html)
