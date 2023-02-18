@@ -4,6 +4,59 @@ const {
   getCurrentPosition
 } = require('../utils')
 
+class GalaxyPhalanxInformation {
+  constructor (phalanxes) {
+    if (!Array.isArray(phalanxes)) {
+      throw new Error('Expected an array of phalanx information.')
+    }
+    this.phalanxes = phalanxes
+    this.data = Array.from(Array(400), () => [])
+    this.calculateSystemsInPhalanx()
+    console.log(this.data)
+  }
+
+  getSystem (system) {
+    return this.data[system - 1]
+  }
+
+  appendPhalanx (system, phalanx) {
+    if (system < 1 || system > 400) return
+    return this.data[system - 1].push(phalanx)
+  }
+
+  calculateSystemsInPhalanx () {
+    this.phalanxes.forEach(phalanx => {
+      const { from, to } = phalanx.range
+      if (from < to || from === to) {
+        for (let system = from; system <= to; system++) {
+          this.appendPhalanx(system, phalanx)
+        }
+      } else {
+        for (let system = from; system <= (400 + to); system++) {
+          this.appendPhalanx(system % 401, phalanx)
+        }
+      }
+    })
+  }
+
+  isInRange (system) {
+    if (system < 1 || system > 400) return false
+    return this.getSystem(system).length > 0
+  }
+
+  // TODO: Tooltip not working yet
+  createDataTooltipContent (system) {
+    const systemData = this.getSystem(system)
+
+    let content = '<ul>'
+    systemData.forEach(phalanx => {
+      content += `<li>[${phalanx.galaxy}:${phalanx.system}:${phalanx.position}]</li>`
+    })
+    content += '</ul>'
+    return content
+  }
+}
+
 function fetchAndDisplay (galaxy) {
   return req.searchPlanets({
     galaxy_min: galaxy,
@@ -42,50 +95,11 @@ function removeRows () {
   }
 }
 
-// build and array with systems as indexes and boolean as values
-// if the value is truw the index is in a phalanx
-async function calculateSystemsInPhalanxRange (galaxy) {
-  const phalanxes = await req.getPhalanxes(galaxy)
-  const galaxyData = Array.from(Array(400), () => [])
-
-  phalanxes.forEach(phalanx => {
-    const { from, to } = phalanx.range
-    if (from < to || from === to) {
-      for (let system = from; system <= to; system++) {
-        galaxyData[system - 1].push(phalanx)
-      }
-    } else {
-      for (let system = from; system <= 400; system++) {
-        galaxyData[system - 1].push(phalanx)
-      }
-
-      for (let system = 1; system <= to; system++) {
-        galaxyData[system - 1].push(phalanx)
-      }
-    }
-  })
-
-  return galaxyData
-}
-
-function createDataTooltipContent (galaxyPhalanxData, system) {
-  const systemData = galaxyPhalanxData[system - 1]
-
-  let content = '<ul>'
-  systemData.forEach(phalanx => {
-    content += `<li>[${phalanx.galaxy}:${phalanx.system}:${phalanx.position}]</li>`
-  })
-  content += '</ul>'
-  return content
-}
-
 async function addRows (planets) {
   const galaxy = document.querySelector('select#galaxy').value
-  const galaxyPhalanxData = await calculateSystemsInPhalanxRange(galaxy)
-  const isInPhalanxRange = system => {
-    if (system < 1 || system > 400) return false
-    return galaxyPhalanxData[system - 1].length > 0
-  }
+
+  const phalanxes = await req.getPhalanxes(galaxy)
+  const galaxyPhalanxInfo = new GalaxyPhalanxInformation(phalanxes)
 
   const ROWS_HEADER = 1
   let anchor = document.querySelector('table#galaxy-status').querySelectorAll('tr')[ROWS_HEADER - 1]
@@ -102,8 +116,8 @@ async function addRows (planets) {
       else if (planetCount >= 3) cls = 'color-green'
       if (oldestAge > 24 * 5) cls = 'color-orange'
 
-      const inPhalanxStyle = isInPhalanxRange(system) ? 'style="border: 1px solid red;"' : ''
-      const phalanxTooltipConent = isInPhalanxRange(system) ? `data-tooltip-content="${createDataTooltipContent(galaxyPhalanxData, system)}"` : ''
+      const inPhalanxStyle = galaxyPhalanxInfo.isInRange(system) ? 'style="border: 1px solid red;"' : ''
+      const phalanxTooltipConent = galaxyPhalanxInfo.isInRange(system) ? `data-tooltip-content="${galaxyPhalanxInfo.createDataTooltipContent(system)}"` : ''
 
       html += `<td ${inPhalanxStyle} ><a ${phalanxTooltipConent} href="${window.location.pathname}?page=galaxy&galaxy=${galaxy}&system=${system}" class="${cls}">${system}</a></td>`
     }
