@@ -357,30 +357,29 @@ function modifyTable (data, modfiyFn) {
 
 function checkPhalanxesInRange (galaxy, system) {
   genericRequest(`/v1/phalanxes/in_range/${galaxy}:${system}`, 'GET')
-  .then(phalanxes => {
-    if (phalanxes.length > 0) {
-      let galaxyTable = document.querySelector('content table.table569')
-      galaxyTable.style.border = "2px solid red";
-      const systemHeader = document.querySelector('.table569 tr:first-child th:first-child')
+    .then(phalanxes => {
+      if (phalanxes.length > 0) {
+        const galaxyTable = document.querySelector('content table.table569')
+        galaxyTable.style.border = '2px solid red'
+        const systemHeader = document.querySelector('.table569 tr:first-child th:first-child')
 
-      const phalanxLabel = document.createElement('span')
-      phalanxLabel.textContent = ' - Phalanxes in Range: '
-      phalanxLabel.style.color = 'red'
-      systemHeader.appendChild(phalanxLabel);
+        const phalanxLabel = document.createElement('span')
+        phalanxLabel.textContent = ' - Phalanxes in Range: '
+        phalanxLabel.style.color = 'red'
+        systemHeader.appendChild(phalanxLabel)
 
-      let phalanesInRange = ""
-      phalanxes.forEach(phalanx => {
-        const span = document.createElement('span');
-        span.innerHTML = `
+        phalanxes.forEach(phalanx => {
+          const span = document.createElement('span')
+          span.innerHTML = `
           <a style="color: red;"
             href="https://pr0game.com/uni2/game.php?page=galaxy&amp;galaxy=${phalanx.galaxy}&amp;system=${phalanx.system}">
             [${phalanx.galaxy}:${phalanx.system}:${phalanx.position}]              
           </a>
         `
-        systemHeader.appendChild(span)            
-      })
-    }
-  })
+          systemHeader.appendChild(span)
+        })
+      }
+    })
 }
 
 function init () {
@@ -389,7 +388,7 @@ function init () {
   addUploadSection()
   modifyTable({}, modifyAddRankFromPopup)
   const data = getVisibleSystem()
-  console.log({data})
+  console.log({ data })
   systemData = data
   checkPlanetStatus(data)
 
@@ -408,8 +407,6 @@ function init () {
       })
   }
 }
-
-
 
 module.exports = {
   addUploadSection,
