@@ -1,10 +1,12 @@
+require('dotenv').config();
+
 module.exports = {
   development: {
     client: 'pg',
     connection: {
       host: 'localhost',
       user: process.env.POSTGRES_USER,
-      password: process.env.DB_PASSWORD,
+      password: process.env.POSTGRES_PASSWORD,
       database: process.env.POSTGRES_DB,
       port: process.env.POSTGRES_PORT
     },
@@ -18,10 +20,9 @@ module.exports = {
     connection: {
       host: process.env.POSTGRES_HOST,
       user: process.env.POSTGRES_USER,
-      password: process.env.DB_PASSWORD,
+      password: process.env.POSTGRES_PASSWORD,
       database: process.env.POSTGRES_DB,
       port: process.env.POSTGRES_PORT,
-      ssl: { rejectUnauthorized: false }
     },
     migrations: {
       tableName: 'knex_migrations',
