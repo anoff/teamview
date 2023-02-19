@@ -30,7 +30,7 @@
     3000,
     5432
   ],
-  "postCreateCommand": "npm install --save-dev typescript @types/node && npm install",
+  "postCreateCommand": "npm install --save-dev typescript @types/node && npm install && npx knex migrate:latest",
   // Comment out to connect as root instead. More info: https://aka.ms/vscode-remote/containers/non-root.
   "remoteUser": "node"
 }
