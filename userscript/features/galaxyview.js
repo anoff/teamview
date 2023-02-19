@@ -388,7 +388,6 @@ function init () {
   addUploadSection()
   modifyTable({}, modifyAddRankFromPopup)
   const data = getVisibleSystem()
-  console.log({ data })
   systemData = data
   checkPlanetStatus(data)
 
