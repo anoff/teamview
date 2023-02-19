@@ -13,7 +13,7 @@ services:
   app:
     container_name: teamview-app
     build: .
-    command: npm run start
+    command: bash -c "npx knex migrate:latest --env production; npm run start"
     networks:
       - backend
     depends_on: [db]
@@ -34,7 +34,7 @@ services:
     networks:
       - backend
     ports: # HOST:INTERNAL
-      - "5434:$POSTGRES_PORT"
+      - "5432:$POSTGRES_PORT"
     restart: unless-stopped
     volumes:
       - .docker/postgres:/var/lib/postgresql/data
