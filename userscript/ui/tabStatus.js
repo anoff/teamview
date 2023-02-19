@@ -4,6 +4,59 @@ const {
   getCurrentPosition
 } = require('../utils')
 
+class GalaxyPhalanxInformation {
+  constructor (phalanxes) {
+    if (!Array.isArray(phalanxes)) {
+      throw new Error('Expected an array of phalanx information.')
+    }
+    this.phalanxes = phalanxes
+    this.data = Array.from(Array(400), () => [])
+    this.calculateSystemsInPhalanx()
+    console.log(this.data)
+  }
+
+  getSystem (system) {
+    return this.data[system - 1]
+  }
+
+  appendPhalanx (system, phalanx) {
+    if (system < 1 || system > 400) return
+    return this.data[system - 1].push(phalanx)
+  }
+
+  calculateSystemsInPhalanx () {
+    this.phalanxes.forEach(phalanx => {
+      const { from, to } = phalanx.range
+      if (from < to || from === to) {
+        for (let system = from; system <= to; system++) {
+          this.appendPhalanx(system, phalanx)
+        }
+      } else {
+        for (let system = from; system <= (400 + to); system++) {
+          this.appendPhalanx(system % 401, phalanx)
+        }
+      }
+    })
+  }
+
+  isInRange (system) {
+    if (system < 1 || system > 400) return false
+    return this.getSystem(system).length > 0
+  }
+
+  // TODO: Tooltip not working yet
+  createDataTooltipContent (system) {
+    const systemData = this.getSystem(system)
+
+    let content = '<ul>'
+    systemData.forEach(phalanx => {
+      content += `<li>[${phalanx.galaxy}:${phalanx.system}:${phalanx.position}]</li>`
+    })
+    content += '</ul>'
+    return content
+  }
+}
+
 function fetchAndDisplay (galaxy) {
   return req.searchPlanets({
     galaxy_min: galaxy,
@@ -42,8 +95,12 @@ function removeRows () {
   }
 }
 
-function addRows (planets) {
+async function addRows (planets) {
   const galaxy = document.querySelector('select#galaxy').value
+
+  const phalanxes = await req.getPhalanxes(galaxy)
+  const galaxyPhalanxInfo = new GalaxyPhalanxInformation(phalanxes)
+
   const ROWS_HEADER = 1
   let anchor = document.querySelector('table#galaxy-status').querySelectorAll('tr')[ROWS_HEADER - 1]
   for (let rowIx = 0; rowIx <= 20; rowIx++) {
@@ -58,7 +115,11 @@ function addRows (planets) {
       else if (planetCount === 2) cls = 'color-blue'
       else if (planetCount >= 3) cls = 'color-green'
       if (oldestAge > 24 * 5) cls = 'color-orange'
-      html += `<td><a href="${window.location.pathname}?page=galaxy&galaxy=${galaxy}&system=${system}" class="${cls}">${system}</a></td>`
+
+      const inPhalanxStyle = galaxyPhalanxInfo.isInRange(system) ? 'style="border: 1px solid red;"' : ''
+      const phalanxTooltipConent = galaxyPhalanxInfo.isInRange(system) ? `data-tooltip-content="${galaxyPhalanxInfo.createDataTooltipContent(system)}"` : ''
+
+      html += `<td ${inPhalanxStyle} ><a ${phalanxTooltipConent} href="${window.location.pathname}?page=galaxy&galaxy=${galaxy}&system=${system}" class="${cls}">${system}</a></td>`
     }
     html += '</tr>'
     anchor.insertAdjacentHTML('afterend', html)

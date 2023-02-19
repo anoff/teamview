@@ -120,30 +120,104 @@ async function tableReports (knex, forceDrop = false) {
   if (!tableExists) {
     console.log('recreate reports')
     // Create a table
-    await knex.schema
-      .createTable('reports', table => {
-        table.increments('id')
-        table.bigint('report_id').index()
-        table.string('report_type').index()
-        table.integer('submitted_by').references('tokens.id')
-        table.datetime('date').index()
-        table.integer('galaxy').index()
-        table.integer('system').index()
-        table.integer('position').index()
-        table.boolean('is_moon')
-        table.json('resources')
-        table.json('buildings')
-        table.json('ships')
-        table.json('research')
-        table.json('defense')
-        table.integer('planet_id')
-        table.integer('moon_id')
-        table.timestamps(false, true)
-      }).raw(`
-          CREATE OR REPLACE TRIGGER update_reports_updated_at BEFORE UPDATE
-          ON reports FOR EACH ROW EXECUTE PROCEDURE 
-          update_updated_at_column();`)
-      .raw('ALTER TABLE reports ADD location int GENERATED ALWAYS AS (galaxy * 1000000 + system * 1000 + position) STORED')
+    await knex.schema.createTable('reports', table => {
+      table.increments('id')
+      table.bigint('report_id').index()
+      table.string('report_type').index()
+      table.integer('submitted_by').references('tokens.id')
+      table.datetime('date').index()
+      table.integer('galaxy').index()
+      table.integer('system').index()
+      table.integer('position').index()
+      table.boolean('is_moon')
+      table.json('resources')
+      table.json('buildings')
+      table.json('ships')
+      table.json('research')
+      table.json('defense')
+      table.integer('planet_id')
+      table.integer('moon_id')
+      table.timestamps(false, true)
+    })
+    .raw(`CREATE 
+      OR REPLACE FUNCTION "public"."update_phalanxes" ( ) RETURNS "pg_catalog"."trigger" AS $BODY$ BEGIN
+      IF
+        NEW.moon_id IS NOT NULL THEN
+        IF
+          EXISTS ( SELECT * FROM phalanxes WHERE moon_id = NEW.moon_id ) THEN
+            UPDATE phalanxes 
+            SET sensor = ( NEW.buildings ->> 'phalanxSensor' ) :: NUMERIC,
+            updated_at = GREATEST ( NEW.DATE, phalanxes.updated_at ) 
+          WHERE
+            moon_id = NEW.moon_id 
+            AND ( phalanxes.updated_at IS NULL OR NEW.DATE > phalanxes.updated_at );
+          ELSE INSERT INTO phalanxes ( sensor, galaxy, SYSTEM, POSITION, moon_id, updated_at )
+          VALUES
+            (
+              ( NEW.buildings ->> 'phalanxSensor' ) :: NUMERIC,
+              NEW.galaxy,
+              NEW.SYSTEM,
+              NEW.POSITION,
+              NEW.moon_id,
+              NEW.DATE 
+            );
+          
+        END IF;
+        
+      END IF;
+      RETURN NEW;
+      
+      END;
+      $BODY$ LANGUAGE plpgsql VOLATILE COST 100;
+   `)
+  .raw(`
+    DO $$ BEGIN
+      IF
+        NOT EXISTS ( SELECT 1 FROM pg_trigger WHERE tgname = 'update_phalanx' AND tgrelid = 'public.reports' :: REGCLASS ) THEN
+          CREATE TRIGGER update_phalanx AFTER INSERT 
+          OR UPDATE ON PUBLIC.reports FOR EACH ROW
+          
+          WHEN ( NEW.moon_id IS NOT NULL AND NEW.moon_id > 0 ) EXECUTE FUNCTION update_phalanxes ( );
+        
+      END IF;
+      
+    END;
+    $$;
+  `)
+  .raw(`INSERT INTO phalanxes ( sensor, galaxy, SYSTEM, POSITION, moon_id, updated_at ) SELECT
+      ( buildings ->> 'phalanxSensor' ) :: NUMERIC AS sensor,
+      galaxy,
+      SYSTEM,
+      POSITION,
+      moon_id,
+      DATE 
+      FROM
+        reports 
+      WHERE
+        moon_id IS NOT NULL 
+        AND DATE = ( SELECT MAX ( DATE ) FROM reports r WHERE r.moon_id = reports.moon_id ) ON CONFLICT ( moon_id ) DO
+      UPDATE 
+        SET sensor = EXCLUDED.sensor,
+        updated_at = GREATEST ( EXCLUDED.updated_at, phalanxes.updated_at );
+  `)
+  }
+}
+
+async function tablePhalanxes (knex, forceDrop = false) {
+  if (forceDrop) await knex.schema.dropTableIfExists('phalanxes')
+  const tableExists = await knex.schema.hasTable('phalanxes')
+  if (!tableExists) {
+    console.log('recreate phalanxes')
+    // Create a table
+    await knex.schema.createTable('phalanxes', (table) => {
+      table.integer('sensor')
+      table.integer('galaxy').notNullable()
+      table.integer('system').notNullable()
+      table.integer('position').notNullable()
+      table.timestamp('updated_at')
+      table.integer('moon_id').unique().index()
+      table.primary(['moon_id'])
+    })
   }
 }
 
@@ -177,6 +251,7 @@ async function initDb () {
     await tablePlayersHistory(knex, forceDrop)
     await tablePlanets(knex, forceDrop)
     await tableReports(knex, forceDrop)
+    await tablePhalanxes(knex, forceDrop)
   } catch (e) {
     console.error(e)
   }

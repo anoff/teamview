@@ -11,3 +11,4 @@ public/*.bundle.js.map
 monitoring-infra/influxdb/data/
 monitoring-infra/grafana/data/
 logs/
+build/

@@ -81,8 +81,22 @@ function searchReportsRequest (query) {
   return genericRequest(`/v1/reports?${q}&type=search`, 'GET')
 }
 
+/**
+ * Retrieve a List of Phalanxes
+ * @param {Object} query query parameters in object notation
+ * @returns {Array[Object]} list of results
+ */
+function getPhalanxes (galaxy = 0) {
+  if (galaxy === 0) {
+    return genericRequest('/v1/phalanxes', 'GET')
+  } else {
+    return genericRequest(`/v1/phalanxes?galaxy=${galaxy}`, 'GET')
+  }
+}
+
 module.exports = {
   genericRequest,
   searchPlanets,
-  searchReportsRequest
+  searchReportsRequest,
+  getPhalanxes
 }
