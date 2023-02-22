@@ -138,8 +138,12 @@ async function tableReports (knex, forceDrop = false) {
       table.integer('planet_id')
       table.integer('moon_id')
       table.timestamps(false, true)
-    })
-    .raw(`CREATE 
+    }).raw(`
+          CREATE OR REPLACE TRIGGER update_reports_updated_at BEFORE UPDATE
+          ON reports FOR EACH ROW EXECUTE PROCEDURE 
+          update_updated_at_column();`)
+      .raw('ALTER TABLE reports ADD location int GENERATED ALWAYS AS (galaxy * 1000000 + system * 1000 + position) STORED')
+      .raw(`CREATE 
       OR REPLACE FUNCTION "public"."update_phalanxes" ( ) RETURNS "pg_catalog"."trigger" AS $BODY$ BEGIN
       IF
         NEW.moon_id IS NOT NULL THEN
@@ -170,7 +174,7 @@ async function tableReports (knex, forceDrop = false) {
       END;
       $BODY$ LANGUAGE plpgsql VOLATILE COST 100;
    `)
-  .raw(`
+      .raw(`
     DO $$ BEGIN
       IF
         NOT EXISTS ( SELECT 1 FROM pg_trigger WHERE tgname = 'update_phalanx' AND tgrelid = 'public.reports' :: REGCLASS ) THEN
@@ -184,7 +188,7 @@ async function tableReports (knex, forceDrop = false) {
     END;
     $$;
   `)
-  .raw(`INSERT INTO phalanxes ( sensor, galaxy, SYSTEM, POSITION, moon_id, updated_at ) SELECT
+      .raw(`INSERT INTO phalanxes ( sensor, galaxy, SYSTEM, POSITION, moon_id, updated_at ) SELECT
       ( buildings ->> 'phalanxSensor' ) :: NUMERIC AS sensor,
       galaxy,
       SYSTEM,
@@ -250,8 +254,8 @@ async function initDb () {
     await tablePlayers(knex, forceDrop)
     await tablePlayersHistory(knex, forceDrop)
     await tablePlanets(knex, forceDrop)
+    await tablePhalanxes(knex, forceDrop) // create before Reports because of reference in reports creation
     await tableReports(knex, forceDrop)
-    await tablePhalanxes(knex, forceDrop)
   } catch (e) {
     console.error(e)
   }
