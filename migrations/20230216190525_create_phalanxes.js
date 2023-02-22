@@ -45,7 +45,7 @@ exports.up = async function (knex) {
   END;
   $BODY$ LANGUAGE plpgsql VOLATILE COST 100;
 `)
-.raw(`
+    .raw(`
   DO $$ BEGIN
     IF
       NOT EXISTS ( SELECT 1 FROM pg_trigger WHERE tgname = 'update_phalanx' AND tgrelid = 'public.reports' :: REGCLASS ) THEN
@@ -59,7 +59,7 @@ exports.up = async function (knex) {
   END;
   $$;
 `)
-.raw(`INSERT INTO phalanxes ( sensor, galaxy, SYSTEM, POSITION, moon_id, updated_at ) SELECT
+    .raw(`INSERT INTO phalanxes ( sensor, galaxy, SYSTEM, POSITION, moon_id, updated_at ) SELECT
   ( buildings ->> 'phalanxSensor' ) :: NUMERIC AS sensor,
   galaxy,
   SYSTEM,
