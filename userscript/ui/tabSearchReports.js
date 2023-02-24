@@ -145,17 +145,17 @@ function insertResults (reports) {
   }
 
   const res2mse = (obj, ratio = TradeRatios.get()) => {
-    const m = obj.metal
-    const c = obj.crystal * ratio.metal / ratio.crystal
-    const d = obj.deuterium * ratio.metal / ratio.deuterium
+    const m = typeof obj.metal === 'number' ? obj.metal : 0
+    const c = typeof obj.crystal === 'number' ? obj.crystal * ratio.metal / ratio.crystal : 0
+    const d = typeof obj.deuterium === 'number' ? obj.deuterium * ratio.metal / ratio.deuterium : 0
     return m + c + d
   }
 
   const allRes = {
-    mse: reports.filter(e => e.resources.metal).map(e => res2mse(e.resources)),
-    metal: reports.filter(e => e.resources.metal).map(e => e.resources.metal),
-    crystal: reports.filter(e => e.resources.metal).map(e => e.resources.crystal),
-    deuterium: reports.filter(e => e.resources.metal).map(e => e.resources.deuterium)
+    metal: reports.filter(e => e.resources.metal).map(e => typeof e.resources.metal === 'number' ? e.resources.metal : 0),
+    crystal: reports.filter(e => e.resources.crystal).map(e => typeof e.resources.crystal === 'number' ? e.resources.crystal : 0),
+    deuterium: reports.filter(e => e.resources.deuterium).map(e => typeof e.resources.deuterium === 'number' ? e.resources.deuterium : 0),
+    mse: reports.filter(e => e.resources.metal).map(e => res2mse(e.resources))
   }
 
   const quantiles = {
