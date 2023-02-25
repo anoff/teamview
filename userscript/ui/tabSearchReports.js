@@ -145,9 +145,9 @@ function insertResults (reports) {
   }
 
   const res2mse = (obj, ratio = TradeRatios.get()) => {
-    const m = typeof obj.metal === 'number' ? obj.metal : 0
-    const c = typeof obj.crystal === 'number' ? obj.crystal * ratio.metal / ratio.crystal : 0
-    const d = typeof obj.deuterium === 'number' ? obj.deuterium * ratio.metal / ratio.deuterium : 0
+    const m = obj.metal || 0
+    const c = obj.crystal * ratio.metal / ratio.crystal || 0
+    const d = obj.deuterium * ratio.metal / ratio.deuterium || 0
     return m + c + d
   }
 
