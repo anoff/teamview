@@ -161,7 +161,8 @@ function insertHtml (anchorElement) {
   document.querySelector(`${PAGE_ID} #galaxy_min`).value = galaxy
   document.querySelector(`${PAGE_ID} #galaxy_max`).value = galaxy
   document.querySelector(`${PAGE_ID} #system_min`).value = Math.max(system - SYSTEM_OFFSET, 1)
-  document.querySelector(`${PAGE_ID} #system_max`).value = system + SYSTEM_OFFSET
+  const systemMax = (system + SYSTEM_OFFSET)
+  document.querySelector(`${PAGE_ID} #system_max`).value = systemMax > 400 ? systemMax % 401 + 1 : systemMax
   // set based on previously saved values
   loadSearchSettings(SETTINGS_NAME, SETTINGS_MAP)
 

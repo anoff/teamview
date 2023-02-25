@@ -520,6 +520,7 @@ const missionTypes = {
  * @returns string formatted as '23.1k'
  */
 function res2str (value) {
+  value = isNaN(value) ? 0 : value
   return `${Math.floor(value / 100) / 10}k`
 }
 /**
