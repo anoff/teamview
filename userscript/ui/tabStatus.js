@@ -12,7 +12,6 @@ class GalaxyPhalanxInformation {
     this.phalanxes = phalanxes
     this.data = Array.from(Array(400), () => [])
     this.calculateSystemsInPhalanx()
-    console.log(this.data)
   }
 
   getSystem (system) {
@@ -21,7 +20,7 @@ class GalaxyPhalanxInformation {
 
   appendPhalanx (system, phalanx) {
     if (system < 1 || system > 400) return
-    return this.data[system - 1].push(phalanx)
+    return this.getSystem(system).push(phalanx)
   }
 
   calculateSystemsInPhalanx () {
