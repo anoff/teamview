@@ -4,6 +4,11 @@ const {
   getCurrentPosition
 } = require('../utils')
 
+const ACTIVITY_INACTIVE = 0
+const ACTIVITY_BANNED = 1
+const ACTIVITY_VACATION = 2
+const ACTIVITY_ACTIVE = 3
+
 class GalaxyPhalanxInformation {
   constructor (phalanxes) {
     if (!Array.isArray(phalanxes)) {
@@ -41,6 +46,40 @@ class GalaxyPhalanxInformation {
   isInRange (system) {
     if (system < 1 || system > 400) return false
     return this.getSystem(system).length > 0
+  }
+
+  getActivity (system) {
+    if (system < 1 || system > 400) return 3
+
+    const phalanxInSystem = this.getSystem(system)
+    let activity = 0
+    phalanxInSystem.forEach(phalanx => {
+      if (phalanx.galaxy === 4 && phalanx.system === 30) console.log({ phalanx, activity })
+      if (phalanx.isVacation && activity < ACTIVITY_VACATION) activity = ACTIVITY_VACATION
+      if (phalanx.isBanned && activity < ACTIVITY_BANNED) activity = ACTIVITY_BANNED
+      if (phalanx.isInactive > 0) activity = ACTIVITY_INACTIVE
+      if (!phalanx.isVacation && !phalanx.isBanned && phalanx.isInactive === 0) activity = ACTIVITY_ACTIVE
+    })
+
+    return activity
+  }
+
+  getActivityColor (system) {
+    if (system < 1 || system > 400) return 'red'
+
+    const activity = this.getActivity(system)
+    console.log(activity)
+    switch (activity) {
+      case ACTIVITY_ACTIVE:
+        return 'red'
+      case ACTIVITY_INACTIVE:
+        return '#999'
+      case ACTIVITY_VACATION:
+      case ACTIVITY_BANNED:
+        return '#659ec7'
+    }
+
+    return 'red'
   }
 
   // TODO: Tooltip not working yet
@@ -115,7 +154,7 @@ async function addRows (planets) {
       else if (planetCount >= 3) cls = 'color-green'
       if (oldestAge > 24 * 5) cls = 'color-orange'
 
-      const inPhalanxStyle = galaxyPhalanxInfo.isInRange(system) ? 'style="border: 1px solid red;"' : ''
+      const inPhalanxStyle = galaxyPhalanxInfo.isInRange(system) ? `style="border: 2px solid ${galaxyPhalanxInfo.getActivityColor(system)};"` : ''
       const phalanxTooltipConent = galaxyPhalanxInfo.isInRange(system) ? `data-tooltip-content="${galaxyPhalanxInfo.createDataTooltipContent(system)}"` : ''
 
       html += `<td ${inPhalanxStyle} ><a ${phalanxTooltipConent} href="${window.location.pathname}?page=galaxy&galaxy=${galaxy}&system=${system}" class="${cls}">${system}</a></td>`
