@@ -370,8 +370,13 @@ function checkPhalanxesInRange (galaxy, system) {
 
         phalanxes.forEach(phalanx => {
           const span = document.createElement('span')
+
+          let color = 'red'
+          if (phalanx.isInactive > 0) color = '#999'
+          if (phalanx.isVacation || phalanx.isBanned) color = '#659ec7'
+
           span.innerHTML = `
-          <a style="color: red;"
+          <a style="color: ${color}; ${phalanx.isBanned ? 'text-decoration: line-through;' : ''}"
             href="https://pr0game.com/uni2/game.php?page=galaxy&amp;galaxy=${phalanx.galaxy}&amp;system=${phalanx.system}">
             [${phalanx.galaxy}:${phalanx.system}:${phalanx.position}]              
           </a>
