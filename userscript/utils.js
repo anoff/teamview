@@ -126,6 +126,103 @@ class Feature {
   }
 }
 
+const Activity = {
+  INACTIVE: 0,
+  BANNED: 1,
+  VACATION: 2,
+  ACTIVE: 3
+}
+
+class PhalanxInfo {
+  constructor (phalanxes) {
+    if (!Array.isArray(phalanxes)) {
+      throw new Error('Expected an array of phalanx information.')
+    }
+    this.phalanxes = phalanxes
+    this.data = Array.from(Array(400), () => [])
+    this.calculateSystemsInPhalanx()
+  }
+
+  getSystem (system) {
+    return this.data[system - 1]
+  }
+
+  appendPhalanx (system, phalanx) {
+    if (system < 1 || system > 400) return
+    return this.getSystem(system).push(phalanx)
+  }
+
+  calculateSystemsInPhalanx () {
+    this.phalanxes.forEach(phalanx => {
+      const { from, to } = phalanx.range
+      if (from < to || from === to) {
+        for (let system = from; system <= to; system++) {
+          this.appendPhalanx(system, phalanx)
+        }
+      } else {
+        for (let system = from; system <= (400 + to); system++) {
+          this.appendPhalanx(system % 401, phalanx)
+        }
+      }
+    })
+  }
+
+  isInRange (system) {
+    if (system < 1 || system > 400) return false
+    return this.getSystem(system).length > 0
+  }
+
+  static getActivity (phalanx) {
+    if (!phalanx.isVacation && !phalanx.isBanned && phalanx.isInactive === 0) return Activity.ACTIVE
+    if (phalanx.isVacation) return Activity.VACATION
+    if (phalanx.isBanned) return Activity.BANNED
+    if (phalanx.isInactive > 0) return Activity.INACTIVE
+  }
+
+  getSystemActivity (system) {
+    if (system < 1 || system > 400) return Activity.ACTIVE
+    const phalanxInSystem = this.getSystem(system)
+    let activity = 0
+    phalanxInSystem.forEach(phalanx => {
+      const curActivity = PhalanxInfo.getActivity(phalanx)
+      if (curActivity > activity) activity = curActivity
+    })
+
+    return activity
+  }
+
+  static getActivityColor (activity) {
+    switch (activity) {
+      case Activity.ACTIVE:
+        return 'red'
+      case Activity.INACTIVE:
+        return '#999'
+      case Activity.VACATION:
+      case Activity.BANNED:
+        return '#659ec7'
+    }
+  }
+
+  getSystemActivityColor (system) {
+    if (system < 1 || system > 400) return 'red'
+
+    const activity = this.getSystemActivity(system)
+    return PhalanxInfo.getActivityColor(activity)
+  }
+
+  // TODO: Tooltip not working yet
+  createDataTooltipContent (system) {
+    const systemData = this.getSystem(system)
+
+    let content = '<ul>'
+    systemData.forEach(phalanx => {
+      content += `<li>[${phalanx.galaxy}:${phalanx.system}:${phalanx.position}]</li>`
+    })
+    content += '</ul>'
+    return content
+  }
+}
+
 /**
  * Turn camelCase into Camel Case
  * @param {str} text text to transform
@@ -150,5 +247,7 @@ module.exports = {
   quantile,
   saveSearchSettings,
   setTeamviewStatus,
+  PhalanxInfo,
+  Activity,
   teamviewDebugMode: TM_getValue('debug_mode') === 1
 }
