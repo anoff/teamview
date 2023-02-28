@@ -321,10 +321,11 @@ function addUploadSection () {
             <th>Teamview</th>
             <td>
               <button type="button" id="teamview-upload">
-                <span>Upload</span>
-                <span id="teamview-status-icon" class="dot status-unknown">
+                <div>
+                  <span>Upload</span>
+                  <span id="teamview-status-icon" class="dot status-unknown"><span>
+                </div>
               </button>
-              <span id="teamview-status-text" style="font-size: 85%; display: none;"></span>
             </td>
         </tr>
       </tbody></table>

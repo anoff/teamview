@@ -1,3 +1,5 @@
+@import './vars.scss';
+
 .location-field {
   max-width: 4em;
 }
@@ -28,37 +30,6 @@
 
   to {
     opacity: 1;
-  }
-}
-
-.status-ok {
-  background-color: #00ee00;
-}
-
-.status-error {
-  background-color: #ee0000;
-}
-
-.status-outdated {
-  background-color: #eeee00;
-}
-
-.status-unknown {
-  background-color: #fafafa;
-}
-
-.status-working {
-  animation: status-animation 0.7s infinite;
-  animation-direction: alternate;
-}
-
-@keyframes status-animation {
-  from {
-    background-color: #fff;
-  }
-
-  to {
-    background-color: #3ae;
   }
 }
 
@@ -94,6 +65,6 @@ th.sortable:before {
 }
 
 th.sortable:after {
-  border-top-color: #eee;
+  border-top-color: var(--tv-color-secondary);
   margin-top: 1px;
 }
