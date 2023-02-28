@@ -314,15 +314,18 @@ function doUploadPlanets () {
 function addUploadSection () {
   const sectionHTML = `
   <tr>
-    <td class="transparent" id="teamview-section" colspan="2">
-      <table>
-        <tbody>
+    <td class="transparent teamview" id="teamview-section" colspan="2">
+      <table class="content no-pr0game-table">
+        <tbody class="">
           <tr>
             <th>Teamview</th>
-            <td><button type="button" id="teamview-upload">Upload</button></td>
-            <td><span style="font-weight: bold;">Status</span></div></td>
-            <td><span id="teamview-status-icon" class="dot status-unknown"></td>
-            <td><span id="teamview-status-text" style="font-size: 85%;"></span></td>
+            <td>
+              <button type="button" id="teamview-upload">
+                <span>Upload</span>
+                <span id="teamview-status-icon" class="dot status-unknown">
+              </button>
+              <span id="teamview-status-text" style="font-size: 85%; display: none;"></span>
+            </td>
         </tr>
       </tbody></table>
     </td>

@@ -1,2 +1,78 @@
-@import './base.scss';
 @import './legacy.scss';
+@import './vars.scss';
+@import './flex.css';
+
+
+.teamview {
+  font-weight: 300;
+  font-family: Yantramanav, Helvetica, sans-serif;
+  line-height: 1;
+  color: #fff;
+  font-size: 1.1em;
+
+  h3,
+  h4,
+  h5,
+  h6 {
+    margin: 6px;
+  }
+
+  button {
+    background-color: var(--tv-bg-tertiary);
+    color: var(--tv-color-primary);
+    border: none;
+    border-radius: 1px;
+    padding: 0.3em 0.6em;
+    font-size: 1.2em;
+
+    &::hover {
+      filter: brightness(1.3);
+    }
+
+    .small {
+      font-size: 1em;
+    }
+
+    .dot {
+      margin-left: 1em;
+      margin-right: 0.5em;
+    }
+  }
+
+  .content {
+    background-color: var(--tv-bg-primary);
+    border-radius: 3px;
+    position: relative;
+    padding: 5px 12px;
+
+    .content .info {
+      color: var(--tv-color-secondary);
+      font-style: italic;
+    }
+  }
+
+  .no-pr0game-table {
+    border-spacing: 0;
+    border-collapse: collapse;
+
+    th {
+      background-image: none;
+      background-color: transparent;
+      border: none;
+    }
+
+    td {
+      background-image: none;
+      background-color: transparent;
+      border: none;
+    }
+  }
+
+
+  .dot {
+    height: 0.8em;
+    width: 0.8em;
+    border-radius: 50%;
+    display: inline-block;
+  }
+}
