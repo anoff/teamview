@@ -134,6 +134,11 @@ const Activity = {
 }
 
 class PhalanxInfo {
+  /**
+   * Create a PhalanxInfo instance.
+   * @param {Array} phalanxes - An array of phalanx information.
+   * @throws {Error} - If phalanxes is not an array.
+   */
   constructor (phalanxes) {
     if (!Array.isArray(phalanxes)) {
       throw new Error('Expected an array of phalanx information.')
@@ -143,15 +148,29 @@ class PhalanxInfo {
     this.calculateSystemsInPhalanx()
   }
 
+  /**
+   * Get the phalanx information for a given system.
+   * @param {number} system - The system number.
+   * @returns {Array} - The phalanx information for the given system.
+   */
   getSystem (system) {
     return this.data[system - 1]
   }
 
+  /**
+   * Append a phalanx to the specified system.
+   * @param {number} system - The system number.
+   * @param {Object} phalanx - The phalanx object to append.
+   * @returns {number} - The new length of the phalanx array for the specified system.
+   */
   appendPhalanx (system, phalanx) {
     if (system < 1 || system > 400) return
     return this.getSystem(system).push(phalanx)
   }
 
+  /**
+   * Calculate which systems are covered by each phalanx.
+   */
   calculateSystemsInPhalanx () {
     this.phalanxes.forEach(phalanx => {
       const { from, to } = phalanx.range
@@ -167,11 +186,21 @@ class PhalanxInfo {
     })
   }
 
+  /**
+   * Check if a system is covered by any phalanx.
+   * @param {number} system - The system number.
+   * @returns {boolean} - True if the system is covered by any phalanx, false otherwise.
+   */
   isInRange (system) {
     if (system < 1 || system > 400) return false
     return this.getSystem(system).length > 0
   }
 
+  /**
+   * Returns the highest activity level among all the phalanxes associated with a specific system.
+   * @param {number} system - The system to check.
+   * @returns {number} - The highest activity level of the phalanxes associated with the input system.
+   */
   static getActivity (phalanx) {
     if (!phalanx.isVacation && !phalanx.isBanned && phalanx.isInactive === 0) return Activity.ACTIVE
     if (phalanx.isVacation) return Activity.VACATION
@@ -179,6 +208,11 @@ class PhalanxInfo {
     if (phalanx.isInactive > 0) return Activity.INACTIVE
   }
 
+  /**
+   * Returns the highest activity level among all the phalanxes associated with a specific system.
+   * @param {number} system - The system to check.
+   * @returns {number} - The highest activity level of the phalanxes associated with the input system.
+   */
   getSystemActivity (system) {
     if (system < 1 || system > 400) return Activity.ACTIVE
     const phalanxInSystem = this.getSystem(system)
@@ -191,6 +225,11 @@ class PhalanxInfo {
     return activity
   }
 
+  /**
+   * Get the color associated with the activity status
+   * @param {number} activity - activity status code.
+   * @returns {string} - The color associated with the activity status
+   */
   static getActivityColor (activity) {
     switch (activity) {
       case Activity.ACTIVE:
@@ -203,6 +242,11 @@ class PhalanxInfo {
     }
   }
 
+  /**
+   * Get the color associated with the highest phalanx activity status of a given system.
+   * @param {number} system - The system number.
+   * @returns {string} - The color associated with the activity status of the given system.
+   */
   getSystemActivityColor (system) {
     if (system < 1 || system > 400) return 'red'
 
