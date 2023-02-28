@@ -1,0 +1,60 @@
+.teamview {
+  font-weight: 300;
+  font-family: Yantramanav, Helvetica, sans-serif;
+  line-height: 1;
+  color: #fff;
+  font-size: 1.1em;
+}
+
+:root {
+  --tv-danger: #ae660e;
+  --tv-highlight: #00f4aa;
+  --tv-error: #d72f00;
+  --tv-bg-primary: #1e2b39;
+  --tv-bg-secondary: #39495e;
+  --tv-bg-tertiary: #506784;
+  --tv-bg-input: #fafafa;
+  --tv-color-input: #111111;
+  --tv-color-primary: #ffffff;
+  --tv-color-secondary: #dadada;
+  --tv-blue: #4bf;
+  --tv-green: #00ee00;
+  --tv-orange: #e93;
+  --tv-yellow: #eeee00;
+  --tv-red: #ee0000;
+  --tv-gray: #666;
+  --tv-white: #fafafa;
+  --tv-black: #111;
+}
+
+.color-green {
+  color: var(--tv-green) !important;
+}
+
+.color-blue {
+  color: var(--tv-blue) !important;
+}
+
+.color-gray {
+  color: var(--tv-gray) !important;
+}
+
+.color-white {
+  color: var(--tv-white) !important;
+}
+
+.color-orange {
+  color: var(--tv-orange) !important;
+}
+
+.color-yellow {
+  color: var(--tv-yellow) !important;
+}
+
+.color-red {
+  color: var(--tv-red) !important;
+}
+
+.color-black {
+  color: var(--tv-black) !important;
+}

@@ -377,9 +377,9 @@ function colorReports () {
   for (const id of reportsOnPage) {
     const title = document.querySelectorAll(`tr.message_${id}.message_head td`)[2]
     if (uploadedReports.includes(id)) {
-      title.classList = 'status-ok text-black'
+      title.classList = 'status-ok color-black'
     } else {
-      title.classList = 'status-outdated text-black'
+      title.classList = 'status-outdated color-black'
     }
   }
 }
