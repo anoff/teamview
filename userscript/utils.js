@@ -137,15 +137,23 @@ class PhalanxInfo {
   /**
    * Create a PhalanxInfo instance.
    * @param {Array} phalanxes - An array of phalanx information.
+   * @param {Object} [options] - An optional object containing options.
+   * @param {number} [options.maxGalaxies=4] - The maximum number of galaxies.
+   * @param {number} [options.maxSystems=400] - The maximum number of systems.
    * @throws {Error} - If phalanxes is not an array.
    */
-  constructor (phalanxes) {
+  constructor (phalanxes, options = {}) {
     if (!Array.isArray(phalanxes)) {
       throw new Error('Expected an array of phalanx information.')
     }
+
+    this.maxGalaxies = options.hasOwnProperty('maxGalaxies') ? options.maxGalaxies : 4
+    this.maxSystems = options.hasOwnProperty('maxSystems') ? options.maxSystems : 400
+
     this.phalanxes = phalanxes
-    this.data = Array.from(Array(400), () => [])
+    this.data = Array.from(Array(this.maxSystems), () => [])
     this.calculateSystemsInPhalanx()
+
   }
 
   /**
@@ -164,7 +172,7 @@ class PhalanxInfo {
    * @returns {number} - The new length of the phalanx array for the specified system.
    */
   appendPhalanx (system, phalanx) {
-    if (system < 1 || system > 400) return
+    if (system < 1 || system > this.maxSystems) return
     return this.getSystem(system).push(phalanx)
   }
 
@@ -179,8 +187,8 @@ class PhalanxInfo {
           this.appendPhalanx(system, phalanx)
         }
       } else {
-        for (let system = from; system <= (400 + to); system++) {
-          this.appendPhalanx(system % 401, phalanx)
+        for (let system = from; system <= (this.maxSystems + to); system++) {
+          this.appendPhalanx(system % (this.maxSystems + 1), phalanx)
         }
       }
     })
@@ -192,7 +200,7 @@ class PhalanxInfo {
    * @returns {boolean} - True if the system is covered by any phalanx, false otherwise.
    */
   isInRange (system) {
-    if (system < 1 || system > 400) return false
+    if (system < 1 || system > this.maxSystems) return false
     return this.getSystem(system).length > 0
   }
 
@@ -214,7 +222,7 @@ class PhalanxInfo {
    * @returns {number} - The highest activity level of the phalanxes associated with the input system.
    */
   getSystemActivity (system) {
-    if (system < 1 || system > 400) return Activity.ACTIVE
+    if (system < 1 || system > this.maxSystems) return Activity.ACTIVE
     const phalanxInSystem = this.getSystem(system)
     let activity = 0
     phalanxInSystem.forEach(phalanx => {
@@ -248,7 +256,7 @@ class PhalanxInfo {
    * @returns {string} - The color associated with the activity status of the given system.
    */
   getSystemActivityColor (system) {
-    if (system < 1 || system > 400) return 'red'
+    if (system < 1 || system > this.maxSystems) return 'red'
 
     const activity = this.getSystemActivity(system)
     return PhalanxInfo.getActivityColor(activity)
