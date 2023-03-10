@@ -3,7 +3,7 @@ const { genericRequest } = require('../requests')
 const {
   report2html
 } = require('../ui/spioHtml')
-const { setTeamviewStatus } = require('../utils')
+const { setTeamviewStatus, PhalanxInfo } = require('../utils')
 
 const MAX_AGE_PLANET_H = 72 // number of hours when a planet info is considered outdated
 
@@ -370,8 +370,11 @@ function checkPhalanxesInRange (galaxy, system) {
 
         phalanxes.forEach(phalanx => {
           const span = document.createElement('span')
+
+          const color = PhalanxInfo.getActivityColor(PhalanxInfo.getActivity(phalanx))
+
           span.innerHTML = `
-          <a style="color: red;"
+          <a style="color: ${color}; ${phalanx.isBanned ? 'text-decoration: line-through;' : ''}"
             href="https://pr0game.com/uni2/game.php?page=galaxy&amp;galaxy=${phalanx.galaxy}&amp;system=${phalanx.system}">
             [${phalanx.galaxy}:${phalanx.system}:${phalanx.position}]              
           </a>
