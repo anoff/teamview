@@ -1,7 +1,7 @@
 const { report2html } = require('./spioHtml')
 const { searchReportsRequest } = require('../requests')
 const searchHtml = require('./tabSearchReports.html').default
-const { getCurrentPosition, quantile, saveSearchSettings, loadSearchSettings, teamviewDebugMode, makeTableSortable } = require('../utils')
+const { getCurrentPosition, quantile, saveSearchSettings, loadSearchSettings, teamviewDebugMode, makeTableSortable, calculateDistance, calculateFlightDuration } = require('../utils')
 const { res2str, obj2str, shipStructurePoints, defenseStructurePoints, itemIds } = require('../gameUtils')
 const { TradeRatios } = require('../features/tradeRatios')
 
@@ -134,6 +134,12 @@ function simLink (resources, defenses, ships, research) {
  */
 function insertResults (reports) {
   const anchor = document.querySelector(`${PAGE_ID} table#search-results tbody`)
+  const currentPosition = getCurrentPosition()
+  const currentCoords = {
+    galaxy: currentPosition[0],
+    system: currentPosition[1],
+    position: currentPosition[2]
+  }
 
   const playerStatus2Indicator = (player) => {
     const text = ['isInactive', 'isBanned', 'isVacation']
@@ -149,6 +155,10 @@ function insertResults (reports) {
     const c = obj.crystal * ratio.metal / ratio.crystal || 0
     const d = obj.deuterium * ratio.metal / ratio.deuterium || 0
     return m + c + d
+  }
+
+  const resPerSecond = (mse, curCoords, targetCoords) => {
+    return mse / (2 * calculateFlightDuration(calculateDistance(curCoords, targetCoords), 23500))
   }
 
   const allRes = {
@@ -209,21 +219,32 @@ function insertResults (reports) {
 
     const tradeRatios = TradeRatios.get()
 
+    const targetCoords = {
+      galaxy: e.galaxy,
+      system: e.system,
+      position: e.position
+    }
+
+    const flightTimeSeconds = Math.floor(calculateFlightDuration(calculateDistance(currentCoords, targetCoords), 23500))
+    const flightTimeStr = `${Math.floor(flightTimeSeconds / 3600)}h ${Math.floor((flightTimeSeconds % 3600) / 60)}m ${flightTimeSeconds % 60}s`
+
     const html = `<tr id="row-${e.planetId}">
-    <td data-value="${e.galaxy * 10e5 + e.system * 10e2 + e.position}">   
+    <td class="col-position" data-value="${e.galaxy * 10e5 + e.system * 10e2 + e.position}">   
       <a href="${window.location.pathname}?page=galaxy&galaxy=${e.galaxy}&system=${e.system}" title="Goto System">[${e.galaxy}:${e.system}:${e.position}]${e.isMoon ? 'M' : ''}</a>
     </td>
-    <td>
+    <td class="col-rank">
       <a href="#" title="Open Playercard" onclick="return Dialog.Playercard(${e.player?.playerId});" style="${!e.player?.playerId ? 'display: none;' : ''}">${e.player?.playerName || '-'}${e.player ? ' ' + playerStatus2Indicator(e.player) : ''}</a>
       <span style="${e.player?.playerId ? 'display: none;' : ''}">${e.player?.playerName || '-'}${e.player ? ' ' + playerStatus2Indicator(e.player) : ''}</span>
         <span style="font-size: 80%; color: yellow;"> (${e.player?.rank})</span>
     </td>
-    <td><span>${e.planetName || ''} ${e.isMoon ? '🌝' : ''}</span></td>
-    <td data-value="${res2mse(e.resources)}"><span title="Metal Standard Units using ${tradeRatios.metal}:${tradeRatios.crystal}:${tradeRatios.deuterium}" class="${res2class(res2mse(e.resources), quantiles.mse)}">${res2str(res2mse(e.resources))}</span></td>
-    <td data-value="${e.resources.metal}"><span class="${res2class(e.resources.metal, quantiles.metal)}">${res2str(e.resources.metal)}</span></td>
-    <td data-value="${e.resources.crystal}"><span class="${res2class(e.resources.crystal, quantiles.crystal)}">${res2str(e.resources.crystal)}</span></td>
-    <td data-value="${e.resources.deuterium}"><span class="${res2class(e.resources.deuterium, quantiles.deuterium)}">${res2str(e.resources.deuterium)}</span></td>
-    <td data-value="${fleetSp}">
+    <td class="col-planet"><span>${e.planetName || ''} ${e.isMoon ? '🌝' : ''}</span></td>
+    <td class="col-res-per-second"><span>${res2str(resPerSecond(res2mse(e.resources), currentCoords, targetCoords) * 3600)}</span></td>
+    <td class="col-flight-time"><span>${flightTimeStr}</span></td>
+    <td class="col-mse" data-value="${res2mse(e.resources)}"><span title="Metal Standard Units using ${tradeRatios.metal}:${tradeRatios.crystal}:${tradeRatios.deuterium}" class="${res2class(res2mse(e.resources), quantiles.mse)}">${res2str(res2mse(e.resources))}</span></td>
+    <td class="col-metal" data-value="${e.resources.metal}"><span class="${res2class(e.resources.metal, quantiles.metal)}">${res2str(e.resources.metal)}</span></td>
+    <td class="col-crystal" data-value="${e.resources.crystal}"><span class="${res2class(e.resources.crystal, quantiles.crystal)}">${res2str(e.resources.crystal)}</span></td>
+    <td class="col-deuterium" data-value="${e.resources.deuterium}"><span class="${res2class(e.resources.deuterium, quantiles.deuterium)}">${res2str(e.resources.deuterium)}</span></td>
+    <td class="col-fleet" data-value="${fleetSp}">
       <span style="${fleetSp === 0 ? 'display: none;' : ''}" class="${fleetSpClass}">
         <img src="./styles/theme/nova/planeten/debris.jpg" alt="TF for entire fleet" width="16" height="16">
         ${Math.round(fleetSp * 0.3 / 1e5) / 10}M<br>
@@ -232,11 +253,11 @@ function insertResults (reports) {
         ${obj2str(e.ships)}
       </span>
     </td>
-    <td data-value="${defSp}"><span style="${Math.min(defSp, fleetSp) === 0 ? 'display: none;' : ''}" class="${def2fleetClass}">Def/Fleet: ${Math.round(def2fleet * 10) / 10}<br></span><span class="report-details">${obj2str(e.defense)}</span></td>
-    <td data-value="${(new Date() - new Date(e.date))}">
+    <td class="col-defense" data-value="${defSp}"><span style="${Math.min(defSp, fleetSp) === 0 ? 'display: none;' : ''}" class="${def2fleetClass}">Def/Fleet: ${Math.round(def2fleet * 10) / 10}<br></span><span class="report-details">${obj2str(e.defense)}</span></td>
+    <td class="col-scan" data-value="${(new Date() - new Date(e.date))}">
       <a href="#" class="tooltip_sticky" data-tooltip-content="${report2html(e)}">${calcTimeDeltaString(e.date)}</a>
     </td>
-    <td>
+    <td class="col-action" >
       <a id="attack-${e.planetId}" title="Attack" href="${window.location.pathname}?page=fleetTable&galaxy=${e.galaxy}&system=${e.system}&planet=${e.position}&planettype=1&target_mission=1#ship_input[202]=${Math.ceil(requiredCargo / 5000)}" target="_blank"> ⚔️ </a>
       <br>
       <span>⸺</span>
@@ -261,6 +282,17 @@ function insertHtml (anchorElement) {
   anchorElement.insertAdjacentHTML('beforeend', searchHtml)
   const btn = document.querySelector(`${PAGE_ID} button#search`)
   btn.addEventListener('click', search.bind(this))
+
+  const checkboxes = document.querySelectorAll('.hide-column-tag')
+  checkboxes.forEach(checkbox => {
+    checkbox.addEventListener('change', function () {
+      const classname = this.value
+      const columns = document.querySelectorAll(`.${classname}`)
+      columns.forEach(column => {
+        column.style.display = this.checked ? '' : 'none'
+      })
+    })
+  })
 
   const [galaxy] = getCurrentPosition()
   document.querySelector(`${PAGE_ID} #galaxy_min`).value = galaxy
