@@ -157,8 +157,8 @@ function insertResults (reports) {
     return m + c + d
   }
 
-  const resPerSecond = (mse, curCoords, targetCoords) => {
-    return mse / (2 * calculateFlightDuration(calculateDistance(curCoords, targetCoords), 23500))
+  const resPerHour = (mse, curCoords, targetCoords) => {
+    return (mse / (2 * calculateFlightDuration(calculateDistance(curCoords, targetCoords), 23500))) * 3600
   }
 
   const allRes = {
@@ -238,7 +238,7 @@ function insertResults (reports) {
         <span style="font-size: 80%; color: yellow;"> (${e.player?.rank})</span>
     </td>
     <td class="col-planet"><span>${e.planetName || ''} ${e.isMoon ? '🌝' : ''}</span></td>
-    <td class="col-res-per-second"><span>${res2str(resPerSecond(res2mse(e.resources), currentCoords, targetCoords) * 3600)}</span></td>
+    <td class="col-res-per-hour"><span>${res2str(resPerHour(res2mse(e.resources), currentCoords, targetCoords))}</span></td>
     <td class="col-flight-time"><span>${flightTimeStr}</span></td>
     <td class="col-mse" data-value="${res2mse(e.resources)}"><span title="Metal Standard Units using ${tradeRatios.metal}:${tradeRatios.crystal}:${tradeRatios.deuterium}" class="${res2class(res2mse(e.resources), quantiles.mse)}">${res2str(res2mse(e.resources))}</span></td>
     <td class="col-metal" data-value="${e.resources.metal}"><span class="${res2class(e.resources.metal, quantiles.metal)}">${res2str(e.resources.metal)}</span></td>
