@@ -143,8 +143,8 @@ function insertResults (reports) {
   }
   const currentTechs = LocalStorage.getResearch()
   const lightCargoSpeed = calculateShipSpeed('lightCargo', currentTechs)
-  // const heavyCargoSpeed = calculateShipSpeed('heavyCargo', currentTechs)
-  // const spyProbeSpeed = calculateShipSpeed('spyProbe', currentTechs)
+  const heavyCargoSpeed = calculateShipSpeed('heavyCargo', currentTechs)
+  const spyProbeSpeed = calculateShipSpeed('spyProbe', currentTechs)
 
   const playerStatus2Indicator = (player) => {
     const text = ['isInactive', 'isBanned', 'isVacation']
@@ -198,6 +198,10 @@ function insertResults (reports) {
     return 'color-white'
   }
 
+  const flighTimeToString = (flightTimeSeconds) => {
+    return `${Math.floor(flightTimeSeconds / 3600)}h ${Math.floor((flightTimeSeconds % 3600) / 60)}m ${flightTimeSeconds % 60}s`
+  }
+
   if (teamviewDebugMode) console.log({ receivedData: reports })
   for (const e of reports) {
     const requiredCargo = 0.5 * Math.max(e.resources.metal + e.resources.crystal + e.resources.deuterium, Math.min(0.75 * (2 * e.resources.metal + e.resources.crystal + e.resources.deuterium), 2 * e.resources.metal + e.resources.deuterium))
@@ -230,21 +234,27 @@ function insertResults (reports) {
       position: e.position
     }
 
-    const flightTimeSeconds = Math.floor(calculateFlightDuration(calculateDistance(currentCoords, targetCoords), lightCargoSpeed))
-    const flightTimeStr = `${Math.floor(flightTimeSeconds / 3600)}h ${Math.floor((flightTimeSeconds % 3600) / 60)}m ${flightTimeSeconds % 60}s`
+    const lcargoFlightTimeSeconds = Math.floor(calculateFlightDuration(calculateDistance(currentCoords, targetCoords), lightCargoSpeed))
+    const hcargoFlightTimeSeconds = Math.floor(calculateFlightDuration(calculateDistance(currentCoords, targetCoords), heavyCargoSpeed))
+    const probeFlightTimeSeconds = Math.floor(calculateFlightDuration(calculateDistance(currentCoords, targetCoords), spyProbeSpeed))
 
-    const html = `<tr id="row-${e.planetId}">
+    const html = `<tr class="loading-bar" id="row-${e.planetId}">
     <td class="col-position" data-value="${e.galaxy * 10e5 + e.system * 10e2 + e.position}">   
       <a href="${window.location.pathname}?page=galaxy&galaxy=${e.galaxy}&system=${e.system}" title="Goto System">[${e.galaxy}:${e.system}:${e.position}]${e.isMoon ? 'M' : ''}</a>
     </td>
     <td class="col-rank">
       <a href="#" title="Open Playercard" onclick="return Dialog.Playercard(${e.player?.playerId});" style="${!e.player?.playerId ? 'display: none;' : ''}">${e.player?.playerName || '-'}${e.player ? ' ' + playerStatus2Indicator(e.player) : ''}</a>
       <span style="${e.player?.playerId ? 'display: none;' : ''}">${e.player?.playerName || '-'}${e.player ? ' ' + playerStatus2Indicator(e.player) : ''}</span>
-        <span style="font-size: 80%; color: yellow;"> (${e.player?.rank})</span>
+      <span style="font-size: 80%; color: yellow;"> (${e.player?.rank})</span>
+      <div id="cd-${e.planetId}">
+      </div>
     </td>
     <td class="col-planet"><span>${e.planetName || ''} ${e.isMoon ? '🌝' : ''}</span></td>
     <td class="col-res-per-hour" data-value="${resPerHour(res2mse(e.resources), currentCoords, targetCoords)}"><span>${res2str(resPerHour(res2mse(e.resources), currentCoords, targetCoords))}</span></td>
-    <td class="col-flight-time"><span>${flightTimeStr}</span></td>
+    <td class="col-flight-time" data-value="${lcargoFlightTimeSeconds}">
+      <span>LC ${flighTimeToString(lcargoFlightTimeSeconds)}</span><br />
+      <span>HC ${flighTimeToString(hcargoFlightTimeSeconds)}</span>
+    </td>
     <td class="col-mse" data-value="${res2mse(e.resources)}"><span title="Metal Standard Units using ${tradeRatios.metal}:${tradeRatios.crystal}:${tradeRatios.deuterium}" class="${res2class(res2mse(e.resources), quantiles.mse)}">${res2str(res2mse(e.resources))}</span></td>
     <td class="col-metal" data-value="${e.resources.metal}"><span class="${res2class(e.resources.metal, quantiles.metal)}">${res2str(e.resources.metal)}</span></td>
     <td class="col-crystal" data-value="${e.resources.crystal}"><span class="${res2class(e.resources.crystal, quantiles.crystal)}">${res2str(e.resources.crystal)}</span></td>
@@ -267,15 +277,42 @@ function insertResults (reports) {
       <br>
       <span>⸺</span>
       <br>
-      <a id="scan-${e.planetId}" title="Spy on planet" href="javascript:doit(6,${e.planetId},{'210':'2'});" style="font-size: 130%; position: relative; top: 2px;">${e.planetId ? ' 🛰 ' : ''}</a>
+      <a class="scan-button" id="scan-${e.planetId}" data-value="${probeFlightTimeSeconds}" title="Spy on planet" href="javascript:doit(6,${e.planetId},{'210':'2'});" style="font-size: 130%; position: relative; top: 2px;">${e.planetId ? ' 🛰 ' : ''}</a>
       <div ${fleetSp + defSp === 0 ? 'class="hidden"' : ''}>
         <span>⸺</span>
         <br>
         <a id="sim-${e.planetId}" title="Simulate" href="${simLink(e.resources, e.defense, e.ships, e.research)}" style="font-size: 130%; position: relative; top: 2px;" target="_blank">${e.planetId ? ' 🔮 ' : ''}</a>
       </div>
+
     </td>
     </tr>`
     anchor.insertAdjacentHTML('beforeend', html)
+
+    function probesSend (e) {
+      const time = new Date()
+      const spyProbesBackDate = new Date(time.getTime() + e.target.dataset.value * 2000)
+      const planetId = e.target.id.split('-')[1]
+
+      const x = setInterval(() => {
+        const now = new Date().getTime()
+        const distance = spyProbesBackDate - now
+
+        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60))
+        const seconds = Math.floor((distance % (1000 * 60)) / 1000)
+
+        // Output the result in an element with id="demo"
+        document.getElementById(`cd-${planetId}`).innerHTML = minutes + 'm ' + seconds + 's '
+
+        // If the count down is over, write some text
+        if (distance < 0) {
+          clearInterval(x)
+          document.getElementById(`cd-${planetId}`).innerHTML = 'DONE'
+        }
+      }, 1000)
+    }
+
+    const scanButtons = document.querySelectorAll('.scan-button')
+    scanButtons.forEach(button => button.addEventListener('click', probesSend))
   }
 }
 

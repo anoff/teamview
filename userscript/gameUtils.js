@@ -557,13 +557,11 @@ function calculateShipSpeed (shipType, engines = { combustionEngine: 0, impulseE
     const { value, tech } = speed
     const factor = engines[tech].factor
     const level = engines[tech].level
-    console.log({ value, tech, factor, level })
     if ('minLevel' in speed && speed.minLevel > level) return
     speeds.push(value * (1 + (level * factor)))
   })
 
-  console.log(speeds)
-  return Math.max({ ...speeds })
+  return Math.max(...speeds)
 }
 
 module.exports = {
