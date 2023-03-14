@@ -2,42 +2,49 @@ const UNIVERSE: string | null = window.location.href.match(/\/\/([^\/]+)\/([^\/]
 const KEY_EMPIRE = `${UNIVERSE}_empire`
 const KEY_TECHNOLOGIES = `${UNIVERSE}_technologies`
 
-export class Planet {
-    galaxy: number
-    system: number
-    position: number
-    date: string
-    resources: Object
-    isMoon: boolean
-    ships: Object
-    defense: Object
+export class Ships {
+    lightCargo: number = 0
+    heavyCargo: number = 0
+    lightFighter: number = 0
+    heavyFighter: number = 0
+    cruiser: number = 0
+    battleship: number = 0
+    colonyShip: number = 0
+    recycler: number = 0
+    spyProbe: number = 0
+    planetBomber: number = 0
+    solarSatellite: number = 0
+    starFighter: number = 0
+    battleFortress: number = 0
+    battleCruiser: number = 0
 
-    constructor(planet: Object) {
-        if (Planet.isPlanet(planet)) {
-          this.galaxy = planet.galaxy;
-          this.system = planet.system;
-          this.position = planet.position;
-          this.date = planet.date;
-          this.resources = planet.resources;
-          this.isMoon = planet.isMoon;
-          this.ships = planet.ships;
-          this.defense = planet.defense;
-        } else {
-          throw new Error("Invalid planet object");
-        }
+    constructor(ships: Partial<Ships> = {}) {
+        Object.keys(this).forEach((key) => {
+            if (key in ships) {
+                (this as any)[key] = (ships as any)[key];
+            }
+        });
     }
+}
 
-    static isPlanet(obj: any): obj is Planet {
-        return (
-          typeof obj.galaxy === "number" &&
-          typeof obj.system === "number" &&
-          typeof obj.position === "number" &&
-          typeof obj.date === "string" &&
-          typeof obj.resources === "object" &&
-          typeof obj.isMoon === "boolean" &&
-          typeof obj.ships === "object" &&
-          typeof obj.defense === "object"
-        );
+export class Defense {
+    missileLauncher: number = 0
+    lightLaserTurret: number = 0
+    heavyLaserTurret: number = 0
+    gaussCannon: number = 0
+    ionCannon: number = 0
+    plasmaCannon: number = 0
+    smallShieldDome: number = 0
+    largeShieldDome: number = 0
+    interceptor: number = 0
+    interplanetaryMissiles: number = 0
+
+    constructor(defense: Partial<Research> = {}) {
+        Object.keys(this).forEach((key) => {
+            if (key in defense) {
+                (this as any)[key] = (defense as any)[key];
+            }
+        });
     }
 }
 
@@ -68,6 +75,45 @@ export class Research {
                 (this as any)[key] = (research as any)[key];
             }
         });
+    }
+}
+
+export class Planet {
+    galaxy: number
+    system: number
+    position: number
+    date: string
+    resources: Object
+    isMoon: boolean
+    ships: Object
+    defense: Object
+
+    constructor(planet: Object) {
+        if (Planet.isPlanet(planet)) {
+          this.galaxy = planet.galaxy
+          this.system = planet.system
+          this.position = planet.position
+          this.date = planet.date
+          this.resources = planet.resources
+          this.isMoon = planet.isMoon
+          this.ships = new Ships(planet.ships)
+          this.defense = new Defense(planet.defense)
+        } else {
+          throw new Error("Invalid planet object")
+        }
+    }
+
+    static isPlanet(obj: any): obj is Planet {
+        return (
+          typeof obj.galaxy === "number" &&
+          typeof obj.system === "number" &&
+          typeof obj.position === "number" &&
+          typeof obj.date === "string" &&
+          typeof obj.resources === "object" &&
+          typeof obj.isMoon === "boolean" &&
+          typeof obj.ships === "object" &&
+          typeof obj.defense === "object"
+        );
     }
 }
 

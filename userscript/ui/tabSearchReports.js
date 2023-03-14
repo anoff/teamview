@@ -2,8 +2,9 @@ const { report2html } = require('./spioHtml')
 const { searchReportsRequest } = require('../requests')
 const searchHtml = require('./tabSearchReports.html').default
 const { getCurrentPosition, quantile, saveSearchSettings, loadSearchSettings, teamviewDebugMode, makeTableSortable, calculateDistance, calculateFlightDuration } = require('../utils')
-const { res2str, obj2str, shipStructurePoints, defenseStructurePoints, itemIds } = require('../gameUtils')
+const { calculateShipSpeed, res2str, obj2str, shipStructurePoints, defenseStructurePoints, itemIds } = require('../gameUtils')
 const { TradeRatios } = require('../features/tradeRatios')
+const { LocalStorage } = require('../features/storage.ts')
 
 const PAGE_ID = '#search-reports' // top level div id to identify this page
 const SETTINGS_NAME = 'search_settings_reports'
@@ -140,6 +141,10 @@ function insertResults (reports) {
     system: currentPosition[1],
     position: currentPosition[2]
   }
+  const currentTechs = LocalStorage.getResearch()
+  const lightCargoSpeed = calculateShipSpeed('lightCargo', currentTechs)
+  // const heavyCargoSpeed = calculateShipSpeed('heavyCargo', currentTechs)
+  // const spyProbeSpeed = calculateShipSpeed('spyProbe', currentTechs)
 
   const playerStatus2Indicator = (player) => {
     const text = ['isInactive', 'isBanned', 'isVacation']
@@ -158,7 +163,7 @@ function insertResults (reports) {
   }
 
   const resPerHour = (mse, curCoords, targetCoords) => {
-    return (mse / (2 * calculateFlightDuration(calculateDistance(curCoords, targetCoords), 23500))) * 3600
+    return (mse / (2 * calculateFlightDuration(calculateDistance(curCoords, targetCoords), lightCargoSpeed))) * 3600
   }
 
   const allRes = {
@@ -225,7 +230,7 @@ function insertResults (reports) {
       position: e.position
     }
 
-    const flightTimeSeconds = Math.floor(calculateFlightDuration(calculateDistance(currentCoords, targetCoords), 23500))
+    const flightTimeSeconds = Math.floor(calculateFlightDuration(calculateDistance(currentCoords, targetCoords), lightCargoSpeed))
     const flightTimeStr = `${Math.floor(flightTimeSeconds / 3600)}h ${Math.floor((flightTimeSeconds % 3600) / 60)}m ${flightTimeSeconds % 60}s`
 
     const html = `<tr id="row-${e.planetId}">
@@ -238,7 +243,7 @@ function insertResults (reports) {
         <span style="font-size: 80%; color: yellow;"> (${e.player?.rank})</span>
     </td>
     <td class="col-planet"><span>${e.planetName || ''} ${e.isMoon ? '🌝' : ''}</span></td>
-    <td class="col-res-per-hour"><span>${res2str(resPerHour(res2mse(e.resources), currentCoords, targetCoords))}</span></td>
+    <td class="col-res-per-hour" data-value="${resPerHour(res2mse(e.resources), currentCoords, targetCoords)}"><span>${res2str(resPerHour(res2mse(e.resources), currentCoords, targetCoords))}</span></td>
     <td class="col-flight-time"><span>${flightTimeStr}</span></td>
     <td class="col-mse" data-value="${res2mse(e.resources)}"><span title="Metal Standard Units using ${tradeRatios.metal}:${tradeRatios.crystal}:${tradeRatios.deuterium}" class="${res2class(res2mse(e.resources), quantiles.mse)}">${res2str(res2mse(e.resources))}</span></td>
     <td class="col-metal" data-value="${e.resources.metal}"><span class="${res2class(e.resources.metal, quantiles.metal)}">${res2str(e.resources.metal)}</span></td>

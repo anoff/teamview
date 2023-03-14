@@ -117,7 +117,7 @@ const shipValues = {
       solarSatellite: 5
     },
     speed: [
-      { value: 12e3, tech: 115 }
+      { value: 7500, tech: 115 }
     ]
   },
   lightFighter: {
@@ -216,7 +216,7 @@ const shipValues = {
     attack: 0,
     rapid: {},
     cargo: 5,
-    speed: [100e6]
+    speed: [{ value: 100e6, tech: 115 }]
   },
   planetBomber: {
     metal: 50e3,
@@ -536,6 +536,36 @@ function obj2str (obj) {
   return str
 }
 
+/**
+ * Calculates the maximum speed of a ship based on its type and engine levels.
+ * @param {string} shipType - The type of ship.
+ * @param {object} engines - The levels of the ship's engines.
+ * @param {number} engines.combustionEngine - The level of the combustion engine.
+ * @param {number} engines.impulseEngine - The level of the impulse engine.
+ * @param {number} engines.hyperspaceEngine - The level of the hyperspace engine.
+ * @returns {number} The maximum speed of the ship.
+ */
+function calculateShipSpeed (shipType, engines = { combustionEngine: 0, impulseEngine: 0, hyperspaceEngine: 0 }) {
+  engines = {
+    115: { level: engines.combustionEngine, factor: 0.1 },
+    117: { level: engines.impulseEngine, factor: 0.2 },
+    118: { level: engines.hyperspaceEngine, factor: 0.2 }
+  }
+
+  const speeds = []
+  shipValues[shipType].speed.forEach(speed => {
+    const { value, tech } = speed
+    const factor = engines[tech].factor
+    const level = engines[tech].level
+    console.log({ value, tech, factor, level })
+    if ('minLevel' in speed && speed.minLevel > level) return
+    speeds.push(value * (1 + (level * factor)))
+  })
+
+  console.log(speeds)
+  return Math.max({ ...speeds })
+}
+
 module.exports = {
   calculateHourlyMineProduction,
   defenseStructurePoints,
@@ -548,6 +578,7 @@ module.exports = {
   missionTypes,
   obj2str,
   res2str,
+  calculateShipSpeed,
   shipStructurePoints,
   shipValues
 }
