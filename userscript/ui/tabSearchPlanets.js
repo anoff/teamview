@@ -15,6 +15,8 @@ const SETTINGS_MAP = {
   inactive: [`${PAGE_ID} #inactive`]
 }
 
+let alreadySpied = []
+
 function search () {
   function getQuery () {
     const fields = ['player_name', 'rank_min', 'rank_max', 'alliance_name', 'galaxy_min', 'galaxy_max', 'system_min', 'system_max', 'inactive', 'vacation', 'banned', 'require_report', 'report_maxage', 'has_moon', 'fleetpoints_min', 'defensepoints_max']
@@ -47,6 +49,8 @@ function search () {
     }
     return query
   }
+
+  alreadySpied = []
 
   saveSearchSettings(SETTINGS_NAME, SETTINGS_MAP)
   const query = getQuery()
@@ -120,8 +124,7 @@ function insertResults (planets) {
     </td>
     <td>
       <a href="#" title="Open Playercard" onclick="return Dialog.Playercard(${player.playerId});">${player.playerName}${player ? ' ' + playerStatus2Indicator(player) : ''} <span style="font-size: 80%; color: yellow;"> (${player.rank})</span></a>
-      <div id="cd-${p.planetId}">
-      </div>
+
     </td>
     <td>${p.planetName}</td>
     <td>${p.moonId && p.moonId > 0 ? `<a id="scan-${p.moonId}" title="Spy on planet" href="javascript:doit(6,${p.moonId},{'210':'2'});" style="font-size: 130%; position: relative; top: 2px;">🌝</a>` : ''}</td>
@@ -130,13 +133,15 @@ function insertResults (planets) {
       <a href="#" class="tooltip_sticky" data-tooltip-content="${report2html(report)}" style="${!report ? 'display: none;' : ''}font-size: 130%; position: relative; top: 2px;">${report ? ' 📃 ' : ''}<span style="font-size: 60%;">${calcTimeDeltaString(report?.date)}</span></a>
     </td>
     <td>
-      <a class="scan-button" data-value="${probeFlightTimeSeconds}" id="scan-${p.planetId}" title="Spy on planet" href="javascript:doit(6,${p.planetId},{'210':'2'});" style="font-size: 130%; position: relative; top: 2px;">${p.planetId ? ' 🛰 ' : ''}</a>
+      <div class="cd-${p.planetId}">
+        <a class="scan-button" data-value="${probeFlightTimeSeconds}" id="scan-${p.planetId}" title="Spy on planet" href="javascript:doit(6,${p.planetId},{'210':'2'});" style="font-size: 130%; position: relative; top: 2px;">${p.planetId ? ' 🛰 ' : ''}</a>
+      </div>
     </td>
     </tr>`
     anchor.insertAdjacentHTML('beforeend', html)
 
-    const scanButtons = document.querySelectorAll('.scan-button')
-    scanButtons.forEach(button => button.addEventListener('click', startProbesCountdownTimer))
+    // const scanButtons = document.querySelectorAll('.scan-button')
+    // scanButtons.forEach(button => button.addEventListener('click', startProbesCountdownTimer))
   }
 }
 
@@ -145,6 +150,13 @@ function markPlanetAsSpied (coords) {
   for (const row of rows) {
     const isMatch = row.children[0].textContent.includes(coords)
     if (isMatch) {
+      try {
+        const planetId = parseInt(row.id.slice(4))
+        if (alreadySpied.includes(planetId)) throw new Error('Exiting because Planet was already spied')
+        const scanButton = row.getElementsByClassName('scan-button')[0]
+        startProbesCountdownTimer({ target: scanButton })
+        alreadySpied.push(planetId)
+      } catch (error) {}
       row.style.opacity = 0.3
     }
   }

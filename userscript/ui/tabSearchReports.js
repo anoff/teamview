@@ -1,7 +1,7 @@
 const { report2html } = require('./spioHtml')
 const { searchReportsRequest } = require('../requests')
 const searchHtml = require('./tabSearchReports.html').default
-const { startProbesCountdownTimer, getCurrentPosition, quantile, saveSearchSettings, loadSearchSettings, teamviewDebugMode, makeTableSortable, calculateDistance, calculateFlightDuration } = require('../utils')
+const { getCurrentPosition, quantile, saveSearchSettings, loadSearchSettings, teamviewDebugMode, makeTableSortable, calculateDistance, calculateFlightDuration } = require('../utils')
 const { calculateShipSpeed, res2str, obj2str, shipStructurePoints, defenseStructurePoints, itemIds } = require('../gameUtils')
 const { TradeRatios } = require('../features/tradeRatios')
 const { LocalStorage } = require('../features/storage.ts')
@@ -269,7 +269,7 @@ function insertResults (reports) {
       <a href="#" title="Open Playercard" onclick="return Dialog.Playercard(${e.player?.playerId});" style="${!e.player?.playerId ? 'display: none;' : ''}">${e.player?.playerName || '-'}${e.player ? ' ' + playerStatus2Indicator(e.player) : ''}</a>
       <span style="${e.player?.playerId ? 'display: none;' : ''}">${e.player?.playerName || '-'}${e.player ? ' ' + playerStatus2Indicator(e.player) : ''}</span>
       <span style="font-size: 80%; color: yellow;"> (${e.player?.rank})</span>
-      <div id="cd-${e.planetId}">
+      <div class="cd-${e.planetId}">
       </div>
     </td>
     <td class="col-planet"><span>${e.planetName || ''} ${e.isMoon ? '🌝' : ''}</span></td>
@@ -311,9 +311,6 @@ function insertResults (reports) {
     </tr>`
     anchor.insertAdjacentHTML('beforeend', html)
   }
-
-  const scanButtons = document.querySelectorAll('.scan-button')
-  scanButtons.forEach(button => button.addEventListener('click', startProbesCountdownTimer))
 
   function formatColumnStateKey (key) {
     return key.replace(/[A-Z]/g, letter => '-' + letter.toLowerCase())
