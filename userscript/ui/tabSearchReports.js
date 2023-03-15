@@ -1,9 +1,10 @@
 const { report2html } = require('./spioHtml')
 const { searchReportsRequest } = require('../requests')
 const searchHtml = require('./tabSearchReports.html').default
-const { getCurrentPosition, quantile, saveSearchSettings, loadSearchSettings, teamviewDebugMode, makeTableSortable } = require('../utils')
-const { res2str, obj2str, shipStructurePoints, defenseStructurePoints, itemIds } = require('../gameUtils')
+const { getCurrentPosition, quantile, saveSearchSettings, loadSearchSettings, teamviewDebugMode, makeTableSortable, calculateDistance, calculateFlightDuration } = require('../utils')
+const { calculateShipSpeed, res2str, obj2str, shipStructurePoints, defenseStructurePoints, itemIds } = require('../gameUtils')
 const { TradeRatios } = require('../features/tradeRatios')
+const { LocalStorage } = require('../features/storage.ts')
 
 const PAGE_ID = '#search-reports' // top level div id to identify this page
 const SETTINGS_NAME = 'search_settings_reports'
@@ -16,6 +17,22 @@ const SETTINGS_MAP = {
   reportMaxAge: [`${PAGE_ID} #report_maxage`],
   fleetpointsMin: [`${PAGE_ID} #fleetpoints_min`],
   defensepointsMax: [`${PAGE_ID} #defensepoints_max`]
+}
+
+let columnStates = {
+  position: { isActive: true, labelText: 'Position' },
+  rank: { isActive: true, labelText: 'Rank' },
+  planet: { isActive: true, labelText: 'Planet' },
+  resPerHour: { isActive: true, labelText: 'Res/Hour' },
+  flightTime: { isActive: true, labelText: 'Flight Time' },
+  mse: { isActive: true, labelText: 'MSE' },
+  metal: { isActive: true, labelText: 'Metal' },
+  crystal: { isActive: true, labelText: 'Crystal' },
+  deuterium: { isActive: true, labelText: 'Deuterium' },
+  fleet: { isActive: true, labelText: 'Fleet' },
+  defense: { isActive: true, labelText: 'Defense' },
+  scan: { isActive: true, labelText: 'Scan' },
+  action: { isActive: true, labelText: 'Action' }
 }
 
 /**
@@ -134,6 +151,16 @@ function simLink (resources, defenses, ships, research) {
  */
 function insertResults (reports) {
   const anchor = document.querySelector(`${PAGE_ID} table#search-results tbody`)
+  const currentPosition = getCurrentPosition()
+  const currentCoords = {
+    galaxy: currentPosition[0],
+    system: currentPosition[1],
+    position: currentPosition[2]
+  }
+  const currentTechs = LocalStorage.getResearch()
+  const lightCargoSpeed = calculateShipSpeed('lightCargo', currentTechs)
+  const heavyCargoSpeed = calculateShipSpeed('heavyCargo', currentTechs)
+  const spyProbeSpeed = calculateShipSpeed('spyProbe', currentTechs)
 
   const playerStatus2Indicator = (player) => {
     const text = ['isInactive', 'isBanned', 'isVacation']
@@ -149,6 +176,17 @@ function insertResults (reports) {
     const c = obj.crystal * ratio.metal / ratio.crystal || 0
     const d = obj.deuterium * ratio.metal / ratio.deuterium || 0
     return m + c + d
+  }
+
+  /**
+  * Calculates the resources per hour for a given flight distance and MSE ratio.
+  * @param {number} mse - The amount of MSE that can be collected
+  * @param {Object} curCoords - The current coordinates of the fleet in the format {galaxy, system, position}.
+  * @param {Object} targetCoords - The target coordinates of the fleet in the format {galaxy, system, position}.
+  * @returns {number} The resources per hour for the given flight distance and MSE.
+  */
+  const resPerHour = (mse, curCoords, targetCoords) => {
+    return (mse / (2 * calculateFlightDuration(calculateDistance(curCoords, targetCoords), lightCargoSpeed))) * 3600
   }
 
   const allRes = {
@@ -183,6 +221,10 @@ function insertResults (reports) {
     return 'color-white'
   }
 
+  const flighTimeToString = (flightTimeSeconds) => {
+    return `${Math.floor(flightTimeSeconds / 3600)}h ${Math.floor((flightTimeSeconds % 3600) / 60)}m ${flightTimeSeconds % 60}s`
+  }
+
   if (teamviewDebugMode) console.log({ receivedData: reports })
   for (const e of reports) {
     const requiredCargo = 0.5 * Math.max(e.resources.metal + e.resources.crystal + e.resources.deuterium, Math.min(0.75 * (2 * e.resources.metal + e.resources.crystal + e.resources.deuterium), 2 * e.resources.metal + e.resources.deuterium))
@@ -209,21 +251,38 @@ function insertResults (reports) {
 
     const tradeRatios = TradeRatios.get()
 
-    const html = `<tr id="row-${e.planetId}">
-    <td data-value="${e.galaxy * 10e5 + e.system * 10e2 + e.position}">   
+    const targetCoords = {
+      galaxy: e.galaxy,
+      system: e.system,
+      position: e.position
+    }
+
+    const lcargoFlightTimeSeconds = Math.floor(calculateFlightDuration(calculateDistance(currentCoords, targetCoords), lightCargoSpeed))
+    const hcargoFlightTimeSeconds = Math.floor(calculateFlightDuration(calculateDistance(currentCoords, targetCoords), heavyCargoSpeed))
+    const probeFlightTimeSeconds = Math.floor(calculateFlightDuration(calculateDistance(currentCoords, targetCoords), spyProbeSpeed))
+
+    const html = `<tr class="loading-bar" id="row-${e.planetId}">
+    <td class="col-position" data-value="${e.galaxy * 10e5 + e.system * 10e2 + e.position}">   
       <a href="${window.location.pathname}?page=galaxy&galaxy=${e.galaxy}&system=${e.system}" title="Goto System">[${e.galaxy}:${e.system}:${e.position}]${e.isMoon ? 'M' : ''}</a>
     </td>
-    <td>
+    <td class="col-rank">
       <a href="#" title="Open Playercard" onclick="return Dialog.Playercard(${e.player?.playerId});" style="${!e.player?.playerId ? 'display: none;' : ''}">${e.player?.playerName || '-'}${e.player ? ' ' + playerStatus2Indicator(e.player) : ''}</a>
       <span style="${e.player?.playerId ? 'display: none;' : ''}">${e.player?.playerName || '-'}${e.player ? ' ' + playerStatus2Indicator(e.player) : ''}</span>
-        <span style="font-size: 80%; color: yellow;"> (${e.player?.rank})</span>
+      <span style="font-size: 80%; color: yellow;"> (${e.player?.rank})</span>
+      <div class="cd-${e.planetId}">
+      </div>
     </td>
-    <td><span>${e.planetName || ''} ${e.isMoon ? '🌝' : ''}</span></td>
-    <td data-value="${res2mse(e.resources)}"><span title="Metal Standard Units using ${tradeRatios.metal}:${tradeRatios.crystal}:${tradeRatios.deuterium}" class="${res2class(res2mse(e.resources), quantiles.mse)}">${res2str(res2mse(e.resources))}</span></td>
-    <td data-value="${e.resources.metal}"><span class="${res2class(e.resources.metal, quantiles.metal)}">${res2str(e.resources.metal)}</span></td>
-    <td data-value="${e.resources.crystal}"><span class="${res2class(e.resources.crystal, quantiles.crystal)}">${res2str(e.resources.crystal)}</span></td>
-    <td data-value="${e.resources.deuterium}"><span class="${res2class(e.resources.deuterium, quantiles.deuterium)}">${res2str(e.resources.deuterium)}</span></td>
-    <td data-value="${fleetSp}">
+    <td class="col-planet"><span>${e.planetName || ''} ${e.isMoon ? '🌝' : ''}</span></td>
+    <td class="col-res-per-hour" data-value="${resPerHour(res2mse(e.resources), currentCoords, targetCoords)}"><span>${res2str(resPerHour(res2mse(e.resources), currentCoords, targetCoords))}</span></td>
+    <td class="col-flight-time" data-value="${lcargoFlightTimeSeconds}">
+      <span>LC ${flighTimeToString(lcargoFlightTimeSeconds)}</span><br />
+      <span>HC ${flighTimeToString(hcargoFlightTimeSeconds)}</span>
+    </td>
+    <td class="col-mse" data-value="${res2mse(e.resources)}"><span title="Metal Standard Units using ${tradeRatios.metal}:${tradeRatios.crystal}:${tradeRatios.deuterium}" class="${res2class(res2mse(e.resources), quantiles.mse)}">${res2str(res2mse(e.resources))}</span></td>
+    <td class="col-metal" data-value="${e.resources.metal}"><span class="${res2class(e.resources.metal, quantiles.metal)}">${res2str(e.resources.metal)}</span></td>
+    <td class="col-crystal" data-value="${e.resources.crystal}"><span class="${res2class(e.resources.crystal, quantiles.crystal)}">${res2str(e.resources.crystal)}</span></td>
+    <td class="col-deuterium" data-value="${e.resources.deuterium}"><span class="${res2class(e.resources.deuterium, quantiles.deuterium)}">${res2str(e.resources.deuterium)}</span></td>
+    <td class="col-fleet" data-value="${fleetSp}">
       <span style="${fleetSp === 0 ? 'display: none;' : ''}" class="${fleetSpClass}">
         <img src="./styles/theme/nova/planeten/debris.jpg" alt="TF for entire fleet" width="16" height="16">
         ${Math.round(fleetSp * 0.3 / 1e5) / 10}M<br>
@@ -232,25 +291,66 @@ function insertResults (reports) {
         ${obj2str(e.ships)}
       </span>
     </td>
-    <td data-value="${defSp}"><span style="${Math.min(defSp, fleetSp) === 0 ? 'display: none;' : ''}" class="${def2fleetClass}">Def/Fleet: ${Math.round(def2fleet * 10) / 10}<br></span><span class="report-details">${obj2str(e.defense)}</span></td>
-    <td data-value="${(new Date() - new Date(e.date))}">
+    <td class="col-defense" data-value="${defSp}"><span style="${Math.min(defSp, fleetSp) === 0 ? 'display: none;' : ''}" class="${def2fleetClass}">Def/Fleet: ${Math.round(def2fleet * 10) / 10}<br></span><span class="report-details">${obj2str(e.defense)}</span></td>
+    <td class="col-scan" data-value="${(new Date() - new Date(e.date))}">
       <a href="#" class="tooltip_sticky" data-tooltip-content="${report2html(e)}">${calcTimeDeltaString(e.date)}</a>
     </td>
-    <td>
+    <td class="col-action" >
       <a id="attack-${e.planetId}" title="Attack" href="${window.location.pathname}?page=fleetTable&galaxy=${e.galaxy}&system=${e.system}&planet=${e.position}&planettype=1&target_mission=1#ship_input[202]=${Math.ceil(requiredCargo / 5000)}" target="_blank"> ⚔️ </a>
       <br>
       <span>⸺</span>
       <br>
-      <a id="scan-${e.planetId}" title="Spy on planet" href="javascript:doit(6,${e.planetId},{'210':'2'});" style="font-size: 130%; position: relative; top: 2px;">${e.planetId ? ' 🛰 ' : ''}</a>
+      <a class="scan-button" id="scan-${e.planetId}" data-value="${probeFlightTimeSeconds}" title="Spy on planet" href="javascript:doit(6,${e.planetId},{'210':'2'});" style="font-size: 130%; position: relative; top: 2px;">${e.planetId ? ' 🛰 ' : ''}</a>
       <div ${fleetSp + defSp === 0 ? 'class="hidden"' : ''}>
         <span>⸺</span>
         <br>
         <a id="sim-${e.planetId}" title="Simulate" href="${simLink(e.resources, e.defense, e.ships, e.research)}" style="font-size: 130%; position: relative; top: 2px;" target="_blank">${e.planetId ? ' 🔮 ' : ''}</a>
       </div>
+
     </td>
     </tr>`
     anchor.insertAdjacentHTML('beforeend', html)
   }
+
+  function formatColumnStateKey (key) {
+    return key.replace(/[A-Z]/g, letter => '-' + letter.toLowerCase())
+  }
+
+  function formatColumnClassName (className) {
+    return className.replace(/col-(.+)/, (_, match) => match.replace(/-(\w)/g, (_, letter) => letter.toUpperCase()))
+  }
+
+  function showHideColumns (columnStateKey) {
+    const columnState = columnStates[columnStateKey]
+    const columns = document.querySelectorAll(`.col-${formatColumnStateKey(columnStateKey)}`)
+    columns.forEach(column => {
+      column.style.display = columnState.isActive ? '' : 'none'
+    })
+  }
+
+  const tagListElement = document.getElementsByClassName('tag-list')[0]
+  tagListElement.innerHTML = ''
+
+  Object.entries(columnStates).forEach(([columnStateKey, data]) => {
+    const formattedColumn = formatColumnStateKey(columnStateKey)
+    const checkboxHtml = `
+      <label>
+        <input class="hide-column-tag" type="checkbox" value="col-${formattedColumn}" ${data.isActive ? 'checked' : ''}>
+        <span>${data.labelText}</span>
+      </label>`
+    tagListElement.innerHTML += checkboxHtml
+    showHideColumns(columnStateKey)
+  })
+
+  const checkboxes = document.querySelectorAll('.hide-column-tag')
+  checkboxes.forEach(checkbox => {
+    checkbox.addEventListener('change', function () {
+      const columnClassName = formatColumnClassName(this.value)
+      columnStates[columnClassName].isActive = !columnStates[columnClassName].isActive
+      showHideColumns(columnClassName)
+      LocalStorage.saveReportColumnStates(columnStates)
+    })
+  })
 }
 
 /**
@@ -270,6 +370,7 @@ function insertHtml (anchorElement) {
 
   // make table sortable
   makeTableSortable(`${PAGE_ID} th.sortable`)
+  columnStates = LocalStorage.getReportColumnStates()
 }
 module.exports = {
   search,

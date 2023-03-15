@@ -147,13 +147,12 @@ class PhalanxInfo {
       throw new Error('Expected an array of phalanx information.')
     }
 
-    this.maxGalaxies = options.hasOwnProperty('maxGalaxies') ? options.maxGalaxies : 4
-    this.maxSystems = options.hasOwnProperty('maxSystems') ? options.maxSystems : 400
+    this.maxGalaxies = Object.prototype.hasOwnProperty.call(options, 'maxGalaxies') ? options.maxGalaxies : 4
+    this.maxSystems = Object.prototype.hasOwnProperty.call(options, 'maxSystems') ? options.maxSystems : 400
 
     this.phalanxes = phalanxes
     this.data = Array.from(Array(this.maxSystems), () => [])
     this.calculateSystemsInPhalanx()
-
   }
 
   /**
@@ -287,6 +286,104 @@ function camel2capitalCase (text) {
     .replace(/^./, e => e.toUpperCase())
 }
 
+/**
+ * Calculates the distance between two locations.
+ *
+ * @param {Object} start - The starting location, including galaxy, system, and position.
+ * @param {number} start.galaxy - The galaxy of the starting location.
+ * @param {number} start.system - The system of the starting location.
+ * @param {number} start.position - The position of the starting location.
+ * @param {Object} target - The target location, including galaxy, system, and position.
+ * @param {number} target.galaxy - The galaxy of the target location.
+ * @param {number} target.system - The system of the target location.
+ * @param {number} target.position - The position of the target location.
+ * @returns {number} The distance between the two locations
+ */
+function calculateDistance (start, target) {
+  const delta = {}
+
+  // TODO: Extract to a project wide constants file
+  const galaxyWidth = 400
+  const galaxyAmount = 4
+
+  if (start.galaxy > target.galaxy) {
+    delta.galaxy = Math.min(start.galaxy - target.galaxy, galaxyAmount - start.galaxy + target.galaxy + 1)
+  } else {
+    delta.galaxy = Math.min(target.galaxy - start.galaxy, galaxyAmount - target.galaxy + start.galaxy + 1)
+  }
+
+  if (start.system > target.system) {
+    delta.system = Math.min(start.system - target.system, galaxyWidth - start.system + target.system + 1)
+  } else {
+    delta.system = Math.min(target.system - start.system, galaxyWidth - target.system + start.system + 1)
+  }
+
+  delta.position = Math.abs(start.position - target.position)
+
+  if (delta.galaxy !== 0) {
+    return 20_000 * delta.galaxy
+  }
+
+  if (delta.system !== 0) {
+    return 2_700 + 95 * delta.system
+  }
+
+  if (delta.position !== 0) {
+    return 1_000 + 5 * delta.system
+  }
+
+  // default Value for traveling on the same position
+  return 5
+}
+
+/**
+ * Calculates the duration of a flight in seconds
+ *
+ * @param {number} distance - The distance to be covered by the flight in kilometers.
+ * @param {number} slowestSpeed - The slowest speed of the flight in kilometers per hour.
+ * @param {number} [modifierSpeed=1] - The modifier speed of the flight as decimals in 0.1 increments
+ * @returns {number} The duration of the flight in seconds.
+ */
+function calculateFlightDuration (distance, slowestSpeed, modiferSpeed = 1) {
+  return (10 + 3500 / modiferSpeed * Math.sqrt(10 * distance / slowestSpeed))
+}
+
+/**
+  * Starts a countdown timer for the spy probes that were sent to a planet.
+  * @param {Event} e - The click event that triggers the countdown timer.
+  * @returns {void}
+  */
+function startProbesCountdownTimer (e) {
+  console.log({ e })
+  const time = new Date()
+  const spyProbesBackDate = new Date(time.getTime() + e.target.dataset.value * 2000)
+  const planetId = e.target.id.split('-')[1]
+
+  const x = setInterval(() => {
+    const now = new Date().getTime()
+    const distance = spyProbesBackDate - now
+
+    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60))
+    const seconds = Math.floor((distance % (1000 * 60)) / 1000)
+
+    // Output the result in an element with id="demo"
+    const cdElements = document.getElementsByClassName(`cd-${planetId}`)
+    const len = cdElements.length
+    for (let i = 0; i < len; i++) {
+      cdElements[i].innerHTML = minutes + 'm ' + seconds + 's '
+    }
+
+    // If the count down is over, write some text
+    if (distance < 0) {
+      clearInterval(x)
+      const len = cdElements.length
+      for (let i = 0; i < len; i++) {
+        cdElements[i].innerHTML = 'DONE'
+      }
+    }
+  }, 1000)
+}
+
 module.exports = {
   camel2capitalCase,
   Feature,
@@ -301,5 +398,8 @@ module.exports = {
   setTeamviewStatus,
   PhalanxInfo,
   Activity,
+  calculateDistance,
+  calculateFlightDuration,
+  startProbesCountdownTimer,
   teamviewDebugMode: TM_getValue('debug_mode') === 1
 }

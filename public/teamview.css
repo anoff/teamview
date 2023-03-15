@@ -182,3 +182,43 @@ th.sortable:after {
   border-top-color: #eee;
   margin-top: 1px;
 }
+
+/* ========================================
+ *            Hide Columns
+ * ======================================== */
+ 
+.hide-columns-container {
+  margin: 1em 0 0 0;
+}
+
+.hide-columns-container .tag-list {
+  display: inline-flex;
+  flex-wrap: wrap;
+}
+
+.hide-columns-container .tag-list label {
+  display: flex;
+  align-items: center;
+  margin-left: 4px;
+  margin-right: 4px;
+  margin-bottom: 10px;
+  padding: 5px 10px;
+  background-color: #333;
+}
+
+.hide-columns-container .tag-list .hide-column-tag {
+  display: none;
+}
+
+.hide-columns-container .tag-list span {
+  margin-left: 5px;
+  color: #f2f3f5;
+}
+
+.hide-columns-container .tag-list .hide-column-tag:checked + span {
+  color: #f2f3f5;
+}
+
+.hide-columns-container .tag-list label:has(.hide-column-tag:checked) {
+  background-color: #4a5d75;
+}

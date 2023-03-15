@@ -24,6 +24,13 @@ module.exports = {
           minimize: true,
           sources: false // Disables attributes processing
         }
+      },
+      {
+        test: /\.ts$/,
+        exclude: /node_modules/,
+        use: {
+          loader: 'ts-loader'
+        }
       }
     ]
 

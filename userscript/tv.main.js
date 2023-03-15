@@ -1,4 +1,5 @@
 'use strict'
+const { LocalStorage } = require('./features/storage.ts')
 /* globals  TM_setValue, TM_getValue */
 
 const { teamviewDebugMode } = require('./utils')
@@ -34,7 +35,7 @@ function loadFeatures () {
   function importAll (r) {
     r.keys().forEach((key) => (list[key] = r(key)))
   }
-  importAll(require.context('./features/', true, /\.js$/))
+  importAll(require.context('./features/', true, /\.(js|ts)$/))
   return list
 }
 

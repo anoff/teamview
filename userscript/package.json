@@ -5,6 +5,7 @@
     "ava": "^5.1.1",
     "http-server": "^14.1.0",
     "standard": "^17.0.0",
+    "ts-loader": "^9.4.2",
     "webpack": "^5.72.0",
     "webpack-cli": "^4.9.2"
   },
@@ -12,5 +13,11 @@
     "dev": "webpack build --watch --node-env development",
     "build": "webpack build",
     "test": "standard && ava"
+  },
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "features/*": ["./features/*"]
+    }
   }
 }
