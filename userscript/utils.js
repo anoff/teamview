@@ -348,6 +348,34 @@ function calculateFlightDuration (distance, slowestSpeed, modiferSpeed = 1) {
   return (10 + 3500 / modiferSpeed * Math.sqrt(10 * distance / slowestSpeed))
 }
 
+/**
+  * Starts a countdown timer for the spy probes that were sent to a planet.
+  * @param {Event} e - The click event that triggers the countdown timer.
+  * @returns {void}
+  */
+function startProbesCountdownTimer (e) {
+  const time = new Date()
+  const spyProbesBackDate = new Date(time.getTime() + e.target.dataset.value * 2000)
+  const planetId = e.target.id.split('-')[1]
+
+  const x = setInterval(() => {
+    const now = new Date().getTime()
+    const distance = spyProbesBackDate - now
+
+    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60))
+    const seconds = Math.floor((distance % (1000 * 60)) / 1000)
+
+    // Output the result in an element with id="demo"
+    document.getElementById(`cd-${planetId}`).innerHTML = minutes + 'm ' + seconds + 's '
+
+    // If the count down is over, write some text
+    if (distance < 0) {
+      clearInterval(x)
+      document.getElementById(`cd-${planetId}`).innerHTML = 'DONE'
+    }
+  }, 1000)
+}
+
 module.exports = {
   camel2capitalCase,
   Feature,
@@ -364,5 +392,6 @@ module.exports = {
   Activity,
   calculateDistance,
   calculateFlightDuration,
+  startProbesCountdownTimer,
   teamviewDebugMode: TM_getValue('debug_mode') === 1
 }

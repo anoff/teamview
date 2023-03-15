@@ -188,7 +188,7 @@ th.sortable:after {
  * ======================================== */
  
 .hide-columns-container {
-  margin: 1em 0;
+  margin: 1em 0 0 0;
 }
 
 .hide-columns-container .tag-list {
@@ -199,7 +199,9 @@ th.sortable:after {
 .hide-columns-container .tag-list label {
   display: flex;
   align-items: center;
-  margin-right: 10px;
+  margin-left: 4px;
+  margin-right: 4px;
+  margin-bottom: 10px;
   padding: 5px 10px;
   background-color: #333;
 }

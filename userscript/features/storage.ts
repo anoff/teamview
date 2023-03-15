@@ -1,6 +1,23 @@
 const UNIVERSE: string | null = window.location.href.match(/\/\/([^\/]+)\/([^\/]+)\//)?.[2] ?? 'uni2';
 const KEY_EMPIRE = `${UNIVERSE}_empire`
 const KEY_TECHNOLOGIES = `${UNIVERSE}_technologies`
+const KEY_REPORT_COLUMN_STATES = `${UNIVERSE}_report_columns_states`
+
+export class ReportColumnStates {
+    position: Object =  { isActive: true, labelText: 'Position' }
+    rank: Object =  { isActive: true, labelText: 'Rank' }
+    planet: Object =  { isActive: true, labelText: 'Planet' }
+    resPerHour: Object =  { isActive: true, labelText: 'Res/Hour' }
+    flightTime: Object =  { isActive: true, labelText: 'Flight Time' }
+    mse: Object =  { isActive: true, labelText: 'MSE' }
+    metal: Object =  { isActive: true, labelText: 'Metal' }
+    crystal: Object =  { isActive: true, labelText: 'Crystal' }
+    deuterium: Object =  { isActive: true, labelText: 'Deuterium' }
+    fleet: Object =  { isActive: true, labelText: 'Fleet' }
+    defense: Object =  { isActive: true, labelText: 'Defense' }
+    scan: Object =  { isActive: true, labelText: 'Scan' }
+    action: Object =  { isActive: true, labelText: 'Action' }
+}
 
 export class Ships {
     lightCargo: number = 0
@@ -130,10 +147,24 @@ export class Empire {
 }
 
 export class LocalStorage {
+    static saveReportColumnStates(states: ReportColumnStates) {
+        const stateStr = JSON.stringify(states)
+        TM_setValue(KEY_REPORT_COLUMN_STATES, stateStr)    
+    }
+
+    static getReportColumnStates() {
+        let stateStr = TM_getValue(KEY_REPORT_COLUMN_STATES)
+        if (!stateStr || stateStr === '') TM_setValue(KEY_REPORT_COLUMN_STATES, JSON.stringify(new ReportColumnStates()))
+
+        const states: ReportColumnStates = JSON.parse(stateStr) ?? new ReportColumnStates()
+        return states
+    }
+
     static saveEmpire(empire: Empire) {
         const empireStr = JSON.stringify(empire)
         TM_setValue(KEY_EMPIRE, empireStr)
     }
+
 
     static getEmpire() :Empire {
         let empireStr = TM_getValue(KEY_EMPIRE)
@@ -150,9 +181,7 @@ export class LocalStorage {
         } else {
           return empire.research
         }
-      }
+    }
 }
 
-export function init() {
-    console.log(UNIVERSE)
-}
+export function init() {}

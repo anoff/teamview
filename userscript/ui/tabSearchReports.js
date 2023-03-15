@@ -1,7 +1,7 @@
 const { report2html } = require('./spioHtml')
 const { searchReportsRequest } = require('../requests')
 const searchHtml = require('./tabSearchReports.html').default
-const { getCurrentPosition, quantile, saveSearchSettings, loadSearchSettings, teamviewDebugMode, makeTableSortable, calculateDistance, calculateFlightDuration } = require('../utils')
+const { startProbesCountdownTimer, getCurrentPosition, quantile, saveSearchSettings, loadSearchSettings, teamviewDebugMode, makeTableSortable, calculateDistance, calculateFlightDuration } = require('../utils')
 const { calculateShipSpeed, res2str, obj2str, shipStructurePoints, defenseStructurePoints, itemIds } = require('../gameUtils')
 const { TradeRatios } = require('../features/tradeRatios')
 const { LocalStorage } = require('../features/storage.ts')
@@ -17,6 +17,22 @@ const SETTINGS_MAP = {
   reportMaxAge: [`${PAGE_ID} #report_maxage`],
   fleetpointsMin: [`${PAGE_ID} #fleetpoints_min`],
   defensepointsMax: [`${PAGE_ID} #defensepoints_max`]
+}
+
+let columnStates = {
+  position: { isActive: true, labelText: 'Position' },
+  rank: { isActive: true, labelText: 'Rank' },
+  planet: { isActive: true, labelText: 'Planet' },
+  resPerHour: { isActive: true, labelText: 'Res/Hour' },
+  flightTime: { isActive: true, labelText: 'Flight Time' },
+  mse: { isActive: true, labelText: 'MSE' },
+  metal: { isActive: true, labelText: 'Metal' },
+  crystal: { isActive: true, labelText: 'Crystal' },
+  deuterium: { isActive: true, labelText: 'Deuterium' },
+  fleet: { isActive: true, labelText: 'Fleet' },
+  defense: { isActive: true, labelText: 'Defense' },
+  scan: { isActive: true, labelText: 'Scan' },
+  action: { isActive: true, labelText: 'Action' }
 }
 
 /**
@@ -162,6 +178,13 @@ function insertResults (reports) {
     return m + c + d
   }
 
+  /**
+  * Calculates the resources per hour for a given flight distance and MSE ratio.
+  * @param {number} mse - The amount of MSE that can be collected
+  * @param {Object} curCoords - The current coordinates of the fleet in the format {galaxy, system, position}.
+  * @param {Object} targetCoords - The target coordinates of the fleet in the format {galaxy, system, position}.
+  * @returns {number} The resources per hour for the given flight distance and MSE.
+  */
   const resPerHour = (mse, curCoords, targetCoords) => {
     return (mse / (2 * calculateFlightDuration(calculateDistance(curCoords, targetCoords), lightCargoSpeed))) * 3600
   }
@@ -287,33 +310,50 @@ function insertResults (reports) {
     </td>
     </tr>`
     anchor.insertAdjacentHTML('beforeend', html)
-
-    function probesSend (e) {
-      const time = new Date()
-      const spyProbesBackDate = new Date(time.getTime() + e.target.dataset.value * 2000)
-      const planetId = e.target.id.split('-')[1]
-
-      const x = setInterval(() => {
-        const now = new Date().getTime()
-        const distance = spyProbesBackDate - now
-
-        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60))
-        const seconds = Math.floor((distance % (1000 * 60)) / 1000)
-
-        // Output the result in an element with id="demo"
-        document.getElementById(`cd-${planetId}`).innerHTML = minutes + 'm ' + seconds + 's '
-
-        // If the count down is over, write some text
-        if (distance < 0) {
-          clearInterval(x)
-          document.getElementById(`cd-${planetId}`).innerHTML = 'DONE'
-        }
-      }, 1000)
-    }
-
-    const scanButtons = document.querySelectorAll('.scan-button')
-    scanButtons.forEach(button => button.addEventListener('click', probesSend))
   }
+
+  const scanButtons = document.querySelectorAll('.scan-button')
+  scanButtons.forEach(button => button.addEventListener('click', startProbesCountdownTimer))
+
+  function formatColumnStateKey (key) {
+    return key.replace(/[A-Z]/g, letter => '-' + letter.toLowerCase())
+  }
+
+  function formatColumnClassName (className) {
+    return className.replace(/col-(.+)/, (_, match) => match.replace(/-(\w)/g, (_, letter) => letter.toUpperCase()))
+  }
+
+  function showHideColumns (columnStateKey) {
+    const columnState = columnStates[columnStateKey]
+    const columns = document.querySelectorAll(`.col-${formatColumnStateKey(columnStateKey)}`)
+    columns.forEach(column => {
+      column.style.display = columnState.isActive ? '' : 'none'
+    })
+  }
+
+  const tagListElement = document.getElementsByClassName('tag-list')[0]
+  tagListElement.innerHTML = ''
+
+  Object.entries(columnStates).forEach(([columnStateKey, data]) => {
+    const formattedColumn = formatColumnStateKey(columnStateKey)
+    const checkboxHtml = `
+      <label>
+        <input class="hide-column-tag" type="checkbox" value="col-${formattedColumn}" ${data.isActive ? 'checked' : ''}>
+        <span>${data.labelText}</span>
+      </label>`
+    tagListElement.innerHTML += checkboxHtml
+    showHideColumns(columnStateKey)
+  })
+
+  const checkboxes = document.querySelectorAll('.hide-column-tag')
+  checkboxes.forEach(checkbox => {
+    checkbox.addEventListener('change', function () {
+      const columnClassName = formatColumnClassName(this.value)
+      columnStates[columnClassName].isActive = !columnStates[columnClassName].isActive
+      showHideColumns(columnClassName)
+      LocalStorage.saveReportColumnStates(columnStates)
+    })
+  })
 }
 
 /**
@@ -325,17 +365,6 @@ function insertHtml (anchorElement) {
   const btn = document.querySelector(`${PAGE_ID} button#search`)
   btn.addEventListener('click', search.bind(this))
 
-  const checkboxes = document.querySelectorAll('.hide-column-tag')
-  checkboxes.forEach(checkbox => {
-    checkbox.addEventListener('change', function () {
-      const classname = this.value
-      const columns = document.querySelectorAll(`.${classname}`)
-      columns.forEach(column => {
-        column.style.display = this.checked ? '' : 'none'
-      })
-    })
-  })
-
   const [galaxy] = getCurrentPosition()
   document.querySelector(`${PAGE_ID} #galaxy_min`).value = galaxy
   document.querySelector(`${PAGE_ID} #galaxy_max`).value = galaxy
@@ -344,6 +373,7 @@ function insertHtml (anchorElement) {
 
   // make table sortable
   makeTableSortable(`${PAGE_ID} th.sortable`)
+  columnStates = LocalStorage.getReportColumnStates()
 }
 module.exports = {
   search,
