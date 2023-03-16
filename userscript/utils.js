@@ -354,7 +354,6 @@ function calculateFlightDuration (distance, slowestSpeed, modiferSpeed = 1) {
   * @returns {void}
   */
 function startProbesCountdownTimer (e) {
-  console.log({ e })
   const time = new Date()
   const spyProbesBackDate = new Date(time.getTime() + e.target.dataset.value * 2000)
   const planetId = e.target.id.split('-')[1]
