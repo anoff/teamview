@@ -1,5 +1,4 @@
 'use strict'
-const { LocalStorage } = require('./features/storage.ts')
 /* globals  TM_setValue, TM_getValue */
 
 const { teamviewDebugMode } = require('./utils')
