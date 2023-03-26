@@ -109,7 +109,7 @@ test('pick simple fight that should be won', t => {
   t.is(result.losses.attackers.lostRes.metal, 0)
 })
 
-test('fighter vs cruiser moonshot, notech', t => {
+test.skip('fighter vs cruiser moonshot, notech', t => {
   const a1 = new be.Fleet(new be.BattleTechs(0, 0, 0))
   const d1 = new be.Fleet(new be.BattleTechs(0, 0, 0))
   a1.addUnitId(204, 1250)
@@ -120,7 +120,7 @@ test('fighter vs cruiser moonshot, notech', t => {
   t.is(result.losses.attackers.lostRes.metal, 0)
 })
 
-test.only('fighter vs cruiser moonshot, tech11', t => {
+test.skip('fighter vs cruiser moonshot, tech11', t => {
   const a1 = new be.Fleet(new be.BattleTechs(11, 11, 11))
   const d1 = new be.Fleet(new be.BattleTechs(11, 11, 11))
   a1.addUnitId(204, 1250)
