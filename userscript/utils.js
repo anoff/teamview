@@ -147,13 +147,12 @@ class PhalanxInfo {
       throw new Error('Expected an array of phalanx information.')
     }
 
-    this.maxGalaxies = options.hasOwnProperty('maxGalaxies') ? options.maxGalaxies : 4
-    this.maxSystems = options.hasOwnProperty('maxSystems') ? options.maxSystems : 400
+    this.maxGalaxies = options.maxGalaxies ? options.maxGalaxies : 4
+    this.maxSystems = options.maxSystems ? options.maxSystems : 400
 
     this.phalanxes = phalanxes
     this.data = Array.from(Array(this.maxSystems), () => [])
     this.calculateSystemsInPhalanx()
-
   }
 
   /**
