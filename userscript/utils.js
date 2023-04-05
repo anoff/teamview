@@ -128,6 +128,154 @@ class Feature {
   }
 }
 
+const Activity = {
+  INACTIVE: 0,
+  BANNED: 1,
+  VACATION: 2,
+  ACTIVE: 3
+}
+
+class PhalanxInfo {
+  /**
+   * Create a PhalanxInfo instance.
+   * @param {Array} phalanxes - An array of phalanx information.
+   * @param {Object} [options] - An optional object containing options.
+   * @param {number} [options.maxGalaxies=4] - The maximum number of galaxies.
+   * @param {number} [options.maxSystems=400] - The maximum number of systems.
+   * @throws {Error} - If phalanxes is not an array.
+   */
+  constructor (phalanxes, options = {}) {
+    if (!Array.isArray(phalanxes)) {
+      throw new Error('Expected an array of phalanx information.')
+    }
+
+    this.maxGalaxies = options.maxGalaxies ? options.maxGalaxies : 4
+    this.maxSystems = options.maxSystems ? options.maxSystems : 400
+
+    this.phalanxes = phalanxes
+    this.data = Array.from(Array(this.maxSystems), () => [])
+    this.calculateSystemsInPhalanx()
+  }
+
+  /**
+   * Get the phalanx information for a given system.
+   * @param {number} system - The system number.
+   * @returns {Array} - The phalanx information for the given system.
+   */
+  getSystem (system) {
+    return this.data[system - 1]
+  }
+
+  /**
+   * Append a phalanx to the specified system.
+   * @param {number} system - The system number.
+   * @param {Object} phalanx - The phalanx object to append.
+   * @returns {number} - The new length of the phalanx array for the specified system.
+   */
+  appendPhalanx (system, phalanx) {
+    if (system < 1 || system > this.maxSystems) return
+    return this.getSystem(system).push(phalanx)
+  }
+
+  /**
+   * Calculate which systems are covered by each phalanx.
+   */
+  calculateSystemsInPhalanx () {
+    this.phalanxes.forEach(phalanx => {
+      const { from, to } = phalanx.range
+      if (from < to || from === to) {
+        for (let system = from; system <= to; system++) {
+          this.appendPhalanx(system, phalanx)
+        }
+      } else {
+        for (let system = from; system <= (this.maxSystems + to); system++) {
+          this.appendPhalanx(system % (this.maxSystems + 1), phalanx)
+        }
+      }
+    })
+  }
+
+  /**
+   * Check if a system is covered by any phalanx.
+   * @param {number} system - The system number.
+   * @returns {boolean} - True if the system is covered by any phalanx, false otherwise.
+   */
+  isInRange (system) {
+    if (system < 1 || system > this.maxSystems) return false
+    return this.getSystem(system).length > 0
+  }
+
+  /**
+   * Returns the highest activity level among all the phalanxes associated with a specific system.
+   * @param {number} system - The system to check.
+   * @returns {number} - The highest activity level of the phalanxes associated with the input system.
+   */
+  static getActivity (phalanx) {
+    if (!phalanx.isVacation && !phalanx.isBanned && phalanx.isInactive === 0) return Activity.ACTIVE
+    if (phalanx.isVacation) return Activity.VACATION
+    if (phalanx.isBanned) return Activity.BANNED
+    if (phalanx.isInactive > 0) return Activity.INACTIVE
+  }
+
+  /**
+   * Returns the highest activity level among all the phalanxes associated with a specific system.
+   * @param {number} system - The system to check.
+   * @returns {number} - The highest activity level of the phalanxes associated with the input system.
+   */
+  getSystemActivity (system) {
+    if (system < 1 || system > this.maxSystems) return Activity.ACTIVE
+    const phalanxInSystem = this.getSystem(system)
+    let activity = 0
+    phalanxInSystem.forEach(phalanx => {
+      const curActivity = PhalanxInfo.getActivity(phalanx)
+      if (curActivity > activity) activity = curActivity
+    })
+
+    return activity
+  }
+
+  /**
+   * Get the color associated with the activity status
+   * @param {number} activity - activity status code.
+   * @returns {string} - The color associated with the activity status
+   */
+  static getActivityColor (activity) {
+    switch (activity) {
+      case Activity.ACTIVE:
+        return 'red'
+      case Activity.INACTIVE:
+        return '#999'
+      case Activity.VACATION:
+      case Activity.BANNED:
+        return '#659ec7'
+    }
+  }
+
+  /**
+   * Get the color associated with the highest phalanx activity status of a given system.
+   * @param {number} system - The system number.
+   * @returns {string} - The color associated with the activity status of the given system.
+   */
+  getSystemActivityColor (system) {
+    if (system < 1 || system > this.maxSystems) return 'red'
+
+    const activity = this.getSystemActivity(system)
+    return PhalanxInfo.getActivityColor(activity)
+  }
+
+  // TODO: Tooltip not working yet
+  createDataTooltipContent (system) {
+    const systemData = this.getSystem(system)
+
+    let content = '<ul>'
+    systemData.forEach(phalanx => {
+      content += `<li>[${phalanx.galaxy}:${phalanx.system}:${phalanx.position}]</li>`
+    })
+    content += '</ul>'
+    return content
+  }
+}
+
 /**
  * Turn camelCase into Camel Case
  * @param {str} text text to transform
@@ -152,5 +300,7 @@ module.exports = {
   quantile,
   saveSearchSettings,
   setTeamviewStatus,
+  PhalanxInfo,
+  Activity,
   teamviewDebugMode: TM_getValue('debug_mode') === 1
 }

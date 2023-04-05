@@ -10,3 +10,4 @@ monitoring-infra/influxdb/data/
 monitoring-infra/grafana/data/
 logs/
 build/
+.vscode/settings.json
