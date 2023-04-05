@@ -1,0 +1,21 @@
+.topleft-noradius {
+  border-top-left-radius: 0 !important;
+}
+
+.topright-noradius {
+  border-top-right-radius: 0 !important;
+}
+
+.center-content {
+  margin: auto;
+  text-align: center;
+}
+
+.floatfix::after {
+  visibility: hidden;
+  display: block;
+  font-size: 0;
+  content: " ";
+  clear: both;
+  height: 0;
+}

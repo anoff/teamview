@@ -1,4 +1,6 @@
 'use strict'
+
+require('./style/teamview.scss')
 const { showStation } = require('./features/teamview')
 const { init: initMain } = require('./tv.main')
 

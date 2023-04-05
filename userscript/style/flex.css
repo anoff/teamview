@@ -1,0 +1,25 @@
+.flex-row {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
+.flex-block {
+  flex-grow: 1;
+  flex-shrink: 0;
+  display: block;
+}
+
+div.column-2 {
+  float: left;
+  margin-left: 5px;
+  margin-right: 5px;
+  min-width: 45%;
+}
+
+div.column-3 {
+  float: left;
+  margin-left: 5px;
+  margin-right: 5px;
+  min-width: 30%;
+}

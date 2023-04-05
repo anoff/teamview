@@ -98,11 +98,13 @@ function makeTableSortable (thSelector) {
  * @param {string}  cssClass  which color to use (status-ok, status-working, status-error, status-outdated)
  * @param {string}  text      a text string that is displayed next to the status indicator
  */
-function setTeamviewStatus (cssClass, text) {
+function setTeamviewStatus (cssClass, text = '') {
   const iconElm = document.getElementById('teamview-status-icon')
   const textElm = document.getElementById('teamview-status-text')
+  if (textElm) {
+    textElm.innerText = text
+  }
   iconElm.classList = `dot ${cssClass}`
-  textElm.innerText = text
 }
 
 /**
