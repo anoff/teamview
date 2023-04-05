@@ -315,7 +315,7 @@ function addUploadSection () {
   <tr>
     <td class="transparent teamview" id="teamview-section" colspan="2">
       <table class="content no-pr0game-table">
-        <tbody class="">
+        <tbody>
           <tr>
             <th>Teamview</th>
             <td>
