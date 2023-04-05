@@ -22,8 +22,6 @@
     color: var(--tv-color-primary);
     border: none;
     border-radius: 2px;
-    padding: 8px 10px;
-    font-size: 1.2em;
     box-shadow: 2px 2px 2px var(--tv-black);
 
     &:hover {
@@ -83,23 +81,23 @@
 }
 
 .status-ok {
-  background-color: var(--tv-green);
+  background-color: var(--tv-green) !important;
 }
 
 .status-done {
-  background-color: var(--tv-blue);
+  background-color: var(--tv-blue) !important;
 }
 
 .status-error {
-  background-color: var(--tv-red);
+  background-color: var(--tv-red) !important;
 }
 
 .status-outdated {
-  background-color: var(--tv-yellow);
+  background-color: var(--tv-yellow) !important;
 }
 
 .status-unknown {
-  background-color: var(--tv-white);
+  background-color: var(--tv-white) !important;
 }
 
 .status-working {
