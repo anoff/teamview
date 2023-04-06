@@ -320,7 +320,7 @@ function uploadReports () {
   const p = genericRequest('/v1/reports/', 'POST', JSON.stringify({ reports: data }))
   p.then(res => {
     const { totalCount, successCount } = res
-    setTeamviewStatus('status-ok', `Submitted ${successCount}/${totalCount}`)
+    setTeamviewStatus('status-done', `Submitted ${successCount}/${totalCount}`)
     colorReports()
   }).catch(e => {
     let errMessage = 'Error'
@@ -335,19 +335,22 @@ function uploadReports () {
 
 function addUploadSection () {
   const sectionHTML = `
-    <td class="transparent" id="teamview-section">
-      <table>
+    <div class="teamview" id="teamview-section">
+      <table class="content no-pr0game-table">
         <tbody><tr>
-            <th colspan="4">Teamview</th>
+            <th>Teamview</th>
+            <td>
+              <button type="button" id="teamview-upload">
+                <div>
+                  <span>Upload</span>
+                  <span id="teamview-status-icon" class="dot status-unknown"><span>
+                </div>
+              </button>
+            </td>
           </tr>
-          <tr>
-            <td><button type="button" id="teamview-upload">Upload</button></td>
-            <td><span style="font-weight: bold;">Status</span></div></td>
-            <td><span id="teamview-status-icon" class="dot status-unknown"></td>
-            <td><span id="teamview-status-text" style="font-size: 85%;"></span></td>
-        </tr>
-      </tbody></table>
-    </td>
+        </tbody>
+      </table>
+    </div>
   `
   document.querySelector('#messagestable').insertAdjacentHTML('afterend', sectionHTML)
   document.getElementById('teamview-upload').addEventListener('click', uploadReports)
@@ -377,9 +380,9 @@ function colorReports () {
   for (const id of reportsOnPage) {
     const title = document.querySelectorAll(`tr.message_${id}.message_head td`)[2]
     if (uploadedReports.includes(id)) {
-      title.classList = 'status-ok text-black'
+      title.classList = 'status-ok color-black'
     } else {
-      title.classList = 'status-outdated text-black'
+      title.classList = 'status-outdated color-black'
     }
   }
 }

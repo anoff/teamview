@@ -3,7 +3,7 @@ const { genericRequest } = require('../requests')
 const {
   report2html
 } = require('../ui/spioHtml')
-const { setTeamviewStatus, PhalanxInfo } = require('../utils')
+const { setTeamviewStatus, PhalanxInfo, teamviewDebugMode } = require('../utils')
 
 const MAX_AGE_PLANET_H = 72 // number of hours when a planet info is considered outdated
 
@@ -136,7 +136,7 @@ function checkPlanetStatus (systemData) {
   return genericRequest(`/v1/planets/${galaxy}:${system}?type=report`, 'GET')
     .then(res => {
       serverData = res
-      // console.log({ serverData, systemData })
+      if (teamviewDebugMode) console.log({ serverData, systemData })
       let status = 'OK'
       let statusClass = 'status-ok'
       if (serverData.length !== systemData.length) {
@@ -151,7 +151,6 @@ function checkPlanetStatus (systemData) {
         const knownPlanets = serverData.map(e => `${e.galaxy}:${e.system}:${e.position}`).sort()
         const visiblePlanets = systemData.map(e => `${e.galaxy}:${e.system}:${e.position}`).sort()
         if (!arrayEquals(knownPlanets, visiblePlanets)) {
-          // console.log({ serverData, systemData })
           status = 'Inconsistent'
           statusClass = 'status-outdated'
         }
@@ -314,15 +313,19 @@ function doUploadPlanets () {
 function addUploadSection () {
   const sectionHTML = `
   <tr>
-    <td class="transparent" id="teamview-section" colspan="2">
-      <table>
+    <td class="transparent teamview" id="teamview-section" colspan="2">
+      <table class="content no-pr0game-table">
         <tbody>
           <tr>
             <th>Teamview</th>
-            <td><button type="button" id="teamview-upload">Upload</button></td>
-            <td><span style="font-weight: bold;">Status</span></div></td>
-            <td><span id="teamview-status-icon" class="dot status-unknown"></td>
-            <td><span id="teamview-status-text" style="font-size: 85%;"></span></td>
+            <td>
+              <button type="button" id="teamview-upload">
+                <div>
+                  <span>Upload</span>
+                  <span id="teamview-status-icon" class="dot status-unknown"><span>
+                </div>
+              </button>
+            </td>
         </tr>
       </tbody></table>
     </td>
