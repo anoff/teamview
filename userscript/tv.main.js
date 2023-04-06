@@ -11,7 +11,7 @@ function loadFeatures () {
   function importAll (r) {
     r.keys().forEach((key) => (list[key] = r(key)))
   }
-  importAll(require.context('./features/', true, /\.js$/))
+  importAll(require.context('./features/', true, /\.(js|ts)$/))
   return list
 }
 
