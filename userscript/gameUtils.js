@@ -552,13 +552,13 @@ function calculateShipSpeed (shipType, engines = { combustionEngine: 0, impulseE
     118: { level: engines.hyperspaceEngine, factor: 0.2 }
   }
 
-  const speeds = []
-  shipValues[shipType].speed.forEach(speed => {
+  const speeds = shipValues[shipType].speed
+  .map(speed => {
     const { value, tech } = speed
     const factor = engines[tech].factor
     const level = engines[tech].level
-    if ('minLevel' in speed && speed.minLevel > level) return
-    speeds.push(value * (1 + (level * factor)))
+    if ('minLevel' in speed && speed.minLevel > level) return 0
+    return value * (1 + (level * factor))
   })
 
   return Math.max(...speeds)

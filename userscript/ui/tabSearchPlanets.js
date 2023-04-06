@@ -139,9 +139,6 @@ function insertResults (planets) {
     </td>
     </tr>`
     anchor.insertAdjacentHTML('beforeend', html)
-
-    // const scanButtons = document.querySelectorAll('.scan-button')
-    // scanButtons.forEach(button => button.addEventListener('click', startProbesCountdownTimer))
   }
 }
 

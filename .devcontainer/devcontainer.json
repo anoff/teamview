@@ -18,11 +18,7 @@
         "tht13.html-preview-vscode",
         "naumovs.color-highlight",
         "ms-vscode.vscode-typescript-tslint-plugin"
-      ],
-
-      "settings": {
-        "standard.ignore": ["**/*.ts"]
-      },
+      ]
 		}
 	},
 
