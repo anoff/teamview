@@ -14,7 +14,7 @@ function addTokenOption () {
       const elm = document.querySelector('#teamview_token')
       TM_setValue('api_key', elm.value)
     }
-    const anchor = document.querySelectorAll('form table tr')[6] // email address
+    const anchor = document.querySelectorAll('content table tr')[6] // email address
     const saveBtn = Array.from(document.querySelectorAll('form table input')).find(e => e.type === 'submit')
 
     const nodeHTML = `<tr>
