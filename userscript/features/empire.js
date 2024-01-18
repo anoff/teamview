@@ -78,7 +78,7 @@ function parseEmpirePage () {
  */
 function injectUploadSection () {
   const html = `
-    <table id="tv-section" class="teamview">
+    <div id="tv-section" class="teamview">
       <tbody>
         <tr>
           <th>Teamview</th>
@@ -88,7 +88,7 @@ function injectUploadSection () {
           <td><span id="teamview-status-text" style="font-size: 85%;"></span></td>
       </tr>
     </tbody>
-  </table>
+  </div>
   `
   document.querySelector('content table').insertAdjacentHTML('beforebegin', html)
   document.getElementById('teamview-upload').addEventListener('click', uploadEmpire)
